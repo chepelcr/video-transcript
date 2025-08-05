@@ -30,6 +30,16 @@ function RouterWithLanguage() {
         const decodedPath = decodeURIComponent(pathFromQuery);
         console.log('Processing GitHub Pages redirect:', pathFromQuery, '->', decodedPath);
         setLocation(decodedPath);
+        
+        // Handle language detection from redirected path
+        if (decodedPath.startsWith('/es')) {
+          console.log('Setting language to Spanish from redirect');
+          setLanguage('es');
+        } else if (decodedPath.startsWith('/en')) {
+          console.log('Setting language to English from redirect');
+          setLanguage('en');
+        }
+        
         // Clean URL by preserving the base path and adding the decoded path
         const basePath = window.location.pathname.includes('/video-transcript') ? '/video-transcript' : '';
         const newUrl = basePath + decodedPath;
@@ -66,7 +76,7 @@ function RouterWithLanguage() {
                            window.location.pathname.includes('/video-transcript') ||
                            (window as any).ghPagesDebug;
       
-      if (isGitHubPages && language === 'es' && location === '/') {
+      if (isGitHubPages && language === 'es' && location === '/' && !pathFromQuery) {
         console.log('GitHub Pages: redirecting to Spanish without browser URL change');
         setLocation('/es');
         return;

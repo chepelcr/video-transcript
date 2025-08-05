@@ -28,6 +28,11 @@
         const query = window.location.search;
         const hash = window.location.hash;
         
+        // Handle direct language routes like /video-transcript/es
+        if (route === '/es' || route === '/en') {
+            console.log('Direct language route access:', route);
+        }
+        
         // Always redirect through query parameter for SPA routing
         const redirectUrl = basePath + '/?p=' + encodeURIComponent(route + query + hash);
         console.log('404 redirect:', fullPath, '→', redirectUrl);
