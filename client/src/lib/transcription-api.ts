@@ -43,29 +43,13 @@ export async function transcribeVideo(videoUrl: string): Promise<TranscriptionRe
     console.log('Attempting to contact transcription service...');
     
     try {
-      // Simple fetch with timeout - no AbortController to avoid promise rejection issues
-      const fetchWithTimeout = new Promise((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-          reject(new Error('Request timeout'));
-        }, 5000);
-        
-        fetch(`${PYTHON_API_BASE_URL}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        .then(response => {
-          clearTimeout(timeoutId);
-          resolve(response);
-        })
-        .catch(error => {
-          clearTimeout(timeoutId);
-          reject(error);
-        });
+      // Direct fetch with simple timeout check - no Promise wrapper
+      const response = await fetch(`${PYTHON_API_BASE_URL}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-
-      const response = await fetchWithTimeout as Response;
 
       if (response.ok) {
         const data = await response.json();
@@ -86,7 +70,6 @@ export async function transcribeVideo(videoUrl: string): Promise<TranscriptionRe
       }
     } catch (apiError: any) {
       console.log('Transcription service unavailable, using simulation mode');
-      // All errors are handled here - no unhandled promises
     }
 
     // Fallback to simulation with realistic processing time
