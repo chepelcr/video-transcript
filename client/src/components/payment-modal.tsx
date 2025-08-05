@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import PayPalButton from "./PayPalButton";
 import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -24,8 +25,10 @@ export default function PaymentModal({ isOpen, onClose, planType }: PaymentModal
 
   const plan = planDetails[planType];
 
+  const { language } = useLanguage();
+  
   const handleStripePayment = () => {
-    setLocation('/subscribe');
+    setLocation(language === 'es' ? '/es/subscribe' : '/subscribe');
     onClose();
   };
 

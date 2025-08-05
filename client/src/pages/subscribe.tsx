@@ -25,6 +25,7 @@ const SubscribeForm = ({ email }: { email: string }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [subscriptionSucceeded, setSubscriptionSucceeded] = useState(false);
   const [, setLocation] = useLocation();
+  const { language } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +67,7 @@ const SubscribeForm = ({ email }: { email: string }) => {
         <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Pro!</h2>
         <p className="text-gray-600 mb-6">Your subscription is now active. Enjoy unlimited transcriptions and premium features.</p>
-        <Button onClick={() => setLocation('/')} className="bg-primary text-white">
+        <Button onClick={() => setLocation(language === 'es' ? '/es' : '/')} className="bg-primary text-white">
           Start Transcribing
         </Button>
       </div>
@@ -142,7 +143,7 @@ export default function Subscribe() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <Button 
-            onClick={() => setLocation('/')} 
+            onClick={() => setLocation(language === 'es' ? '/es' : '/')} 
             variant="ghost" 
             className="mb-6"
           >
@@ -241,7 +242,7 @@ export default function Subscribe() {
             <Button onClick={() => setIsSetupComplete(false)} className="mr-2">
               Try Again
             </Button>
-            <Button onClick={() => setLocation('/')} variant="outline">
+            <Button onClick={() => setLocation(language === 'es' ? '/es' : '/')} variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t('nav.back') || 'Back to Home'}
             </Button>

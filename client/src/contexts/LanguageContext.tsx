@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 
 type Language = 'en' | 'es';
 
@@ -15,6 +16,7 @@ const translations = {
     'nav.pricing': 'Pricing',
     'nav.contact': 'Contact',
     'nav.getStarted': 'Get Started',
+    'nav.back': 'Back to Home',
     
     // Hero Section
     'hero.title': 'Transform Videos to Text',
@@ -138,6 +140,7 @@ const translations = {
     'nav.pricing': 'Precios',
     'nav.contact': 'Contacto',
     'nav.getStarted': 'Comenzar',
+    'nav.back': 'Volver al Inicio',
     
     // Hero Section
     'hero.title': 'Convierte Videos a Texto',
