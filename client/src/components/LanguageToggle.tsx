@@ -16,10 +16,27 @@ export function LanguageToggle() {
   const switchLanguage = (newLang: 'en' | 'es') => {
     setLanguage(newLang);
     
-    // Update URL with language prefix
-    const currentPath = location.replace(/^\/(en|es)/, '') || '/';
-    const newPath = newLang === 'en' ? currentPath : `/es${currentPath}`;
-    setLocation(newPath);
+    // Check if we're in GitHub Pages environment
+    const isGitHubPages = window.location.pathname.includes('/video-transcript') || (window as any).ghPagesDebug;
+    
+    if (isGitHubPages) {
+      // For GitHub Pages, preserve base path in browser URL
+      const basePath = '/video-transcript';
+      const currentPath = location.replace(/^\/(en|es)/, '') || '/';
+      const newPath = newLang === 'en' ? currentPath : `/es${currentPath}`;
+      const fullPath = `${basePath}${newPath}`;
+      
+      console.log('Language change in GitHub Pages:', { newLang, currentPath, newPath, fullPath });
+      
+      // Update both router state and browser URL
+      setLocation(newPath);
+      window.history.pushState({}, '', fullPath);
+    } else {
+      // Development environment - normal routing
+      const currentPath = location.replace(/^\/(en|es)/, '') || '/';
+      const newPath = newLang === 'en' ? currentPath : `/es${currentPath}`;
+      setLocation(newPath);
+    }
   };
 
   return (
