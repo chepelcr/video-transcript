@@ -21,14 +21,15 @@ function RouterWithLanguage() {
 
   useEffect(() => {
     try {
-      // Handle GitHub Pages query parameter redirect
+      // Handle GitHub Pages query parameter redirect  
       const urlParams = new URLSearchParams(window.location.search);
       const pathFromQuery = urlParams.get('p');
       if (pathFromQuery) {
         const decodedPath = decodeURIComponent(pathFromQuery);
         setLocation(decodedPath);
-        // Clean URL by removing the query parameter
-        const newUrl = window.location.pathname.replace('/video-transcript', '') + decodedPath;
+        // Clean URL by preserving the base path and adding the decoded path
+        const basePath = window.location.pathname.includes('/video-transcript') ? '/video-transcript' : '';
+        const newUrl = basePath + decodedPath;
         window.history.replaceState({}, '', newUrl);
         return;
       }

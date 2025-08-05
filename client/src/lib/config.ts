@@ -13,6 +13,16 @@ const environment = import.meta.env.MODE === 'production' ? 'production' : 'deve
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || config[environment].apiBaseUrl;
 
+// Base path configuration for GitHub Pages subdirectory deployment
+export const BASE_PATH = import.meta.env.MODE === 'production' ? '/video-transcript' : '';
+
+// Helper function to create proper URLs for the subdirectory deployment
+export const createUrl = (path: string) => {
+  // Remove leading slash to avoid double slashes
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return BASE_PATH ? `${BASE_PATH}/${cleanPath}` : `/${cleanPath}`;
+};
+
 export const isProduction = import.meta.env.MODE === 'production';
 export const isDevelopment = !isProduction;
 
