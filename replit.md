@@ -3,23 +3,18 @@
 This is a video transcription service application built with a full-stack TypeScript architecture, now optimized for GitHub Pages deployment. The app allows users to submit video URLs for transcription with a freemium pricing model - users get 3 free transcriptions before requiring a paid subscription. The system integrates with both Stripe and PayPal for payment processing and features a modern React frontend with shadcn/ui components.
 
 ## Recent Changes (August 2025)
+- ✅ **PAYPAL INTEGRATION FIXED**: Updated PayPal button to use proper API base URL for hybrid deployment
+- ✅ **HYBRID DEPLOYMENT COMPLETE**: Frontend (GitHub Pages) + Backend (Replit) architecture fully configured
+- ✅ **API CONFIGURATION**: Production API URL set to `https://rest-express--jcampos8.replit.app`
+- ✅ **BASE PATH PRESERVATION**: Fixed /video-transcript subdirectory URL preservation in spa-github-pages routing
+- ✅ **CORS CONFIGURED**: Backend properly configured for https://jcampos.dev domain
+- ✅ **ENVIRONMENT VARIABLES**: VITE_API_BASE_URL and VITE_STRIPE_PUBLIC_KEY properly configured
 - ✅ **SECURITY DOCUMENTATION**: Created SECURITY.md clarifying Stripe public vs secret key separation
 - ✅ **STRIPE CONFIG CENTRALIZED**: Fixed missing VITE_STRIPE_PUBLIC_KEY error with proper frontend-only config
 - ✅ **SUBDIRECTORY DEPLOYMENT FIXED**: Configured for `https://jcampos.dev/video-transcript/` with proper asset paths
 - ✅ **SPA ROUTING SOLUTION**: Added 404.html redirect handling for GitHub Pages single-page app routing
-- ✅ **CORS UPDATED**: Set correct domain `https://jcampos.dev` for production CORS
 - ✅ **GITHUB WORKFLOW UPGRADED**: Updated to proven working deployment configuration with proper permissions
 - ✅ **OFFICIAL ACTIONS**: Using `actions/deploy-pages@v4` instead of third-party action for reliability  
-- ✅ **HYBRID DEPLOYMENT CONFIGURED**: Set up GitHub Pages frontend + Replit backend architecture
-- ✅ **STRIPE INTEGRATION FIXED**: Secret key properly configured, payments working
-- ✅ **FLAG-BASED LANGUAGE UI**: Clean flag icons (🇺🇸/🇪🇸) with right-aligned dropdown
-- ✅ **SUBDIRECTORY DEPLOYMENT FIXED**: Configured for `https://jcampos.dev/video-transcript/` with proper asset paths
-- ✅ **SPA ROUTING SOLUTION**: Added 404.html redirect handling for GitHub Pages single-page app routing
-- ✅ **CORS UPDATED**: Set correct domain `https://jcampos.dev` for production CORS
-- ✅ **GITHUB WORKFLOW UPGRADED**: Updated to proven working deployment configuration with proper permissions
-- ✅ **OFFICIAL ACTIONS**: Using `actions/deploy-pages@v4` instead of third-party action for reliability  
-- ✅ **HYBRID DEPLOYMENT CONFIGURED**: Set up GitHub Pages frontend + Replit backend architecture
-- ✅ **STRIPE INTEGRATION FIXED**: Secret key properly configured, payments working
 - ✅ **FLAG-BASED LANGUAGE UI**: Clean flag icons (🇺🇸/🇪🇸) with right-aligned dropdown
 
 # User Preferences

@@ -4,8 +4,8 @@ const config = {
     apiBaseUrl: 'http://localhost:5000',
   },
   production: {
-    // Replace with your actual Replit deployment URL when ready
-    apiBaseUrl: 'https://your-replit-app.replit.app',
+    // Replit backend API for hybrid deployment
+    apiBaseUrl: 'https://rest-express--jcampos8.replit.app',
   }
 };
 
