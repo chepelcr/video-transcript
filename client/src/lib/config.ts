@@ -16,9 +16,11 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || config[environm
 export const isProduction = import.meta.env.MODE === 'production';
 export const isDevelopment = !isProduction;
 
-// Stripe configuration
+// Stripe configuration - ONLY public key for frontend
 export const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
-if (!STRIPE_PUBLIC_KEY) {
-  console.warn('Missing VITE_STRIPE_PUBLIC_KEY environment variable. Stripe payments will not work.');
+if (!STRIPE_PUBLIC_KEY && import.meta.env.MODE === 'production') {
+  console.error('Missing VITE_STRIPE_PUBLIC_KEY environment variable. Stripe payments will not work.');
+} else if (!STRIPE_PUBLIC_KEY) {
+  console.warn('VITE_STRIPE_PUBLIC_KEY not set. Using development fallback.');
 }
