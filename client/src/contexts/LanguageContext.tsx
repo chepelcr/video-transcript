@@ -1,0 +1,297 @@
+import { createContext, useContext, useState } from 'react';
+
+type Language = 'en' | 'es';
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const translations = {
+  en: {
+    // Navigation
+    'nav.features': 'Features',
+    'nav.pricing': 'Pricing',
+    'nav.contact': 'Contact',
+    'nav.getStarted': 'Get Started',
+    
+    // Hero Section
+    'hero.title': 'Transform Videos to Text',
+    'hero.subtitle': 'in Seconds',
+    'hero.description': 'Powerful AI-driven video transcription service. Upload any video URL and get accurate transcripts instantly. Perfect for content creators, students, and professionals.',
+    'hero.placeholder': 'Paste your video URL here (YouTube, Vimeo, etc.)',
+    'hero.transcribe': 'Transcribe',
+    'hero.processing': 'Processing...',
+    'hero.remaining': 'free transcriptions remaining',
+    
+    // Features
+    'features.title': 'Why Choose VideoScript?',
+    'features.subtitle': 'Experience the fastest, most accurate video transcription service powered by advanced AI technology.',
+    'features.fast.title': 'Lightning Fast',
+    'features.fast.desc': 'Get your video transcriptions in seconds, not minutes. Our optimized AI processes videos up to 10x faster than competitors.',
+    'features.accurate.title': '99% Accuracy',
+    'features.accurate.desc': 'Industry-leading accuracy with support for multiple languages and accents. Perfect transcriptions every time.',
+    'features.secure.title': 'Secure & Private',
+    'features.secure.desc': 'Your data is encrypted and never stored. We process your videos securely and delete them immediately after transcription.',
+    
+    // Pricing
+    'pricing.title': 'Simple, Transparent Pricing',
+    'pricing.subtitle': 'Start free, upgrade when you need more. No hidden fees, cancel anytime.',
+    'pricing.free.title': 'Free',
+    'pricing.free.subtitle': 'Perfect for trying out',
+    'pricing.free.transcriptions': '3 transcriptions per month',
+    'pricing.free.duration': 'Up to 10 minutes per video',
+    'pricing.free.accuracy': 'Basic accuracy',
+    'pricing.free.format': 'Download as TXT',
+    'pricing.free.button': 'Current Plan',
+    'pricing.pro.title': 'Pro',
+    'pricing.pro.subtitle': 'per month',
+    'pricing.pro.popular': 'Most Popular',
+    'pricing.pro.unlimited': 'Unlimited transcriptions',
+    'pricing.pro.duration': 'Up to 2 hours per video',
+    'pricing.pro.accuracy': 'Premium accuracy (99%)',
+    'pricing.pro.formats': 'Multiple formats (TXT, SRT, VTT)',
+    'pricing.pro.priority': 'Priority processing',
+    'pricing.pro.support': 'Email support',
+    'pricing.pro.button': 'Upgrade to Pro',
+    'pricing.enterprise.title': 'Enterprise',
+    'pricing.enterprise.subtitle': 'For large teams',
+    'pricing.enterprise.everything': 'Everything in Pro',
+    'pricing.enterprise.api': 'Custom API integration',
+    'pricing.enterprise.whitelabel': 'White-label options',
+    'pricing.enterprise.phone': '24/7 phone support',
+    'pricing.enterprise.sla': 'SLA guarantee',
+    'pricing.enterprise.button': 'Contact Sales',
+    'pricing.payment': 'Secure payment powered by',
+    
+    // Testimonials
+    'testimonials.title': 'Trusted by Content Creators Worldwide',
+    'testimonials.subtitle': 'Join thousands of satisfied users who rely on VideoScript for their transcription needs.',
+    'testimonials.sarah.text': 'VideoScript has revolutionized my content creation workflow. The accuracy is incredible and it saves me hours of manual transcription work every week.',
+    'testimonials.sarah.name': 'Sarah Johnson',
+    'testimonials.sarah.role': 'YouTube Creator',
+    'testimonials.mike.text': 'As a student, VideoScript helps me convert lecture videos to text for better studying. The free tier is perfect for my needs.',
+    'testimonials.mike.name': 'Mike Chen',
+    'testimonials.mike.role': 'University Student',
+    'testimonials.lisa.text': 'The accuracy and speed are unmatched. We use VideoScript for all our corporate training materials and the results are consistently excellent.',
+    'testimonials.lisa.name': 'Lisa Rodriguez',
+    'testimonials.lisa.role': 'Training Manager',
+    
+    // Results
+    'results.title': 'Your Transcription',
+    'results.download': 'Download TXT',
+    'results.copy': 'Copy Text',
+    'results.duration': 'Duration',
+    'results.words': 'Words',
+    'results.accuracy': 'Accuracy',
+    'results.processing': 'Processing',
+    
+    // Payment Modal
+    'payment.title': 'Choose Payment Method',
+    'payment.plan': 'Plan',
+    'payment.description': 'Monthly subscription for unlimited transcriptions',
+    'payment.stripe': 'Pay with Stripe',
+    'payment.paypal': 'PayPal',
+    'payment.secure': 'Secured by 256-bit SSL encryption',
+    
+    // Forms
+    'form.email': 'Email Address',
+    'form.emailPlaceholder': 'Enter your email address',
+    'form.continue': 'Continue to Payment',
+    'form.subscribe': 'Subscribe Now',
+    'form.complete': 'Complete Payment',
+    'form.setupError': 'Setup Error',
+    'form.paymentError': 'Payment Setup Error',
+    'form.tryAgain': 'Try Again',
+    'form.backHome': 'Back to Home',
+    'form.back': 'Back',
+    
+    // Messages
+    'messages.success': 'Success',
+    'messages.error': 'Error',
+    'messages.transcribed': 'Video transcribed successfully!',
+    'messages.failed': 'Failed to transcribe video. Please try again.',
+    'messages.invalidUrl': 'Please enter a valid URL',
+    'messages.enterUrl': 'Please enter a video URL',
+    'messages.limitReached': 'You have reached your free tier limit. Please upgrade to continue.',
+    'messages.paymentFailed': 'Payment Failed',
+    'messages.paymentSuccess': 'Payment Successful',
+    'messages.thankYou': 'Thank you for your purchase!',
+    'messages.subscriptionSuccess': 'Welcome to VideoScript Pro!',
+    'messages.welcomePro': 'Your subscription is now active. Enjoy unlimited transcriptions and premium features.',
+    'messages.startTranscribing': 'Start Transcribing',
+    'messages.copied': 'Transcription copied to clipboard!',
+    'messages.downloadStarted': 'Your transcription has been downloaded as a text file.',
+    'messages.copyFailed': 'Failed to copy to clipboard.',
+    'messages.emailRequired': 'Please enter your email address',
+    'messages.settingUp': 'Setting up...',
+    'messages.returnHome': 'Return to Home',
+    
+    // Footer
+    'footer.getStarted': 'Get Started',
+    'footer.noCommitments': 'Cancel anytime. No long-term commitments.',
+  },
+  es: {
+    // Navigation
+    'nav.features': 'Características',
+    'nav.pricing': 'Precios',
+    'nav.contact': 'Contacto',
+    'nav.getStarted': 'Comenzar',
+    
+    // Hero Section
+    'hero.title': 'Convierte Videos a Texto',
+    'hero.subtitle': 'en Segundos',
+    'hero.description': 'Potente servicio de transcripción de video impulsado por IA. Sube cualquier URL de video y obtén transcripciones precisas al instante. Perfecto para creadores de contenido, estudiantes y profesionales.',
+    'hero.placeholder': 'Pega la URL de tu video aquí (YouTube, Vimeo, etc.)',
+    'hero.transcribe': 'Transcribir',
+    'hero.processing': 'Procesando...',
+    'hero.remaining': 'transcripciones gratuitas restantes',
+    
+    // Features
+    'features.title': '¿Por qué elegir VideoScript?',
+    'features.subtitle': 'Experimenta el servicio de transcripción de video más rápido y preciso impulsado por tecnología IA avanzada.',
+    'features.fast.title': 'Súper Rápido',
+    'features.fast.desc': 'Obtén tus transcripciones de video en segundos, no minutos. Nuestra IA optimizada procesa videos hasta 10 veces más rápido que la competencia.',
+    'features.accurate.title': '99% Precisión',
+    'features.accurate.desc': 'Precisión líder en la industria con soporte para múltiples idiomas y acentos. Transcripciones perfectas cada vez.',
+    'features.secure.title': 'Seguro y Privado',
+    'features.secure.desc': 'Tus datos están encriptados y nunca almacenados. Procesamos tus videos de forma segura y los eliminamos inmediatamente después de la transcripción.',
+    
+    // Pricing
+    'pricing.title': 'Precios Simples y Transparentes',
+    'pricing.subtitle': 'Comienza gratis, actualiza cuando necesites más. Sin tarifas ocultas, cancela en cualquier momento.',
+    'pricing.free.title': 'Gratis',
+    'pricing.free.subtitle': 'Perfecto para probar',
+    'pricing.free.transcriptions': '3 transcripciones por mes',
+    'pricing.free.duration': 'Hasta 10 minutos por video',
+    'pricing.free.accuracy': 'Precisión básica',
+    'pricing.free.format': 'Descarga como TXT',
+    'pricing.free.button': 'Plan Actual',
+    'pricing.pro.title': 'Pro',
+    'pricing.pro.subtitle': 'por mes',
+    'pricing.pro.popular': 'Más Popular',
+    'pricing.pro.unlimited': 'Transcripciones ilimitadas',
+    'pricing.pro.duration': 'Hasta 2 horas por video',
+    'pricing.pro.accuracy': 'Precisión premium (99%)',
+    'pricing.pro.formats': 'Múltiples formatos (TXT, SRT, VTT)',
+    'pricing.pro.priority': 'Procesamiento prioritario',
+    'pricing.pro.support': 'Soporte por email',
+    'pricing.pro.button': 'Actualizar a Pro',
+    'pricing.enterprise.title': 'Empresarial',
+    'pricing.enterprise.subtitle': 'Para equipos grandes',
+    'pricing.enterprise.everything': 'Todo en Pro',
+    'pricing.enterprise.api': 'Integración API personalizada',
+    'pricing.enterprise.whitelabel': 'Opciones de marca blanca',
+    'pricing.enterprise.phone': 'Soporte telefónico 24/7',
+    'pricing.enterprise.sla': 'Garantía SLA',
+    'pricing.enterprise.button': 'Contactar Ventas',
+    'pricing.payment': 'Pago seguro proporcionado por',
+    
+    // Testimonials
+    'testimonials.title': 'Confiado por Creadores de Contenido Mundial',
+    'testimonials.subtitle': 'Únete a miles de usuarios satisfechos que confían en VideoScript para sus necesidades de transcripción.',
+    'testimonials.sarah.text': 'VideoScript ha revolucionado mi flujo de trabajo de creación de contenido. La precisión es increíble y me ahorra horas de trabajo de transcripción manual cada semana.',
+    'testimonials.sarah.name': 'Sarah Johnson',
+    'testimonials.sarah.role': 'Creadora de YouTube',
+    'testimonials.mike.text': 'Como estudiante, VideoScript me ayuda a convertir videos de conferencias a texto para estudiar mejor. El nivel gratuito es perfecto para mis necesidades.',
+    'testimonials.mike.name': 'Mike Chen',
+    'testimonials.mike.role': 'Estudiante Universitario',
+    'testimonials.lisa.text': 'La precisión y velocidad son incomparables. Usamos VideoScript para todos nuestros materiales de entrenamiento corporativo y los resultados son consistentemente excelentes.',
+    'testimonials.lisa.name': 'Lisa Rodriguez',
+    'testimonials.lisa.role': 'Gerente de Entrenamiento',
+    
+    // Results
+    'results.title': 'Tu Transcripción',
+    'results.download': 'Descargar TXT',
+    'results.copy': 'Copiar Texto',
+    'results.duration': 'Duración',
+    'results.words': 'Palabras',
+    'results.accuracy': 'Precisión',
+    'results.processing': 'Procesamiento',
+    
+    // Payment Modal
+    'payment.title': 'Elige Método de Pago',
+    'payment.plan': 'Plan',
+    'payment.description': 'Suscripción mensual para transcripciones ilimitadas',
+    'payment.stripe': 'Pagar con Stripe',
+    'payment.paypal': 'PayPal',
+    'payment.secure': 'Asegurado con encriptación SSL de 256 bits',
+    
+    // Forms
+    'form.email': 'Dirección de Email',
+    'form.emailPlaceholder': 'Ingresa tu dirección de email',
+    'form.continue': 'Continuar al Pago',
+    'form.subscribe': 'Suscribirse Ahora',
+    'form.complete': 'Completar Pago',
+    'form.setupError': 'Error de Configuración',
+    'form.paymentError': 'Error de Configuración de Pago',
+    'form.tryAgain': 'Intentar de Nuevo',
+    'form.backHome': 'Volver al Inicio',
+    'form.back': 'Atrás',
+    
+    // Messages
+    'messages.success': 'Éxito',
+    'messages.error': 'Error',
+    'messages.transcribed': '¡Video transcrito exitosamente!',
+    'messages.failed': 'Error al transcribir video. Por favor intenta de nuevo.',
+    'messages.invalidUrl': 'Por favor ingresa una URL válida',
+    'messages.enterUrl': 'Por favor ingresa una URL de video',
+    'messages.limitReached': 'Has alcanzado tu límite de nivel gratuito. Por favor actualiza para continuar.',
+    'messages.paymentFailed': 'Pago Fallido',
+    'messages.paymentSuccess': 'Pago Exitoso',
+    'messages.thankYou': '¡Gracias por tu compra!',
+    'messages.subscriptionSuccess': '¡Bienvenido a VideoScript Pro!',
+    'messages.welcomePro': 'Tu suscripción está ahora activa. Disfruta transcripciones ilimitadas y características premium.',
+    'messages.startTranscribing': 'Comenzar a Transcribir',
+    'messages.copied': '¡Transcripción copiada al portapapeles!',
+    'messages.downloadStarted': 'Tu transcripción ha sido descargada como archivo de texto.',
+    'messages.copyFailed': 'Error al copiar al portapapeles.',
+    'messages.emailRequired': 'Por favor ingresa tu dirección de email',
+    'messages.settingUp': 'Configurando...',
+    'messages.returnHome': 'Volver al Inicio',
+    
+    // Footer
+    'footer.getStarted': 'Comenzar',
+    'footer.noCommitments': 'Cancela en cualquier momento. Sin compromisos a largo plazo.',
+  }
+};
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const [language, setLanguage] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('language') as Language;
+      if (saved) return saved;
+      const browserLang = navigator.language.toLowerCase();
+      return browserLang.startsWith('es') ? 'es' : 'en';
+    }
+    return 'en';
+  });
+
+  const handleSetLanguage = (lang: Language) => {
+    setLanguage(lang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('language', lang);
+    }
+  };
+
+  const t = (key: string): string => {
+    return translations[language][key as keyof typeof translations['en']] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+}

@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import VideoTranscriptionForm from "@/components/video-transcription-form";
 import TranscriptionResults from "@/components/transcription-results";
 import PaymentModal from "@/components/payment-modal";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Transcription {
   id: string;
@@ -26,6 +29,7 @@ export default function Home() {
   const [currentTranscription, setCurrentTranscription] = useState<Transcription | null>(null);
   const [showResults, setShowResults] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const remainingTranscriptions = Math.max(0, 3 - transcriptionsUsed);
 
@@ -50,29 +54,33 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
+      <nav className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-primary">VideoScript</h1>
             </div>
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
-                <button onClick={() => scrollToSection('features')} className="text-gray-600 hover:text-primary px-3 py-2 text-sm font-medium">
-                  Features
-                </button>
-                <button onClick={() => scrollToSection('pricing')} className="text-gray-600 hover:text-primary px-3 py-2 text-sm font-medium">
-                  Pricing
-                </button>
-                <button onClick={() => scrollToSection('contact')} className="text-gray-600 hover:text-primary px-3 py-2 text-sm font-medium">
-                  Contact
-                </button>
-                <Button onClick={() => handleUpgrade('pro')} className="bg-primary text-white hover:bg-indigo-600">
-                  Get Started
-                </Button>
-              </div>
+            <div className="hidden md:flex items-center space-x-4">
+              <button onClick={() => scrollToSection('features')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
+                {t('nav.features')}
+              </button>
+              <button onClick={() => scrollToSection('pricing')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
+                {t('nav.pricing')}
+              </button>
+              <button onClick={() => scrollToSection('contact')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
+                {t('nav.contact')}
+              </button>
+              <ThemeToggle />
+              <LanguageToggle />
+              <Button onClick={() => handleUpgrade('pro')} className="bg-primary text-white hover:bg-indigo-600">
+                {t('nav.getStarted')}
+              </Button>
+            </div>
+            <div className="md:hidden flex items-center space-x-2">
+              <ThemeToggle />
+              <LanguageToggle />
             </div>
           </div>
         </div>
@@ -83,11 +91,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Transform Videos to Text
-              <span className="block text-indigo-200">in Seconds</span>
+              {t('hero.title')}
+              <span className="block text-indigo-200">{t('hero.subtitle')}</span>
             </h1>
             <p className="text-xl text-indigo-100 mb-8 max-w-3xl mx-auto">
-              Powerful AI-driven video transcription service. Upload any video URL and get accurate transcripts instantly. Perfect for content creators, students, and professionals.
+              {t('hero.description')}
             </p>
             
             <VideoTranscriptionForm 
@@ -105,50 +113,50 @@ export default function Home() {
       )}
 
       {/* Features Section */}
-      <section id="features" className="py-20">
+      <section id="features" className="py-20 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose VideoScript?
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              {t('features.title')}
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Experience the fastest, most accurate video transcription service powered by advanced AI technology.
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              {t('features.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="hover:shadow-xl transition-shadow">
+            <Card className="hover:shadow-xl transition-shadow bg-white dark:bg-gray-700">
               <CardContent className="p-8">
                 <div className="w-12 h-12 feature-icon rounded-lg flex items-center justify-center mb-6">
                   <Bolt className="text-primary text-xl" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Lightning Fast</h3>
-                <p className="text-gray-600">
-                  Get your video transcriptions in seconds, not minutes. Our optimized AI processes videos up to 10x faster than competitors.
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('features.fast.title')}</h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {t('features.fast.desc')}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-xl transition-shadow">
+            <Card className="hover:shadow-xl transition-shadow bg-white dark:bg-gray-700">
               <CardContent className="p-8">
                 <div className="w-12 h-12 accent-icon rounded-lg flex items-center justify-center mb-6">
                   <Target className="text-accent text-xl" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">99% Accuracy</h3>
-                <p className="text-gray-600">
-                  Industry-leading accuracy with support for multiple languages and accents. Perfect transcriptions every time.
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('features.accurate.title')}</h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {t('features.accurate.desc')}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-xl transition-shadow">
+            <Card className="hover:shadow-xl transition-shadow bg-white dark:bg-gray-700">
               <CardContent className="p-8">
                 <div className="w-12 h-12 secondary-icon rounded-lg flex items-center justify-center mb-6">
                   <Shield className="text-secondary text-xl" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Secure & Private</h3>
-                <p className="text-gray-600">
-                  Your data is encrypted and never stored. We process your videos securely and delete them immediately after transcription.
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('features.secure.title')}</h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {t('features.secure.desc')}
                 </p>
               </CardContent>
             </Card>
@@ -157,125 +165,125 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 bg-gray-100">
+      <section id="pricing" className="py-20 bg-gray-100 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Simple, Transparent Pricing
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              {t('pricing.title')}
             </h2>
-            <p className="text-xl text-gray-600">
-              Start free, upgrade when you need more. No hidden fees, cancel anytime.
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              {t('pricing.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Free Tier */}
-            <Card className="pricing-card">
+            <Card className="pricing-card bg-white dark:bg-gray-800">
               <CardContent className="p-8">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Free</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">$0</div>
-                  <p className="text-gray-600">Perfect for trying out</p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('pricing.free.title')}</h3>
+                  <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">$0</div>
+                  <p className="text-gray-600 dark:text-gray-300">{t('pricing.free.subtitle')}</p>
                 </div>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>3 transcriptions per month</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.transcriptions')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Up to 10 minutes per video</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.duration')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Basic accuracy</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.accuracy')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Download as TXT</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.format')}</span>
                   </li>
                 </ul>
-                <Button className="w-full bg-gray-200 text-gray-800 hover:bg-gray-300" disabled>
-                  Current Plan
+                <Button className="w-full bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500" disabled>
+                  {t('pricing.free.button')}
                 </Button>
               </CardContent>
             </Card>
 
             {/* Pro Tier */}
-            <Card className="pricing-card border-2 border-primary relative">
+            <Card className="pricing-card border-2 border-primary relative bg-white dark:bg-gray-800">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-primary text-white">Most Popular</Badge>
+                <Badge className="bg-primary text-white">{t('pricing.pro.popular')}</Badge>
               </div>
               <CardContent className="p-8">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">$19</div>
-                  <p className="text-gray-600">per month</p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('pricing.pro.title')}</h3>
+                  <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">$19</div>
+                  <p className="text-gray-600 dark:text-gray-300">{t('pricing.pro.subtitle')}</p>
                 </div>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Unlimited transcriptions</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.unlimited')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Up to 2 hours per video</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.duration')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Premium accuracy (99%)</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.accuracy')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Multiple formats (TXT, SRT, VTT)</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.formats')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Priority processing</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.priority')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Email support</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.support')}</span>
                   </li>
                 </ul>
                 <Button onClick={() => handleUpgrade('pro')} className="w-full bg-primary text-white hover:bg-indigo-600">
-                  Upgrade to Pro
+                  {t('pricing.pro.button')}
                 </Button>
               </CardContent>
             </Card>
 
             {/* Enterprise Tier */}
-            <Card className="pricing-card">
+            <Card className="pricing-card bg-white dark:bg-gray-800">
               <CardContent className="p-8">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">Custom</div>
-                  <p className="text-gray-600">For large teams</p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('pricing.enterprise.title')}</h3>
+                  <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Custom</div>
+                  <p className="text-gray-600 dark:text-gray-300">{t('pricing.enterprise.subtitle')}</p>
                 </div>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Everything in Pro</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.everything')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>Custom API integration</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.api')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>White-label options</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.whitelabel')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>24/7 phone support</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.phone')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span>SLA guarantee</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.sla')}</span>
                   </li>
                 </ul>
                 <Button onClick={() => handleUpgrade('enterprise')} className="w-full bg-secondary text-white hover:bg-violet-600">
-                  Contact Sales
+                  {t('pricing.enterprise.button')}
                 </Button>
               </CardContent>
             </Card>
@@ -283,7 +291,7 @@ export default function Home() {
 
           {/* Payment Methods */}
           <div className="text-center mt-12">
-            <p className="text-gray-600 mb-4">Secure payment powered by</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{t('pricing.payment')}</p>
             <div className="flex justify-center items-center space-x-8">
               <div className="flex items-center space-x-2">
                 <div className="text-2xl font-bold text-primary">STRIPE</div>
