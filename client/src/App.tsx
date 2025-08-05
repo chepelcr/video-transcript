@@ -77,23 +77,14 @@ function RouterWithLanguage() {
   // Use the current location for routing
   const routePath = location;
   
+  // Debug routing decision
+  console.log('Switch routing with:', { routePath, location, currentPath });
+  
   return (
-    <Switch location={routePath}>
+    <Switch location={currentPath}>
       <Route path="/" component={Home} />
-      <Route path="/en" component={Home} />
-      <Route path="/es" component={Home} />
-      <Route path="/en/" component={Home} />
-      <Route path="/es/" component={Home} />
       <Route path="/checkout" component={Checkout} />
-      <Route path="/en/checkout" component={Checkout} />
-      <Route path="/es/checkout" component={Checkout} />
-      <Route path="/en/checkout/" component={Checkout} />
-      <Route path="/es/checkout/" component={Checkout} />
       <Route path="/subscribe" component={Subscribe} />
-      <Route path="/en/subscribe" component={Subscribe} />
-      <Route path="/es/subscribe" component={Subscribe} />
-      <Route path="/en/subscribe/" component={Subscribe} />
-      <Route path="/es/subscribe/" component={Subscribe} />
       <Route component={NotFound} />
     </Switch>
   );
