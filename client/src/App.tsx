@@ -57,6 +57,12 @@ function RouterWithLanguage() {
         setLocation('/es');
       }
       
+      // Prevent URL rewriting that strips base path in production
+      if (window.location.pathname.includes('/video-transcript') && !location.startsWith('/video-transcript')) {
+        console.warn('Base path mismatch detected, not modifying browser URL');
+        return;
+      }
+      
       // Log current routing state for debugging
       console.log('Routing state:', { location, language, windowPath: window.location.pathname });
     } catch (error) {
