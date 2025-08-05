@@ -24,9 +24,18 @@ export function LanguageToggle() {
       const basePath = '/video-transcript';
       const currentPath = location.replace(/^\/(en|es)/, '') || '/';
       const newPath = newLang === 'en' ? currentPath : `/es${currentPath}`;
-      const fullPath = `${basePath}${newPath}`;
       
-      console.log('Language change in GitHub Pages:', { newLang, currentPath, newPath, fullPath });
+      // Build the correct full path - don't double the base path
+      let fullPath;
+      if (newPath === '/') {
+        fullPath = basePath + '/';
+      } else if (newPath.startsWith('/es/')) {
+        fullPath = basePath + newPath;
+      } else {
+        fullPath = basePath + newPath;
+      }
+      
+      console.log('Language change in GitHub Pages:', { newLang, currentPath, newPath, fullPath, currentLocation: location });
       
       // Update both router state and browser URL
       setLocation(newPath);
