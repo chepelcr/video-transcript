@@ -133,7 +133,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{t('features.fast.title')}</h3>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600 dark:text-gray-300 text-justify">
                   {t('features.fast.desc')}
                 </p>
               </CardContent>
@@ -147,7 +147,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{t('features.accurate.title')}</h3>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600 dark:text-gray-300 text-justify">
                   {t('features.accurate.desc')}
                 </p>
               </CardContent>
@@ -161,7 +161,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{t('features.secure.title')}</h3>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600 dark:text-gray-300 text-justify">
                   {t('features.secure.desc')}
                 </p>
               </CardContent>
@@ -338,7 +338,7 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200 mb-6 flex-grow">
+                <p className="text-gray-800 dark:text-gray-200 mb-6 flex-grow text-justify">
                   "{t('testimonials.sarah.text')}"
                 </p>
                 <div className="flex items-center mt-auto">
@@ -362,7 +362,7 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200 mb-6 flex-grow">
+                <p className="text-gray-800 dark:text-gray-200 mb-6 flex-grow text-justify">
                   "{t('testimonials.mike.text')}"
                 </p>
                 <div className="flex items-center mt-auto">
@@ -386,7 +386,7 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200 mb-6 flex-grow">
+                <p className="text-gray-800 dark:text-gray-200 mb-6 flex-grow text-justify">
                   "{t('testimonials.lisa.text')}"
                 </p>
                 <div className="flex items-center mt-auto">
