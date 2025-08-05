@@ -36,7 +36,7 @@ export default function Home() {
   const handleTranscriptionComplete = (transcription: Transcription) => {
     setCurrentTranscription(transcription);
     setShowResults(true);
-    setTranscriptionsUsed(prev => prev + 1);
+    setTranscriptionsUsed((prev: number) => prev + 1);
     
     // Scroll to results
     setTimeout(() => {
@@ -225,7 +225,7 @@ export default function Home() {
               <CardContent className="p-8 flex-grow flex flex-col">
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('pricing.pro.title')}</h3>
-                  <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">$19</div>
+                  <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">$15</div>
                   <p className="text-gray-600 dark:text-gray-300">{t('pricing.pro.subtitle')}</p>
                 </div>
                 <div className="flex-grow">

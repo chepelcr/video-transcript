@@ -159,7 +159,7 @@ export default function Subscribe() {
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
                 <div className="text-center mb-4">
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{t('subscription.planTitle')}</h3>
-                  <p className="text-3xl font-bold text-primary">$19<span className="text-lg text-gray-600 dark:text-gray-400">{t('subscription.month')}</span></p>
+                  <p className="text-3xl font-bold text-primary">$15<span className="text-lg text-gray-600 dark:text-gray-400">{t('subscription.month')}</span></p>
                 </div>
                 
                 <ul className="space-y-3">
