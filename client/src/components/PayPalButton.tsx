@@ -74,15 +74,23 @@ export default function PayPalButton({
   useEffect(() => {
     const loadPayPalSDK = async () => {
       try {
+        console.log("PayPal Button: Starting SDK load process");
         if (!(window as any).paypal) {
           const script = document.createElement("script");
           script.src = import.meta.env.PROD
             ? "https://www.paypal.com/web-sdk/v6/core"
             : "https://www.sandbox.paypal.com/web-sdk/v6/core";
           script.async = true;
-          script.onload = () => initPayPal();
+          script.onload = () => {
+            console.log("PayPal SDK loaded successfully");
+            initPayPal();
+          };
+          script.onerror = (error) => {
+            console.error("PayPal SDK failed to load", error);
+          };
           document.body.appendChild(script);
         } else {
+          console.log("PayPal SDK already loaded");
           await initPayPal();
         }
       } catch (e) {
@@ -94,9 +102,20 @@ export default function PayPalButton({
   }, []);
   const initPayPal = async () => {
     try {
-      const clientToken: string = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/paypal/setup`)
-        .then((res) => res.json())
+      console.log("PayPal Button: Initializing PayPal");
+      const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/paypal/setup`;
+      console.log("PayPal Button: Fetching client token from:", apiUrl);
+      
+      const clientToken: string = await fetch(apiUrl)
+        .then((res) => {
+          console.log("PayPal Button: Setup response status:", res.status);
+          if (!res.ok) {
+            throw new Error(`Setup request failed: ${res.status}`);
+          }
+          return res.json();
+        })
         .then((data) => {
+          console.log("PayPal Button: Received client token:", data.clientToken ? "✓" : "✗");
           return data.clientToken;
         });
       const sdkInstance = await (window as any).paypal.createInstance({

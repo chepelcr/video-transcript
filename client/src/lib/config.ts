@@ -9,8 +9,8 @@ const config = {
   }
 };
 
-// Temporarily force production API for testing
-const environment = 'production'; // import.meta.env.MODE === 'production' ? 'production' : 'development';
+// Back to development mode since production API is not accessible
+const environment = import.meta.env.MODE === 'production' ? 'production' : 'development';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || config[environment].apiBaseUrl;
 
