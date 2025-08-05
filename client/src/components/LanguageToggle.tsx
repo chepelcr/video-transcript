@@ -25,25 +25,27 @@ export function LanguageToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="w-9 h-9 rounded-md">
-          <span className="text-lg">
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 rounded-md flex items-center justify-center">
+          <span className="text-base">
             {language === 'es' ? '🇪🇸' : '🇺🇸'}
           </span>
           <span className="sr-only">Toggle language</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="min-w-[120px]">
         <DropdownMenuItem
           onClick={() => switchLanguage('en')}
-          className={language === 'en' ? 'bg-accent' : ''}
+          className={`flex items-center ${language === 'en' ? 'bg-accent' : ''}`}
         >
-          🇺🇸 English
+          <span className="mr-2">🇺🇸</span>
+          <span>English</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => switchLanguage('es')}
-          className={language === 'es' ? 'bg-accent' : ''}
+          className={`flex items-center ${language === 'es' ? 'bg-accent' : ''}`}
         >
-          🇪🇸 Español
+          <span className="mr-2">🇪🇸</span>
+          <span>Español</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
