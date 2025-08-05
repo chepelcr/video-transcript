@@ -36,7 +36,7 @@ export default function PayPalButton({
       currency: currency,
       intent: intent,
     };
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/paypal/order`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/paypal/order`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderPayload),
@@ -46,7 +46,7 @@ export default function PayPalButton({
   };
 
   const captureOrder = async (orderId: string) => {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/paypal/order/${orderId}/capture`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/paypal/order/${orderId}/capture`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -103,7 +103,9 @@ export default function PayPalButton({
   const initPayPal = async () => {
     try {
       console.log("PayPal Button: Initializing PayPal");
-      const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/paypal/setup`;
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+      const apiUrl = `${baseUrl}/api/paypal/setup`;
+      console.log("PayPal Button: Base URL:", baseUrl);
       console.log("PayPal Button: Fetching client token from:", apiUrl);
       
       const clientToken: string = await fetch(apiUrl)
