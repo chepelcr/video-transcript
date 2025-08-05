@@ -1,9 +1,13 @@
 // API Configuration for different environments
+// Detect if we're in Replit environment (HTTPS)
+const isReplitEnv = window.location.hostname.includes('replit.dev');
+const isHttps = window.location.protocol === 'https:';
+
 const config = {
   development: {
-    // Use HTTPS in Replit environment for mixed content compatibility
-    apiBaseUrl: window.location.protocol === 'https:' ? 
-      `https://${window.location.hostname}:5000` : 
+    // In Replit, backend and frontend run on same port/origin
+    apiBaseUrl: (isHttps && isReplitEnv) ? 
+      `${window.location.protocol}//${window.location.host}` : 
       'http://localhost:5000',
   },
   production: {
@@ -12,10 +16,20 @@ const config = {
   }
 };
 
-// Production API still has errors - back to development
-const environment = import.meta.env.MODE === 'production' ? 'production' : 'development';
+// Force development mode but with smart URL detection
+const environment = 'development'; // import.meta.env.MODE === 'production' ? 'production' : 'development';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || config[environment].apiBaseUrl;
+
+// Debug logging
+console.log('API Config Debug:', {
+  hostname: window.location.hostname,
+  protocol: window.location.protocol,
+  isReplitEnv,
+  isHttps,
+  environment,
+  apiBaseUrl: API_BASE_URL
+});
 
 // Base path configuration for GitHub Pages subdirectory deployment
 export const BASE_PATH = import.meta.env.MODE === 'production' ? '/video-transcript' : '';
