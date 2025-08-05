@@ -127,10 +127,12 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="hover:shadow-xl transition-shadow bg-white dark:bg-gray-700">
               <CardContent className="p-8">
-                <div className="w-12 h-12 feature-icon rounded-lg flex items-center justify-center mb-6">
-                  <Bolt className="text-primary text-xl" />
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 feature-icon rounded-lg flex items-center justify-center mr-4">
+                    <Bolt className="text-primary text-xl" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{t('features.fast.title')}</h3>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('features.fast.title')}</h3>
                 <p className="text-gray-600 dark:text-gray-300">
                   {t('features.fast.desc')}
                 </p>
@@ -139,10 +141,12 @@ export default function Home() {
 
             <Card className="hover:shadow-xl transition-shadow bg-white dark:bg-gray-700">
               <CardContent className="p-8">
-                <div className="w-12 h-12 accent-icon rounded-lg flex items-center justify-center mb-6">
-                  <Target className="text-accent text-xl" />
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 accent-icon rounded-lg flex items-center justify-center mr-4">
+                    <Target className="text-accent text-xl" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{t('features.accurate.title')}</h3>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('features.accurate.title')}</h3>
                 <p className="text-gray-600 dark:text-gray-300">
                   {t('features.accurate.desc')}
                 </p>
@@ -151,10 +155,12 @@ export default function Home() {
 
             <Card className="hover:shadow-xl transition-shadow bg-white dark:bg-gray-700">
               <CardContent className="p-8">
-                <div className="w-12 h-12 secondary-icon rounded-lg flex items-center justify-center mb-6">
-                  <Shield className="text-secondary text-xl" />
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 secondary-icon rounded-lg flex items-center justify-center mr-4">
+                    <Shield className="text-secondary text-xl" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{t('features.secure.title')}</h3>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('features.secure.title')}</h3>
                 <p className="text-gray-600 dark:text-gray-300">
                   {t('features.secure.desc')}
                 </p>
