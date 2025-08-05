@@ -1,67 +1,46 @@
 # GitHub Pages Deployment Guide
 
-## ✅ STRIPE ISSUE RESOLVED
-The Stripe payment integration is now working correctly! The secret key has been properly configured.
+## Current Issue: "You need to join the team to see this project"
 
-## Current Issue and Solution
+This error indicates the GitHub Pages deployment isn't properly configured. Follow these steps:
 
-### Problem
-The GitHub Pages deployment is failing with a 404 error because:
-1. GitHub Pages only serves static files (no server-side functionality)
-2. This is a full-stack application that requires a backend server
-3. Payment processing, database operations, and API routes won't work on GitHub Pages
+### 1. Repository Settings
+1. Go to your GitHub repository
+2. Click **Settings** tab
+3. Scroll to **Pages** section (left sidebar)
+4. Under **Source**, select **GitHub Actions**
+5. Save the settings
 
-### Solution for GitHub Pages
+### 2. Verify Workflow Permissions
+1. In repository Settings > **Actions** > **General**
+2. Under **Workflow permissions**, select **Read and write permissions**
+3. Check **Allow GitHub Actions to create and approve pull requests**
+4. Save changes
 
-#### Step 1: Fix the Build Process
-The current workflow tries to run `npm run build:client` but this script doesn't exist in package.json. 
+### 3. Trigger Deployment
+1. Push any change to the `main` branch
+2. Go to **Actions** tab to watch the workflow
+3. Wait for "Deploy to GitHub Pages" to complete
+4. Check the workflow output for the deployment URL
 
-**Option A: Static Frontend Only (Limited Functionality)**
-⚠️ **WARNING**: This will break payment processing and video transcription features since they require server-side functionality.
+### 4. Expected URLs After Deployment
+- Main site: `https://jcampos.dev/video-transcript/`
+- English: `https://jcampos.dev/video-transcript/en`
+- Spanish: `https://jcampos.dev/video-transcript/es`
+- Debug mode: `https://jcampos.dev/video-transcript/?debug=true`
 
-**Option B: Full-Stack Deployment (✅ RECOMMENDED)**
-For a full-stack application with both frontend and backend, GitHub Pages won't work. Consider:
-- **Replit Deployments**: Native deployment on Replit
-- **Vercel**: Excellent for full-stack Next.js/React apps
-- **Netlify**: Good for JAMstack applications
-- **Railway/Render**: For full-stack Node.js applications
+### 5. Troubleshooting
+If the error persists:
+1. Check if the repository is public (GitHub Pages free requires public repo)
+2. Verify the workflow ran successfully in Actions tab
+3. Check the Pages settings show a green checkmark
+4. Try the debug URL to see detailed error information
 
-#### Step 2: Fix Base Path
-The vite.config.ts needs the correct base path. Replace `your-repository-name` with your actual GitHub repository name:
+### 6. Current Configuration
+- ✅ Subdirectory deployment configured (`/video-transcript/`)
+- ✅ Asset paths automatically fixed in build process
+- ✅ SPA routing handled with 404.html redirects
+- ✅ Language routing works with subdirectory
+- ✅ Favicon and debug logging added
 
-```typescript
-base: "/your-actual-repo-name/",
-```
-
-#### Step 3: Environment Variables
-GitHub Pages deployment needs these secrets set in your repository:
-- `VITE_STRIPE_PUBLIC_KEY`: Your Stripe publishable key (pk_test_...)
-- `VITE_PYTHON_API_URL`: Your Python transcription service URL
-
-Note: Server-side secrets like `STRIPE_SECRET_KEY` won't work on GitHub Pages since it's static hosting.
-
-## Stripe Payment Integration Issue
-
-### Problem
-The STRIPE_SECRET_KEY is currently set to a publishable key (pk_test_...) instead of a secret key (sk_test_...).
-
-### Solution
-1. Go to https://dashboard.stripe.com/apikeys
-2. Copy your "Secret key" that starts with `sk_test_`
-3. Update the STRIPE_SECRET_KEY secret in Replit
-4. Restart the application
-
-## Recommended Deployment Strategy
-
-For this full-stack application with payment processing, I recommend:
-
-1. **Use Replit Deployments** for the full application (frontend + backend)
-2. **Use GitHub for version control** and development
-3. **Use GitHub Pages only for documentation** or a simple landing page
-
-This way you get:
-- ✅ Full payment processing functionality
-- ✅ Database connectivity
-- ✅ Server-side API routes
-- ✅ Environment variable security
-- ✅ HTTPS by default
+The routing logic is correct - the issue is that GitHub Pages isn't deployed yet.

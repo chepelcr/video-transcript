@@ -48,8 +48,14 @@ jobs:
         sed -i 's|src="/assets/|src="/video-transcript/assets/|g' dist/gh-pages/index.html
         sed -i 's|href="/assets/|href="/video-transcript/assets/|g' dist/gh-pages/index.html
         
-        # Add debug script to help troubleshoot white screen issues
+        # Add debug script and fix favicon path
         sed -i 's|<head>|<head><script>window.ghPagesDebug=true;console.log("🚀 GitHub Pages deployment loaded");console.log("Base path:",window.location.pathname);</script>|g' dist/gh-pages/index.html
+        sed -i 's|href="/favicon.ico"|href="/video-transcript/favicon.ico"|g' dist/gh-pages/index.html
+        
+        echo "Asset paths fixed for GitHub Pages subdirectory:"
+        echo "- JavaScript and CSS assets: /video-transcript/assets/"
+        echo "- Favicon: /video-transcript/favicon.ico"
+        echo "- Debug logging enabled"
       env:
         VITE_STRIPE_PUBLIC_KEY: ${{ secrets.VITE_STRIPE_PUBLIC_KEY }}
         VITE_PYTHON_API_URL: ${{ secrets.VITE_PYTHON_API_URL }}

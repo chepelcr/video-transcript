@@ -31,6 +31,7 @@ function RouterWithLanguage() {
         const basePath = window.location.pathname.includes('/video-transcript') ? '/video-transcript' : '';
         const newUrl = basePath + decodedPath;
         window.history.replaceState({}, '', newUrl);
+        console.log('GitHub Pages redirect handled:', decodedPath, '->', newUrl);
         return;
       }
 
@@ -55,6 +56,9 @@ function RouterWithLanguage() {
         console.log(`Redirecting root to Spanish: /es`);
         setLocation('/es');
       }
+      
+      // Log current routing state for debugging
+      console.log('Routing state:', { location, language, windowPath: window.location.pathname });
     } catch (error) {
       console.error('Router error:', error);
     }
