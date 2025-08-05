@@ -9,7 +9,7 @@ const config = {
   }
 };
 
-// Back to development - production API has internal server error
+// Production API still has errors - back to development
 const environment = import.meta.env.MODE === 'production' ? 'production' : 'development';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || config[environment].apiBaseUrl;
