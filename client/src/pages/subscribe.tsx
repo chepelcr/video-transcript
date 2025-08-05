@@ -25,7 +25,7 @@ const SubscribeForm = ({ email }: { email: string }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [subscriptionSucceeded, setSubscriptionSucceeded] = useState(false);
   const [, setLocation] = useLocation();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,10 +65,10 @@ const SubscribeForm = ({ email }: { email: string }) => {
     return (
       <div className="text-center py-12">
         <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Pro!</h2>
-        <p className="text-gray-600 mb-6">Your subscription is now active. Enjoy unlimited transcriptions and premium features.</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('subscription.welcomePro')}</h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">{t('subscription.activeDesc')}</p>
         <Button onClick={() => setLocation(language === 'es' ? '/es' : '/')} className="bg-primary text-white">
-          Start Transcribing
+          {t('subscription.startTranscribing')}
         </Button>
       </div>
     );
@@ -85,10 +85,10 @@ const SubscribeForm = ({ email }: { email: string }) => {
         {isProcessing ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing...
+            t('subscription.processing')
           </>
         ) : (
-          'Subscribe Now'
+          t('subscription.subscribeNow')
         )}
       </Button>
     </form>
@@ -102,7 +102,7 @@ export default function Subscribe() {
   const [isSetupComplete, setIsSetupComplete] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   const handleSetupSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,53 +153,53 @@ export default function Subscribe() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-center">Subscribe to VideoScript Pro</CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">{t('subscription.title')}</CardTitle>
             </CardHeader>
             <CardContent>
               {/* Plan Details */}
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
                 <div className="text-center mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Pro Plan</h3>
-                  <p className="text-3xl font-bold text-primary">$19<span className="text-lg text-gray-600 dark:text-gray-400">/month</span></p>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{t('subscription.planTitle')}</h3>
+                  <p className="text-3xl font-bold text-primary">$19<span className="text-lg text-gray-600 dark:text-gray-400">{t('subscription.month')}</span></p>
                 </div>
                 
                 <ul className="space-y-3">
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">Unlimited transcriptions</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.unlimited')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">Up to 2 hours per video</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.duration')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">Premium accuracy (99%)</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.accuracy')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">Multiple formats (TXT, SRT, VTT)</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.formats')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">Priority processing</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.priority')}</span>
                   </li>
                   <li className="flex items-center">
                     <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">Email support</span>
+                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.support')}</span>
                   </li>
                 </ul>
               </div>
 
               <form onSubmit={handleSetupSubscription} className="space-y-6">
                 <div>
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email">{t('form.email')}</Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email address"
+                    placeholder={t('form.emailPlaceholder')}
                     required
                   />
                 </div>
@@ -212,10 +212,10 @@ export default function Subscribe() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Setting up...
+                      t('messages.settingUp')
                     </>
                   ) : (
-                    'Continue to Payment'
+                    t('form.continue')
                   )}
                 </Button>
               </form>
@@ -223,8 +223,8 @@ export default function Subscribe() {
           </Card>
 
           <div className="text-center mt-6">
-            <p className="text-sm text-gray-500">
-              Cancel anytime. No long-term commitments.
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t('footer.noCommitments')}
             </p>
           </div>
         </div>
@@ -237,10 +237,10 @@ export default function Subscribe() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="w-full max-w-md mx-4">
           <CardContent className="pt-6 text-center">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Subscription Setup Error</h2>
-            <p className="text-gray-600 mb-6">Unable to setup subscription. Please try again.</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('subscription.setupError')}</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">{t('subscription.setupErrorDesc')}</p>
             <Button onClick={() => setIsSetupComplete(false)} className="mr-2">
-              Try Again
+              {t('subscription.tryAgain')}
             </Button>
             <Button onClick={() => setLocation(language === 'es' ? '/es' : '/')} variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -266,12 +266,12 @@ export default function Subscribe() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">Complete Your Subscription</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">{t('subscription.setupComplete')}</CardTitle>
             <div className="text-center">
               <div className="bg-gray-50 rounded-lg p-4 mt-4">
-                <h3 className="font-semibold text-gray-900">Pro Plan</h3>
-                <p className="text-3xl font-bold text-primary">$19/month</p>
-                <p className="text-sm text-gray-600">Subscription for {email}</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('subscription.planTitle')}</h3>
+                <p className="text-3xl font-bold text-primary">$19{t('subscription.month')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('subscription.subscriptionFor')} {email}</p>
               </div>
             </div>
           </CardHeader>
@@ -285,7 +285,7 @@ export default function Subscribe() {
         <div className="text-center mt-6">
           <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center">
             <Lock className="mr-2 h-4 w-4" />
-            Secured by 256-bit SSL encryption
+            t('subscription.sslSecured')
           </p>
         </div>
       </div>

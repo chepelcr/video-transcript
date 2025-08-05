@@ -254,6 +254,22 @@ const translations = {
     'messages.settingUp': 'Configurando...',
     'messages.returnHome': 'Volver al Inicio',
     
+    // Subscription Page
+    'subscription.title': 'Suscríbete a VideoScript Pro',
+    'subscription.planTitle': 'Plan Pro',
+    'subscription.month': '/mes',
+    'subscription.setupComplete': 'Completar tu Suscripción',
+    'subscription.setupError': 'Error de Configuración de Suscripción',
+    'subscription.setupErrorDesc': 'No se pudo configurar la suscripción. Por favor, inténtalo de nuevo.',
+    'subscription.welcomePro': '¡Bienvenido a Pro!',
+    'subscription.activeDesc': 'Tu suscripción está ahora activa. Disfruta de transcripciones ilimitadas y características premium.',
+    'subscription.startTranscribing': 'Comenzar a Transcribir',
+    'subscription.processing': 'Procesando...',
+    'subscription.subscribeNow': 'Suscribirse Ahora',
+    'subscription.tryAgain': 'Intentar de Nuevo',
+    'subscription.subscriptionFor': 'Suscripción para',
+    'subscription.sslSecured': 'Asegurado por encriptación SSL de 256 bits',
+    
     // Footer
     'footer.description': 'El servicio de transcripción de video más rápido y preciso impulsado por IA. Transforma tus videos en texto editable y searchable en segundos.',
     'footer.product': 'Producto',
