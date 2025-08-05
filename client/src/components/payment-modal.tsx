@@ -33,7 +33,7 @@ export default function PaymentModal({ isOpen, onClose, planType }: PaymentModal
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white text-center">
             Choose Payment Method
           </DialogTitle>
         </DialogHeader>
@@ -48,17 +48,22 @@ export default function PaymentModal({ isOpen, onClose, planType }: PaymentModal
           <div className="space-y-4">
             <Button 
               onClick={handleStripePayment}
-              className="w-full bg-primary text-white py-4 hover:bg-indigo-600 transition-colors flex items-center justify-center"
+              className="w-full bg-primary text-white py-4 hover:bg-indigo-600 transition-colors flex items-center justify-between"
             >
-              <div className="mr-3 text-xl font-bold">STRIPE</div>
-              Pay with Stripe
+              <div className="flex items-center">
+                <div className="mr-3 text-xl font-bold">STRIPE</div>
+                <span>Pay with Stripe</span>
+              </div>
+              <div className="bg-white px-3 py-1 rounded text-primary font-bold text-sm">
+                STRIPE
+              </div>
             </Button>
             
             <div className="w-full bg-blue-600 text-white rounded-lg relative overflow-hidden cursor-pointer hover:bg-blue-700 transition-colors">
-              <div className="flex items-center justify-between p-4 pointer-events-none">
+              <div className="flex items-center justify-between py-4 px-4 pointer-events-none">
                 <div className="flex items-center">
                   <div className="mr-3 text-xl font-bold">PayPal</div>
-                  <span className="text-sm">Pay with PayPal</span>
+                  <span>Pay with PayPal</span>
                 </div>
                 <div className="bg-yellow-400 px-3 py-1 rounded text-blue-900 font-bold text-sm">
                   PayPal
