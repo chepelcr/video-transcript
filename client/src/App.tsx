@@ -24,92 +24,20 @@ function RouterWithLanguage() {
     try {
       console.log('Router effect triggered:', { location, language, windowPath: window.location.pathname });
       
-      // Handle GitHub Pages query parameter redirect  
-      const urlParams = new URLSearchParams(window.location.search);
-      const pathFromQuery = urlParams.get('p');
-      if (pathFromQuery) {
-        const decodedPath = decodeURIComponent(pathFromQuery);
-        console.log('Processing GitHub Pages redirect:', pathFromQuery, '->', decodedPath);
-        setLocation(decodedPath);
-        
-        // Handle language detection from redirected path
-        if (decodedPath.startsWith('/es')) {
-          console.log('Setting language to Spanish from redirect:', decodedPath);
-          setLanguage('es');
-        } else if (decodedPath.startsWith('/en')) {
-          console.log('Setting language to English from redirect:', decodedPath);
-          setLanguage('en');
-        }
-        
-        // Ensure the route is processed correctly
-        console.log('GitHub Pages redirect processing complete:', {
-          originalQuery: pathFromQuery,
-          decodedPath,
-          newLocation: decodedPath,
-          languageSet: decodedPath.startsWith('/es') ? 'es' : decodedPath.startsWith('/en') ? 'en' : 'none'
-        });
-        
-        // Clean URL by preserving the base path and adding the decoded path
-        const basePath = window.location.pathname.includes('/video-transcript') ? '/video-transcript' : '';
-        const newUrl = basePath + decodedPath;
-        window.history.replaceState({}, '', newUrl);
-        console.log('GitHub Pages redirect completed:', newUrl);
-        
-        // Ensure component re-renders with new route after redirect
-        setTimeout(() => setIsInitialized(true), 0);
-        return;
-      }
-
-      // Prevent infinite redirect loops
-      if (location.includes('/es/es') || location.includes('/en/en')) {
-        console.warn('Detected duplicate language prefix, fixing...');
-        const cleanPath = location.replace(/^\/(en|es)\/(en|es)/, '/$2');
-        setLocation(cleanPath);
-        return;
-      }
-
-      // Check if URL starts with language prefix (after removing base path)
-      const pathWithoutBase = location.replace('/video-transcript', '') || '/';
-      const pathMatch = pathWithoutBase.match(/^\/(en|es)(\/.*|$)/);
+      // Simple language routing - check URL for language prefix
+      const pathMatch = location.match(/^\/(en|es)(\/.*|$)/);
       if (pathMatch) {
         const urlLang = pathMatch[1] as 'en' | 'es';
         if (urlLang !== language) {
           console.log(`Setting language to ${urlLang} from URL`);
           setLanguage(urlLang);
         }
-      } else if (language === 'es' && !pathWithoutBase.startsWith('/es') && pathWithoutBase === '/') {
-        // Only redirect root path to Spanish, avoid other paths
-        console.log(`Redirecting root to Spanish: /es`);
-        setLocation('/es');
+      } else if (location === '/') {
+        // Redirect root to default language
+        const defaultPath = `/${language}`;
+        console.log(`Redirecting root to: ${defaultPath}`);
+        setLocation(defaultPath);
       }
-      
-      // Handle GitHub Pages deployment - prevent URL rewriting
-      const isGitHubPages = window.location.hostname.includes('github.io') || 
-                           window.location.pathname.includes('/video-transcript') ||
-                           (window as any).ghPagesDebug;
-      
-      // For GitHub Pages, handle both /en and /es routes properly
-      if (isGitHubPages && location === '/' && !pathFromQuery) {
-        console.log('GitHub Pages: Root access, redirecting to language-specific route');
-        // Force English for base path to prevent Spanish redirects that lose base path
-        const langPath = '/en';
-        setLocation(langPath);
-        setLanguage('en');
-        // Always preserve the base path for GitHub Pages
-        const fullPath = `/video-transcript${langPath}`;
-        window.history.replaceState({}, '', fullPath);
-        console.log('GitHub Pages redirect applied:', fullPath);
-        return;
-      }
-      
-      if (isGitHubPages) {
-        console.log('GitHub Pages detected - preserving base path routing');
-        console.log('Current state:', { location, language, isGitHubPages, windowPath: window.location.pathname });
-        return;
-      }
-      
-      // Log current routing state for debugging
-      console.log('Development routing state:', { location, language, windowPath: window.location.pathname });
       
       // Mark as initialized after processing
       if (!isInitialized) {
@@ -120,24 +48,15 @@ function RouterWithLanguage() {
     }
   }, [location, language, setLanguage, setLocation, isInitialized]);
 
-  const stripBasePath = (path: string) => {
-    // Remove GitHub Pages base path first
-    if (path.startsWith('/video-transcript')) {
-      path = path.replace('/video-transcript', '') || '/';
-    }
-    return path;
-  };
-
   const stripLanguagePrefix = (path: string) => {
     return path.replace(/^\/(en|es)/, '') || '/';
   };
 
-  // First strip base path, then language prefix
-  const pathWithoutBase = stripBasePath(location);
-  const currentPath = stripLanguagePrefix(pathWithoutBase);
+  // Get current path without language prefix
+  const currentPath = stripLanguagePrefix(location);
 
   // Debug current routing state
-  console.log('Router rendering with:', { location, pathWithoutBase, currentPath, language, isInitialized });
+  console.log('Router rendering with:', { location, currentPath, language, isInitialized });
   
   // Show loading state until initialized
   React.useEffect(() => {
@@ -155,8 +74,8 @@ function RouterWithLanguage() {
     );
   }
   
-  // Use the path without base for routing
-  const routePath = pathWithoutBase;
+  // Use the current location for routing
+  const routePath = location;
   
   return (
     <Switch location={routePath}>
