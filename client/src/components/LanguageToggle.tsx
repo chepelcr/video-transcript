@@ -23,34 +23,29 @@ export function LanguageToggle() {
   };
 
   return (
-    <div className="flex items-center space-x-2">
-      {/* Language indicator */}
-      <span className="text-sm font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-        /{language}
-      </span>
-      
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="w-9 h-9 rounded-md">
-            <Globe className="h-4 w-4" />
-            <span className="sr-only">Toggle language</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={() => switchLanguage('en')}
-            className={language === 'en' ? 'bg-accent' : ''}
-          >
-            🇺🇸 English
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => switchLanguage('es')}
-            className={language === 'es' ? 'bg-accent' : ''}
-          >
-            🇪🇸 Español
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="w-9 h-9 rounded-md">
+          <span className="text-lg">
+            {language === 'es' ? '🇪🇸' : '🇺🇸'}
+          </span>
+          <span className="sr-only">Toggle language</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          onClick={() => switchLanguage('en')}
+          className={language === 'en' ? 'bg-accent' : ''}
+        >
+          🇺🇸 English
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => switchLanguage('es')}
+          className={language === 'es' ? 'bg-accent' : ''}
+        >
+          🇪🇸 Español
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

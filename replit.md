@@ -13,6 +13,7 @@ This is a video transcription service application built with a full-stack TypeSc
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+UI Design: Prefers flag icons over text indicators for language selection in navigation.
 
 # System Architecture
 
