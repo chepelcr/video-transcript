@@ -7,6 +7,7 @@
 //
 // <BEGIN_EXACT_CODE>
 import React, { useEffect } from "react";
+import { API_BASE_URL } from "@/lib/config";
 
 declare global {
   namespace JSX {
@@ -36,7 +37,7 @@ export default function PayPalButton({
       currency: currency,
       intent: intent,
     };
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/paypal/order`, {
+    const response = await fetch(`${API_BASE_URL}/api/paypal/order`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderPayload),
@@ -46,7 +47,7 @@ export default function PayPalButton({
   };
 
   const captureOrder = async (orderId: string) => {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/paypal/order/${orderId}/capture`, {
+    const response = await fetch(`${API_BASE_URL}/api/paypal/order/${orderId}/capture`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -103,10 +104,15 @@ export default function PayPalButton({
   const initPayPal = async () => {
     try {
       console.log("PayPal Button: Initializing PayPal");
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+      const baseUrl = API_BASE_URL;
       const apiUrl = `${baseUrl}/api/paypal/setup`;
       console.log("PayPal Button: Base URL:", baseUrl);
       console.log("PayPal Button: Fetching client token from:", apiUrl);
+      console.log("PayPal Button: Environment check:", {
+        hostname: window.location.hostname,
+        protocol: window.location.protocol,
+        isReplit: window.location.hostname.includes('replit.dev')
+      });
       
       const clientToken: string = await fetch(apiUrl)
         .then((res) => {
