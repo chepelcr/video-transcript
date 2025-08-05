@@ -1,7 +1,10 @@
 // API Configuration for different environments
 const config = {
   development: {
-    apiBaseUrl: 'http://localhost:5000',
+    // Use HTTPS in Replit environment for mixed content compatibility
+    apiBaseUrl: window.location.protocol === 'https:' ? 
+      `https://${window.location.hostname}:5000` : 
+      'http://localhost:5000',
   },
   production: {
     // Replit backend API for hybrid deployment

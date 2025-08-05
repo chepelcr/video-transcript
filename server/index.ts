@@ -13,12 +13,17 @@ app.use((req, res, next) => {
     'http://127.0.0.1:5173',
     'http://127.0.0.1:5174',
     'https://jcampos.dev', // Your actual domain
-    process.env.FRONTEND_URL
+    'https://a84950eb-2031-40c4-8a39-1789c99c8ca2-00-2c46rofc44noa.spock.replit.dev', // Replit frontend
+    process.env.FRONTEND_URL,
+    process.env.REPL_SLUG && `https://${process.env.REPL_SLUG}--${process.env.REPL_OWNER}.replit.app`
   ].filter(Boolean);
 
   const origin = req.headers.origin;
   console.log(`CORS check: origin=${origin}, allowed=${allowedOrigins.includes(origin || '')}`);
   if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (origin && origin.includes('replit.dev')) {
+    // Allow any replit.dev subdomain
     res.setHeader('Access-Control-Allow-Origin', origin);
   } else {
     // Allow all origins in development for now
