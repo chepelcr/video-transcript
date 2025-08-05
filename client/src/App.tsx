@@ -46,15 +46,16 @@ function RouterWithLanguage() {
         return;
       }
 
-      // Check if URL starts with language prefix
-      const pathMatch = location.match(/^\/(en|es)(\/.*|$)/);
+      // Check if URL starts with language prefix (after removing base path)
+      const pathWithoutBase = location.replace('/video-transcript', '') || '/';
+      const pathMatch = pathWithoutBase.match(/^\/(en|es)(\/.*|$)/);
       if (pathMatch) {
         const urlLang = pathMatch[1] as 'en' | 'es';
         if (urlLang !== language) {
           console.log(`Setting language to ${urlLang} from URL`);
           setLanguage(urlLang);
         }
-      } else if (language === 'es' && !location.startsWith('/es') && location === '/') {
+      } else if (language === 'es' && !pathWithoutBase.startsWith('/es') && pathWithoutBase === '/') {
         // Only redirect root path to Spanish, avoid other paths
         console.log(`Redirecting root to Spanish: /es`);
         setLocation('/es');
@@ -84,17 +85,30 @@ function RouterWithLanguage() {
     }
   }, [location, language, setLanguage, setLocation]);
 
+  const stripBasePath = (path: string) => {
+    // Remove GitHub Pages base path first
+    if (path.startsWith('/video-transcript')) {
+      path = path.replace('/video-transcript', '') || '/';
+    }
+    return path;
+  };
+
   const stripLanguagePrefix = (path: string) => {
     return path.replace(/^\/(en|es)/, '') || '/';
   };
 
-  const currentPath = stripLanguagePrefix(location);
+  // First strip base path, then language prefix
+  const pathWithoutBase = stripBasePath(location);
+  const currentPath = stripLanguagePrefix(pathWithoutBase);
 
   // Debug current routing state
-  console.log('Router rendering with:', { location, currentPath, language });
+  console.log('Router rendering with:', { location, pathWithoutBase, currentPath, language });
+  
+  // Use the path without base for routing
+  const routePath = pathWithoutBase;
   
   return (
-    <Switch>
+    <Switch location={routePath}>
       <Route path="/" component={Home} />
       <Route path="/en" component={Home} />
       <Route path="/es" component={Home} />
