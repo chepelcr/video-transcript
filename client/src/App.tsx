@@ -91,11 +91,14 @@ function RouterWithLanguage() {
       // For GitHub Pages, handle both /en and /es routes properly
       if (isGitHubPages && location === '/' && !pathFromQuery) {
         console.log('GitHub Pages: Root access, redirecting to language-specific route');
-        const langPath = `/${language}`;
+        // Force English for base path to prevent Spanish redirects that lose base path
+        const langPath = '/en';
         setLocation(langPath);
+        setLanguage('en');
         // Always preserve the base path for GitHub Pages
         const fullPath = `/video-transcript${langPath}`;
         window.history.replaceState({}, '', fullPath);
+        console.log('GitHub Pages redirect applied:', fullPath);
         return;
       }
       

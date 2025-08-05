@@ -296,6 +296,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       if (pathname.includes('/es')) return 'es';
       if (pathname.includes('/en')) return 'en';
       
+      // For GitHub Pages base URL access, default to English to prevent redirect loops
+      const isGitHubPages = pathname.includes('/video-transcript');
+      if (isGitHubPages && (pathname === '/video-transcript' || pathname === '/video-transcript/')) {
+        return 'en';
+      }
+      
       // For base URL access (without language), use stored preference or browser language
       const saved = localStorage.getItem('language') as Language;
       if (saved) return saved;
