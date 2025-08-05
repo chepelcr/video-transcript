@@ -305,19 +305,19 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Trusted by Content Creators Worldwide
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              {t('testimonials.title')}
             </h2>
-            <p className="text-xl text-gray-600">
-              Join thousands of satisfied users who rely on VideoScript for their transcription needs.
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              {t('testimonials.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="testimonial-card bg-gray-50">
+            <Card className="testimonial-card bg-gray-50 dark:bg-gray-700">
               <CardContent className="p-8">
                 <div className="flex items-center mb-4">
                   <div className="flex text-yellow-400">
@@ -326,22 +326,22 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-800 mb-6">
-                  "VideoScript has revolutionized my content creation workflow. The accuracy is incredible and it saves me hours of manual transcription work every week."
+                <p className="text-gray-800 dark:text-gray-200 mb-6">
+                  "{t('testimonials.sarah.text')}"
                 </p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mr-4">
                     <span className="text-white font-bold">SJ</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Sarah Johnson</div>
-                    <div className="text-gray-600 text-sm">YouTube Creator</div>
+                    <div className="font-semibold text-gray-900 dark:text-white">{t('testimonials.sarah.name')}</div>
+                    <div className="text-gray-600 dark:text-gray-400 text-sm">{t('testimonials.sarah.role')}</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="testimonial-card bg-gray-50">
+            <Card className="testimonial-card bg-gray-50 dark:bg-gray-700">
               <CardContent className="p-8">
                 <div className="flex items-center mb-4">
                   <div className="flex text-yellow-400">
@@ -350,22 +350,22 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-800 mb-6">
-                  "As a student, VideoScript helps me convert lecture videos to text for better studying. The free tier is perfect for occasional use, and the accuracy is impressive."
+                <p className="text-gray-800 dark:text-gray-200 mb-6">
+                  "{t('testimonials.mike.text')}"
                 </p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-accent to-primary rounded-full flex items-center justify-center mr-4">
                     <span className="text-white font-bold">MC</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Mike Chen</div>
-                    <div className="text-gray-600 text-sm">Graduate Student</div>
+                    <div className="font-semibold text-gray-900 dark:text-white">{t('testimonials.mike.name')}</div>
+                    <div className="text-gray-600 dark:text-gray-400 text-sm">{t('testimonials.mike.role')}</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="testimonial-card bg-gray-50">
+            <Card className="testimonial-card bg-gray-50 dark:bg-gray-700">
               <CardContent className="p-8">
                 <div className="flex items-center mb-4">
                   <div className="flex text-yellow-400">
@@ -374,16 +374,16 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-800 mb-6">
-                  "Our marketing team uses VideoScript to create captions for all our video content. The Pro plan handles our volume perfectly and the quality is consistently excellent."
+                <p className="text-gray-800 dark:text-gray-200 mb-6">
+                  "{t('testimonials.lisa.text')}"
                 </p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-secondary to-accent rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-bold">ER</span>
+                    <span className="text-white font-bold">LR</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Emily Rodriguez</div>
-                    <div className="text-gray-600 text-sm">Marketing Director</div>
+                    <div className="font-semibold text-gray-900 dark:text-white">{t('testimonials.lisa.name')}</div>
+                    <div className="text-gray-600 dark:text-gray-400 text-sm">{t('testimonials.lisa.role')}</div>
                   </div>
                 </div>
               </CardContent>
@@ -393,13 +393,13 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="bg-gray-900 text-white py-16">
+      <footer id="contact" className="bg-gray-900 dark:bg-black text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="col-span-2">
               <h3 className="text-2xl font-bold mb-4">VideoScript</h3>
-              <p className="text-gray-400 mb-6">
-                The fastest, most accurate AI-powered video transcription service. Transform your videos into searchable, editable text in seconds.
+              <p className="text-gray-400 dark:text-gray-300 mb-6">
+                {t('footer.description')}
               </p>
               <div className="flex space-x-4">
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -415,29 +415,29 @@ export default function Home() {
             </div>
             
             <div>
-              <h4 className="text-lg font-semibold mb-4">Product</h4>
+              <h4 className="text-lg font-semibold mb-4">{t('footer.product')}</h4>
               <ul className="space-y-2">
-                <li><button onClick={() => scrollToSection('features')} className="text-gray-400 hover:text-white transition-colors">Features</button></li>
-                <li><button onClick={() => scrollToSection('pricing')} className="text-gray-400 hover:text-white transition-colors">Pricing</button></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">API Docs</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Status</a></li>
+                <li><button onClick={() => scrollToSection('features')} className="text-gray-400 hover:text-white transition-colors">{t('nav.features')}</button></li>
+                <li><button onClick={() => scrollToSection('pricing')} className="text-gray-400 hover:text-white transition-colors">{t('nav.pricing')}</button></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.apiDocs')}</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.status')}</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="text-lg font-semibold mb-4">Support</h4>
+              <h4 className="text-lg font-semibold mb-4">{t('footer.support')}</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.helpCenter')}</a></li>
+                <li><button onClick={() => scrollToSection('contact')} className="text-gray-400 hover:text-white transition-colors">{t('footer.contact')}</button></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.privacy')}</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.terms')}</a></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center">
-            <p className="text-gray-400">
-              © 2024 VideoScript. All rights reserved. Made with ❤️ for content creators worldwide.
+          <div className="border-t border-gray-800 dark:border-gray-600 mt-12 pt-8 text-center">
+            <p className="text-gray-400 dark:text-gray-300">
+              {t('footer.copyright')}
             </p>
           </div>
         </div>

@@ -252,6 +252,16 @@ const translations = {
     'messages.returnHome': 'Volver al Inicio',
     
     // Footer
+    'footer.description': 'El servicio de transcripción de video más rápido y preciso impulsado por IA. Transforma tus videos en texto editable y searchable en segundos.',
+    'footer.product': 'Producto',
+    'footer.support': 'Soporte',
+    'footer.apiDocs': 'Documentación API',
+    'footer.status': 'Estado',
+    'footer.helpCenter': 'Centro de Ayuda',
+    'footer.contact': 'Contáctanos',
+    'footer.privacy': 'Política de Privacidad',
+    'footer.terms': 'Términos de Servicio',
+    'footer.copyright': '© 2024 VideoScript. Todos los derechos reservados. Hecho con ❤️ para creadores de contenido en todo el mundo.',
     'footer.getStarted': 'Comenzar',
     'footer.noCommitments': 'Cancela en cualquier momento. Sin compromisos a largo plazo.',
   }
