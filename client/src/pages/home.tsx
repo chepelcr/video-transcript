@@ -178,111 +178,117 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Free Tier */}
-            <Card className="pricing-card bg-white dark:bg-gray-800">
-              <CardContent className="p-8">
+            <Card className="pricing-card bg-white dark:bg-gray-800 flex flex-col">
+              <CardContent className="p-8 flex-grow flex flex-col">
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('pricing.free.title')}</h3>
                   <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">$0</div>
                   <p className="text-gray-600 dark:text-gray-300">{t('pricing.free.subtitle')}</p>
                 </div>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.transcriptions')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.duration')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.accuracy')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.format')}</span>
-                  </li>
-                </ul>
-                <Button className="w-full bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500" disabled>
+                <div className="flex-grow">
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.transcriptions')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.duration')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.accuracy')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.free.format')}</span>
+                    </li>
+                  </ul>
+                </div>
+                <Button className="w-full bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 mt-auto" disabled>
                   {t('pricing.free.button')}
                 </Button>
               </CardContent>
             </Card>
 
             {/* Pro Tier */}
-            <Card className="pricing-card border-2 border-primary relative bg-white dark:bg-gray-800">
+            <Card className="pricing-card border-2 border-primary relative bg-white dark:bg-gray-800 flex flex-col">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <Badge className="bg-primary text-white">{t('pricing.pro.popular')}</Badge>
               </div>
-              <CardContent className="p-8">
+              <CardContent className="p-8 flex-grow flex flex-col">
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('pricing.pro.title')}</h3>
                   <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">$19</div>
                   <p className="text-gray-600 dark:text-gray-300">{t('pricing.pro.subtitle')}</p>
                 </div>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.unlimited')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.duration')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.accuracy')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.formats')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.priority')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.support')}</span>
-                  </li>
-                </ul>
-                <Button onClick={() => handleUpgrade('pro')} className="w-full bg-primary text-white hover:bg-indigo-600">
+                <div className="flex-grow">
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.unlimited')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.duration')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.accuracy')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.formats')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.priority')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.support')}</span>
+                    </li>
+                  </ul>
+                </div>
+                <Button onClick={() => handleUpgrade('pro')} className="w-full bg-primary text-white hover:bg-indigo-600 mt-auto">
                   {t('pricing.pro.button')}
                 </Button>
               </CardContent>
             </Card>
 
             {/* Enterprise Tier */}
-            <Card className="pricing-card bg-white dark:bg-gray-800">
-              <CardContent className="p-8">
+            <Card className="pricing-card bg-white dark:bg-gray-800 flex flex-col">
+              <CardContent className="p-8 flex-grow flex flex-col">
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('pricing.enterprise.title')}</h3>
                   <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Custom</div>
                   <p className="text-gray-600 dark:text-gray-300">{t('pricing.enterprise.subtitle')}</p>
                 </div>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.everything')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.api')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.whitelabel')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.phone')}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="text-accent mr-3 h-5 w-5" />
-                    <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.sla')}</span>
-                  </li>
-                </ul>
-                <Button onClick={() => handleUpgrade('enterprise')} className="w-full bg-secondary text-white hover:bg-violet-600">
+                <div className="flex-grow">
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.everything')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.api')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.whitelabel')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.phone')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="text-accent mr-3 h-5 w-5" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.sla')}</span>
+                    </li>
+                  </ul>
+                </div>
+                <Button onClick={() => handleUpgrade('enterprise')} className="w-full bg-secondary text-white hover:bg-violet-600 mt-auto">
                   {t('pricing.enterprise.button')}
                 </Button>
               </CardContent>
@@ -317,8 +323,8 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="testimonial-card bg-gray-50 dark:bg-gray-700">
-              <CardContent className="p-8">
+            <Card className="testimonial-card bg-gray-50 dark:bg-gray-700 flex flex-col">
+              <CardContent className="p-8 flex-grow flex flex-col">
                 <div className="flex items-center mb-4">
                   <div className="flex text-yellow-400">
                     {[...Array(5)].map((_, i) => (
@@ -326,14 +332,14 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200 mb-6">
+                <p className="text-gray-800 dark:text-gray-200 mb-6 flex-grow">
                   "{t('testimonials.sarah.text')}"
                 </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mr-4">
+                <div className="flex items-center mt-auto">
+                  <div className="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                     <span className="text-white font-bold">SJ</span>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="font-semibold text-gray-900 dark:text-white">{t('testimonials.sarah.name')}</div>
                     <div className="text-gray-600 dark:text-gray-400 text-sm">{t('testimonials.sarah.role')}</div>
                   </div>
@@ -341,8 +347,8 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="testimonial-card bg-gray-50 dark:bg-gray-700">
-              <CardContent className="p-8">
+            <Card className="testimonial-card bg-gray-50 dark:bg-gray-700 flex flex-col">
+              <CardContent className="p-8 flex-grow flex flex-col">
                 <div className="flex items-center mb-4">
                   <div className="flex text-yellow-400">
                     {[...Array(5)].map((_, i) => (
@@ -350,14 +356,14 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200 mb-6">
+                <p className="text-gray-800 dark:text-gray-200 mb-6 flex-grow">
                   "{t('testimonials.mike.text')}"
                 </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-accent to-primary rounded-full flex items-center justify-center mr-4">
+                <div className="flex items-center mt-auto">
+                  <div className="w-12 h-12 bg-gradient-to-r from-accent to-primary rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                     <span className="text-white font-bold">MC</span>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="font-semibold text-gray-900 dark:text-white">{t('testimonials.mike.name')}</div>
                     <div className="text-gray-600 dark:text-gray-400 text-sm">{t('testimonials.mike.role')}</div>
                   </div>
@@ -365,8 +371,8 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="testimonial-card bg-gray-50 dark:bg-gray-700">
-              <CardContent className="p-8">
+            <Card className="testimonial-card bg-gray-50 dark:bg-gray-700 flex flex-col">
+              <CardContent className="p-8 flex-grow flex flex-col">
                 <div className="flex items-center mb-4">
                   <div className="flex text-yellow-400">
                     {[...Array(5)].map((_, i) => (
@@ -374,14 +380,14 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200 mb-6">
+                <p className="text-gray-800 dark:text-gray-200 mb-6 flex-grow">
                   "{t('testimonials.lisa.text')}"
                 </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-secondary to-accent rounded-full flex items-center justify-center mr-4">
+                <div className="flex items-center mt-auto">
+                  <div className="w-12 h-12 bg-gradient-to-r from-secondary to-accent rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                     <span className="text-white font-bold">LR</span>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="font-semibold text-gray-900 dark:text-white">{t('testimonials.lisa.name')}</div>
                     <div className="text-gray-600 dark:text-gray-400 text-sm">{t('testimonials.lisa.role')}</div>
                   </div>
