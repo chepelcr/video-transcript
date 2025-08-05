@@ -9,7 +9,7 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
-    'https://username.github.io', // Replace with your GitHub username
+    'https://jcampos.dev', // Your actual domain
     process.env.FRONTEND_URL
   ].filter(Boolean);
 

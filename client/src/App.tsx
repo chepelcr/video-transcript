@@ -16,6 +16,17 @@ function RouterWithLanguage() {
   const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
+    // Handle GitHub Pages query parameter redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    const pathFromQuery = urlParams.get('p');
+    if (pathFromQuery) {
+      const decodedPath = decodeURIComponent(pathFromQuery);
+      setLocation(decodedPath);
+      // Clean URL by removing the query parameter
+      window.history.replaceState({}, '', window.location.pathname + decodedPath);
+      return;
+    }
+
     // Check if URL starts with language prefix
     const pathMatch = location.match(/^\/(en|es)(\/.*|$)/);
     if (pathMatch) {

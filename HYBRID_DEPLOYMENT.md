@@ -35,11 +35,13 @@ VITE_PYTHON_API_URL=https://your-python-api.com
 VITE_API_BASE_URL=https://your-replit-app.replit.app
 ```
 
-### 2.2 Update Base Path (if needed)
-If your repository name is not the same as your domain, update `vite.config.ts`:
-```typescript
-base: "/your-repository-name/",
+### 2.2 Configure Base Path for Subdirectory
+Since your site is deployed at `https://jcampos.dev/video-transcript/`, the build command in the GitHub workflow automatically sets:
+```bash
+npm run build -- --base=/video-transcript/
 ```
+
+This ensures all asset paths are correctly prefixed for the subdirectory deployment.
 
 ## Step 3: Deploy Frontend to GitHub Pages
 
@@ -70,10 +72,11 @@ git push origin main
 3. Test language switching (flags work correctly)
 4. Verify payment integration connects to your Replit backend
 
-### 4.3 Common Issues
-- **404 Error**: Ensure GitHub Pages source is set to "GitHub Actions"
-- **CORS Issues**: Verify your Replit CORS settings include your GitHub Pages URL
-- **API Errors**: Check that environment variables are set correctly in GitHub Secrets
+### 4.3 Common Issues Fixed
+- ✅ **Subdirectory Deployment**: Asset paths automatically corrected for `/video-transcript/` base path
+- ✅ **SPA Routing**: 404.html handles client-side routing redirects properly
+- ✅ **CORS Configuration**: Domain `https://jcampos.dev` configured in backend
+- **Remaining Setup**: Ensure GitHub Secrets contain your Replit backend URL
 
 ## Environment Configuration
 

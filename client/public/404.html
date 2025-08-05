@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Transcription Service</title>
+    <script>
+        // GitHub Pages SPA redirect handling
+        const path = window.location.pathname.replace('/video-transcript', '');
+        const query = window.location.search;
+        const hash = window.location.hash;
+        
+        // Redirect to index.html with the path as a query parameter
+        if (path !== '/') {
+            window.location.replace('/video-transcript/' + '?p=' + encodeURIComponent(path + query + hash));
+        }
+    </script>
+</head>
+<body>
+    <noscript>
+        <meta http-equiv="refresh" content="0; url=/video-transcript/">
+    </noscript>
+</body>
+</html>
