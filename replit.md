@@ -3,12 +3,13 @@
 This is a video transcription service application built with a full-stack TypeScript architecture, now optimized for GitHub Pages deployment. The app allows users to submit video URLs for transcription with a freemium pricing model - users get 3 free transcriptions before requiring a paid subscription. The system integrates with both Stripe and PayPal for payment processing and features a modern React frontend with shadcn/ui components.
 
 ## Recent Changes (August 2025)
-- ✓ Configured GitHub Pages deployment with automated CI/CD workflow
+- ✓ Fixed critical Stripe API integration - payments now working correctly
+- ✓ Resolved language selector UI with clean flag-based interface
+- ✓ Fixed Spanish translation issues in payment flow
+- ✓ Created comprehensive deployment documentation
+- ✓ Configured GitHub Pages deployment workflow
 - ✓ Fixed environment variable handling for frontend (import.meta.env)
 - ✓ Updated PayPal button API endpoints for consistency
-- ✓ Created comprehensive deployment documentation
-- ✓ Added environment variable templates and README
-- ✓ Optimized for static frontend deployment while maintaining full functionality
 
 # User Preferences
 
