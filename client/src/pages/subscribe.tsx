@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ArrowLeft, CheckCircle, Check } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle, Check, Lock } from "lucide-react";
 import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
@@ -100,6 +101,7 @@ export default function Subscribe() {
   const [isSetupComplete, setIsSetupComplete] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSetupSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +139,7 @@ export default function Subscribe() {
 
   if (!isSetupComplete) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <Button 
             onClick={() => setLocation('/')} 
@@ -145,7 +147,7 @@ export default function Subscribe() {
             className="mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
+            {t('nav.back') || 'Back to Home'}
           </Button>
 
           <Card>
@@ -154,36 +156,36 @@ export default function Subscribe() {
             </CardHeader>
             <CardContent>
               {/* Plan Details */}
-              <div className="bg-gray-50 rounded-lg p-6 mb-6">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
                 <div className="text-center mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900">Pro Plan</h3>
-                  <p className="text-3xl font-bold text-primary">$19<span className="text-lg text-gray-600">/month</span></p>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Pro Plan</h3>
+                  <p className="text-3xl font-bold text-primary">$19<span className="text-lg text-gray-600 dark:text-gray-400">/month</span></p>
                 </div>
                 
                 <ul className="space-y-3">
                   <li className="flex items-center">
-                    <Check className="text-green-500 mr-3 h-5 w-5" />
-                    <span>Unlimited transcriptions</span>
+                    <Check className="text-accent mr-3 h-5 w-5" />
+                    <span className="text-gray-700 dark:text-gray-300">Unlimited transcriptions</span>
                   </li>
                   <li className="flex items-center">
-                    <Check className="text-green-500 mr-3 h-5 w-5" />
-                    <span>Up to 2 hours per video</span>
+                    <Check className="text-accent mr-3 h-5 w-5" />
+                    <span className="text-gray-700 dark:text-gray-300">Up to 2 hours per video</span>
                   </li>
                   <li className="flex items-center">
-                    <Check className="text-green-500 mr-3 h-5 w-5" />
-                    <span>Premium accuracy (99%)</span>
+                    <Check className="text-accent mr-3 h-5 w-5" />
+                    <span className="text-gray-700 dark:text-gray-300">Premium accuracy (99%)</span>
                   </li>
                   <li className="flex items-center">
-                    <Check className="text-green-500 mr-3 h-5 w-5" />
-                    <span>Multiple formats (TXT, SRT, VTT)</span>
+                    <Check className="text-accent mr-3 h-5 w-5" />
+                    <span className="text-gray-700 dark:text-gray-300">Multiple formats (TXT, SRT, VTT)</span>
                   </li>
                   <li className="flex items-center">
-                    <Check className="text-green-500 mr-3 h-5 w-5" />
-                    <span>Priority processing</span>
+                    <Check className="text-accent mr-3 h-5 w-5" />
+                    <span className="text-gray-700 dark:text-gray-300">Priority processing</span>
                   </li>
                   <li className="flex items-center">
-                    <Check className="text-green-500 mr-3 h-5 w-5" />
-                    <span>Email support</span>
+                    <Check className="text-accent mr-3 h-5 w-5" />
+                    <span className="text-gray-700 dark:text-gray-300">Email support</span>
                   </li>
                 </ul>
               </div>
@@ -241,7 +243,7 @@ export default function Subscribe() {
             </Button>
             <Button onClick={() => setLocation('/')} variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
+              {t('nav.back') || 'Back to Home'}
             </Button>
           </CardContent>
         </Card>
@@ -280,8 +282,8 @@ export default function Subscribe() {
         </Card>
 
         <div className="text-center mt-6">
-          <p className="text-sm text-gray-500 flex items-center justify-center">
-            <i className="fas fa-lock mr-1"></i>
+          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center">
+            <Lock className="mr-2 h-4 w-4" />
             Secured by 256-bit SSL encryption
           </p>
         </div>
