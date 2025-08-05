@@ -1,144 +1,161 @@
-# VideoScript - AI-Powered Video Transcription Service
+# Video Transcription Service 🎥
 
-A modern, responsive web application that transforms video URLs into accurate text transcriptions using AI technology. Built with React, TypeScript, and integrated with Stripe and PayPal for payment processing.
+A professional video transcription application with hybrid deployment architecture - static frontend on GitHub Pages connected to Replit backend API.
 
 ## 🚀 Features
 
-- **Free Tier**: 3 free transcriptions per month
-- **Pro Plan**: Unlimited transcriptions with premium features ($19/month)
-- **Multi-Provider Payments**: Support for both Stripe and PayPal
-- **Real-time Processing**: Fast video transcription via Python API
-- **Modern UI**: Built with shadcn/ui components and Tailwind CSS
-- **Mobile Responsive**: Works seamlessly on all devices
-- **GitHub Pages Ready**: Optimized for static deployment
+- **Freemium Model**: 3 free transcriptions, then $19/month Pro plan
+- **Dual Payment Support**: Stripe subscriptions + PayPal one-time payments
+- **Multilingual**: Complete Spanish/English support with flag-based UI
+- **Modern Design**: shadcn/ui components with dark/light mode
+- **Hybrid Deployment**: Fast GitHub Pages frontend + powerful Replit backend
 
-## 🛠️ Tech Stack
+## 🏗️ Architecture
 
-### Frontend
-- **React 18** with TypeScript
-- **Vite** for build tooling
-- **Tailwind CSS** + **shadcn/ui** for styling
-- **Wouter** for client-side routing
-- **TanStack Query** for data fetching
-- **Stripe Elements** for payment processing
-
-### Backend
-- **Express.js** with TypeScript
-- **Stripe SDK** for subscription management
-- **PayPal Server SDK** for payment processing
-- **Drizzle ORM** with PostgreSQL
-
-### External Services
-- **Python Transcription API** (your existing service)
-- **Stripe** for subscriptions and payments
-- **PayPal** for alternative payment processing
-
-## 📦 Deployment Options
-
-### 1. GitHub Pages (Static Frontend Only)
-
-Perfect for demonstration purposes with external API integration:
-
-1. Fork this repository
-2. Set up GitHub Secrets in your repository settings:
-   - `VITE_STRIPE_PUBLIC_KEY`: Your Stripe publishable key
-   - `VITE_PYTHON_API_URL`: Your Python API endpoint URL
-
-3. Enable GitHub Pages in repository settings (Actions source)
-4. Push to main branch - automatic deployment via GitHub Actions
-
-### 2. Full-Stack Deployment (Replit, Vercel, etc.)
-
-For complete functionality including payment processing:
-
-1. Clone the repository
-2. Install dependencies: `npm install`  
-3. Set up environment variables (see `.env.example`)
-4. Run development server: `npm run dev`
-5. Deploy to your preferred platform
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-Copy `.env.example` to `.env.local` and configure:
-
-```bash
-# Stripe Configuration
-VITE_STRIPE_PUBLIC_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
-
-# PayPal Configuration  
-PAYPAL_CLIENT_ID=your_client_id
-PAYPAL_CLIENT_SECRET=your_client_secret
-
-# Python API
-VITE_PYTHON_API_URL=https://your-api-domain.com
+```
+GitHub Pages (Frontend) ←→ Replit (Backend)
+├── React + TypeScript    ├── Express.js API
+├── Stripe/PayPal UI      ├── Payment processing
+├── Multilingual support  ├── PostgreSQL database
+└── Responsive design     └── Transcription API
 ```
 
-### API Integration
+## 🛠️ Development Setup
 
-The app expects your Python API to have this endpoint:
-```
-GET /video-listener/listen-video?videoUrl={url}
-```
+### Prerequisites
+- Node.js 18+
+- PostgreSQL database
+- Stripe account (test keys)
+- PayPal developer account
 
-Returns transcription data in JSON format.
-
-## 🎨 Customization
-
-### Styling
-- Colors defined in `client/src/index.css`
-- Uses CSS custom properties for theming
-- Tailwind configuration in `tailwind.config.ts`
-
-### Payment Plans
-Update pricing in:
-- `client/src/pages/home.tsx` (pricing display)
-- `server/routes.ts` (Stripe price IDs)
-
-### Branding
-- Logo/brand name: Search for "VideoScript" in components
-- Meta tags: Update in `client/index.html`
-
-## 🔧 Development
-
+### Local Development
 ```bash
 # Install dependencies
 npm install
 
-# Start development server  
+# Set up environment variables (see .env.example)
+cp .env.example .env
+
+# Start development server
 npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
 ```
 
-## 📱 Features Overview
+Visit `http://localhost:5173` for the app.
 
-### Free Tier
-- 3 transcriptions per month
-- Up to 10 minutes per video
-- Basic accuracy
-- TXT download format
+## 🚀 Deployment
 
-### Pro Plan ($19/month)
-- Unlimited transcriptions
-- Up to 2 hours per video
-- 99% accuracy
-- Multiple formats (TXT, SRT, VTT)
-- Priority processing
-- Email support
+### Option 1: Hybrid Deployment (Recommended)
+Deploy frontend to GitHub Pages, backend to Replit:
 
-### Enterprise (Custom Pricing)
-- Everything in Pro
-- Custom API integration
-- White-label options
-- 24/7 phone support
-- SLA guarantee
+1. **Deploy Backend to Replit**
+   - Click "Deploy" in your Replit workspace
+   - Get your deployment URL: `https://your-app.replit.app`
+
+2. **Configure GitHub Secrets**
+   ```
+   VITE_STRIPE_PUBLIC_KEY=pk_test_...
+   VITE_API_BASE_URL=https://your-app.replit.app
+   VITE_PYTHON_API_URL=https://your-transcription-api.com
+   ```
+
+3. **Update CORS Settings**
+   - Edit `server/index.ts` line 15 with your GitHub Pages URL
+   - Set `FRONTEND_URL` environment variable in Replit
+
+4. **Deploy Frontend**
+   - Push to GitHub main branch
+   - GitHub Actions will automatically deploy to Pages
+
+See [HYBRID_DEPLOYMENT.md](HYBRID_DEPLOYMENT.md) for detailed instructions.
+
+### Option 2: Full Replit Deployment
+Deploy everything on Replit using the "Deploy" button.
+
+## 🔧 Configuration
+
+### Environment Variables
+
+#### Replit (Backend)
+```bash
+# Database (auto-configured)
+DATABASE_URL=postgresql://...
+
+# Payment APIs
+STRIPE_SECRET_KEY=sk_test_...
+PAYPAL_CLIENT_ID=...
+PAYPAL_CLIENT_SECRET=...
+
+# CORS
+FRONTEND_URL=https://yourusername.github.io
+```
+
+#### GitHub (Frontend Build)
+```bash
+VITE_STRIPE_PUBLIC_KEY=pk_test_...
+VITE_API_BASE_URL=https://your-app.replit.app
+VITE_PYTHON_API_URL=https://transcription-api.com
+```
+
+## 🌍 Internationalization
+
+The app supports English and Spanish with:
+- Dynamic language switching with flag icons (🇺🇸/🇪🇸)
+- Complete UI translation
+- Localized payment flows
+- Right-to-left text support ready
+
+## 💳 Payment Integration
+
+### Stripe (Subscriptions)
+- Monthly Pro plan: $19/month
+- Automatic billing management
+- Customer portal access
+
+### PayPal (Alternative)
+- One-time payments
+- Sandbox/production switching
+- International support
+
+## 🔒 Security
+
+- Environment-based API URLs
+- CORS protection for cross-origin requests
+- Secure payment processing
+- Session management with PostgreSQL store
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Touch-friendly interfaces
+- Progressive Web App ready
+- Dark/light mode support
+
+## 🔧 Tech Stack
+
+**Frontend**
+- React 18 + TypeScript
+- Vite build system
+- shadcn/ui + Tailwind CSS
+- TanStack Query for state management
+- Wouter for routing
+
+**Backend**
+- Express.js + TypeScript
+- Drizzle ORM + PostgreSQL
+- Stripe & PayPal SDKs
+- Session-based authentication
+
+**Deployment**
+- GitHub Pages (frontend)
+- Replit Deployments (backend)
+- Automated CI/CD with GitHub Actions
+
+## 📊 Performance
+
+- **Frontend**: CDN delivery via GitHub Pages
+- **Backend**: Scalable Replit infrastructure
+- **Database**: Neon serverless PostgreSQL
+- **Payments**: Direct API integration (no redirects)
 
 ## 🤝 Contributing
 
@@ -150,19 +167,8 @@ npm run preview
 
 ## 📄 License
 
-MIT License - see LICENSE file for details.
-
-## 🆘 Support
-
-For issues with the application:
-1. Check the GitHub Issues
-2. Review the configuration guide
-3. Ensure all environment variables are set correctly
-
-For payment processing issues:
-- Stripe: Check your Stripe Dashboard
-- PayPal: Check your PayPal Developer Console
+This project is licensed under the MIT License.
 
 ---
 
-Built with ❤️ for seamless video transcription
+Built with ❤️ using Replit and deployed on GitHub Pages
