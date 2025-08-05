@@ -57,9 +57,19 @@ function RouterWithLanguage() {
         setLocation('/es');
       }
       
-      // Prevent URL rewriting that strips base path in production
-      if (window.location.pathname.includes('/video-transcript') && !location.startsWith('/video-transcript')) {
-        console.warn('Base path mismatch detected, not modifying browser URL');
+      // Handle GitHub Pages deployment - prevent URL rewriting
+      const isGitHubPages = window.location.hostname.includes('github.io') || 
+                           window.location.pathname.includes('/video-transcript') ||
+                           window.ghPagesDebug;
+      
+      if (isGitHubPages && language === 'es' && location === '/') {
+        console.log('GitHub Pages: redirecting to Spanish without browser URL change');
+        setLocation('/es');
+        return;
+      }
+      
+      if (isGitHubPages) {
+        console.log('GitHub Pages detected - preserving base path routing');
         return;
       }
       

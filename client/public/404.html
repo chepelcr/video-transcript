@@ -5,14 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Transcription Service</title>
     <script>
-        // GitHub Pages SPA redirect handling
-        const path = window.location.pathname.replace('/video-transcript', '');
+        // GitHub Pages SPA redirect handling for subdirectory deployment
+        console.log('404.html activated for:', window.location.pathname);
+        
+        const fullPath = window.location.pathname;
+        const basePath = '/video-transcript';
+        
+        // Extract the route after removing base path
+        let route = fullPath;
+        if (fullPath.startsWith(basePath)) {
+            route = fullPath.replace(basePath, '') || '/';
+        }
+        
         const query = window.location.search;
         const hash = window.location.hash;
         
-        // Redirect to index.html with the path as a query parameter
-        if (path !== '/') {
-            window.location.replace('/video-transcript/' + '?p=' + encodeURIComponent(path + query + hash));
+        // Only redirect if we're not already on the main page
+        if (route !== '/' || query || hash) {
+            const redirectUrl = basePath + '/?p=' + encodeURIComponent(route + query + hash);
+            console.log('Redirecting from 404:', fullPath, 'to:', redirectUrl);
+            window.location.replace(redirectUrl);
+        } else {
+            // Direct access to base path - show main page
+            console.log('Direct access to base path, loading main application');
         }
     </script>
 </head>

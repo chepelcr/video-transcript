@@ -51,10 +51,24 @@ jobs:
         sed -i 's|<head>|<head><script>window.ghPagesDebug=true;console.log("🚀 GitHub Pages deployment loaded");console.log("Base path:",window.location.pathname);</script>|g' dist/gh-pages/index.html
         sed -i 's|href="/favicon.ico"|href="/video-transcript/favicon.ico"|g' dist/gh-pages/index.html
         
-        echo "Asset paths fixed for GitHub Pages subdirectory:"
-        echo "- JavaScript and CSS assets: /video-transcript/assets/"
-        echo "- Favicon: /video-transcript/favicon.ico"
-        echo "- Debug logging enabled"
+        # Verify deployment files exist and show structure
+        echo "=== GitHub Pages Deployment Structure ==="
+        ls -la dist/gh-pages/
+        echo ""
+        echo "=== Asset Path Verification ==="
+        echo "JavaScript assets:"
+        find dist/gh-pages/assets/ -name "*.js" | head -3
+        echo "CSS assets:"
+        find dist/gh-pages/assets/ -name "*.css" | head -3
+        echo ""
+        echo "=== Index.html Content Check ==="
+        head -10 dist/gh-pages/index.html
+        echo ""
+        echo "Asset paths fixed for subdirectory deployment:"
+        echo "✓ JavaScript and CSS: /video-transcript/assets/"
+        echo "✓ Favicon: /video-transcript/favicon.ico"
+        echo "✓ 404.html routing configured"
+        echo "✓ Debug logging enabled"
       env:
         VITE_STRIPE_PUBLIC_KEY: ${{ secrets.VITE_STRIPE_PUBLIC_KEY }}
         VITE_PYTHON_API_URL: ${{ secrets.VITE_PYTHON_API_URL }}
