@@ -19,10 +19,15 @@ const config = {
 // Force development mode but with smart URL detection
 const environment = 'development'; // import.meta.env.MODE === 'production' ? 'production' : 'development';
 
-export const API_BASE_URL = '/api'; // Frontend-only mode with mock API
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || config[environment].apiBaseUrl;
 
 // Debug logging
-console.log('Frontend-only mode: Using mock API services', {
+console.log('API Config Debug:', {
+  hostname: window.location.hostname,
+  protocol: window.location.protocol,
+  isReplitEnv,
+  isHttps,
+  environment,
   apiBaseUrl: API_BASE_URL
 });
 
