@@ -43,19 +43,19 @@ export async function transcribeVideo(videoUrl: string): Promise<TranscriptionRe
     console.log('Attempting to contact transcription service...');
     
     try {
-      // Create a timeout promise that rejects after 5 seconds
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 5000);
-      });
+      // Create an AbortController for proper cleanup
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-      const fetchPromise = fetch(`${PYTHON_API_BASE_URL}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`, {
+      const response = await fetch(`${PYTHON_API_BASE_URL}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        signal: controller.signal,
       });
       
-      const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         const data = await response.json();
@@ -74,8 +74,12 @@ export async function transcribeVideo(videoUrl: string): Promise<TranscriptionRe
           accuracy: 95 + Math.floor(Math.random() * 5),
         };
       }
-    } catch (apiError) {
+    } catch (apiError: any) {
       console.log('Transcription service unavailable, using simulation mode');
+      // Handle AbortError or other fetch errors gracefully
+      if (apiError.name === 'AbortError') {
+        console.log('Request timed out, falling back to simulation');
+      }
     }
 
     // Fallback to simulation with realistic processing time
