@@ -3,13 +3,13 @@
 This is a video transcription service application built with a full-stack TypeScript architecture, now optimized for GitHub Pages deployment. The app allows users to submit video URLs for transcription with a freemium pricing model - users get 3 free transcriptions before requiring a paid subscription. The system integrates with both Stripe and PayPal for payment processing and features a modern React frontend with shadcn/ui components.
 
 ## Recent Changes (August 2025)
+- ✅ **GITHUB WORKFLOW UPGRADED**: Updated to proven working deployment configuration with proper permissions
+- ✅ **OFFICIAL ACTIONS**: Using `actions/deploy-pages@v4` instead of third-party action for reliability  
 - ✅ **HYBRID DEPLOYMENT CONFIGURED**: Set up GitHub Pages frontend + Replit backend architecture
 - ✅ **API BASE URL SYSTEM**: Implemented environment-aware API routing for cross-origin requests  
 - ✅ **CORS CONFIGURATION**: Added proper CORS headers for GitHub Pages integration
 - ✅ **STRIPE INTEGRATION FIXED**: Secret key properly configured, payments working
 - ✅ **FLAG-BASED LANGUAGE UI**: Clean flag icons (🇺🇸/🇪🇸) with right-aligned dropdown
-- ✅ **SPANISH TRANSLATIONS**: Fixed payment flow error messages in Spanish
-- ✅ **COMPREHENSIVE DOCS**: Created HYBRID_DEPLOYMENT.md with step-by-step guide
 
 # User Preferences
 

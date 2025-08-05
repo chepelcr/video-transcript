@@ -6,34 +6,57 @@ on:
   pull_request:
     branches: [ main ]
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
-
+      uses: actions/checkout@v4
+      
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
-
+        
     - name: Install dependencies
       run: npm ci
-
-    - name: Build client application
-      run: npm run build
+      
+    - name: Build project  
+      run: |
+        npm run build
+        mkdir -p dist/gh-pages
+        cp -r dist/public/* dist/gh-pages/
       env:
         VITE_STRIPE_PUBLIC_KEY: ${{ secrets.VITE_STRIPE_PUBLIC_KEY }}
         VITE_PYTHON_API_URL: ${{ secrets.VITE_PYTHON_API_URL }}
         VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      if: github.ref == 'refs/heads/main'
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist/public
-        # cname: your-domain.com # Optional: Replace with your custom domain
+        path: ./dist/gh-pages
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      if: github.ref == 'refs/heads/main'

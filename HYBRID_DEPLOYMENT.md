@@ -53,20 +53,27 @@ git push origin main
 ### 3.2 Enable GitHub Pages
 1. Go to your repository Settings > Pages
 2. Set Source to "GitHub Actions"
-3. The workflow uses `peaceiris/actions-gh-pages@v4` for reliable deployment
-4. Automatic deployment triggers on push to main branch
+3. The workflow uses the official `actions/deploy-pages@v4` for reliable deployment
+4. Uses proper permissions and artifact upload for GitHub Pages environment
+5. Automatic deployment triggers on push to main branch
 
-## Step 4: Test the Integration
+## Step 4: Verify Deployment
 
-### 4.1 Verify API Connectivity
-1. Open browser dev tools on your GitHub Pages site
-2. Test a simple API call (e.g., health check)
-3. Verify CORS headers are working
+### 4.1 Check GitHub Actions
+1. Go to your repository > Actions tab
+2. Verify the workflow completed successfully
+3. Check that the `github-pages` environment was deployed
 
-### 4.2 Test Payment Flow
-1. Try the subscription flow in Spanish and English
-2. Verify Stripe and PayPal integration works
-3. Check that all API endpoints respond correctly
+### 4.2 Test Your Site
+1. Visit your GitHub Pages URL (shown in Actions output)
+2. Open browser dev tools and check for API connectivity
+3. Test language switching (flags work correctly)
+4. Verify payment integration connects to your Replit backend
+
+### 4.3 Common Issues
+- **404 Error**: Ensure GitHub Pages source is set to "GitHub Actions"
+- **CORS Issues**: Verify your Replit CORS settings include your GitHub Pages URL
+- **API Errors**: Check that environment variables are set correctly in GitHub Secrets
 
 ## Environment Configuration
 
