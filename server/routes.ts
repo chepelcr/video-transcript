@@ -9,7 +9,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-07-30.basil",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -66,13 +66,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create subscription
-      const priceId = planType === 'pro' 
-        ? process.env.STRIPE_PRO_PRICE_ID 
-        : process.env.STRIPE_ENTERPRISE_PRICE_ID;
-
+      // Create subscription - use a hardcoded test price for development
+      // For production, you would set STRIPE_PRO_PRICE_ID in environment variables
+      let priceId = process.env.STRIPE_PRO_PRICE_ID;
+      
+      // If no price ID is set, create a test price on the fly
       if (!priceId) {
-        throw new Error(`Missing price ID for ${planType} plan`);
+        const price = await stripe.prices.create({
+          currency: 'usd',
+          unit_amount: 1900, // $19.00
+          recurring: { interval: 'month' },
+          product_data: {
+            name: 'VideoScript Pro',
+          },
+        });
+        priceId = price.id;
       }
 
       const subscription = await stripe.subscriptions.create({

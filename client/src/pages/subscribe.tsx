@@ -46,15 +46,15 @@ const SubscribeForm = ({ email }: { email: string }) => {
 
     if (error) {
       toast({
-        title: "Payment Failed",
+        title: t('messages.paymentFailed'),
         description: error.message,
         variant: "destructive",
       });
     } else {
       setSubscriptionSucceeded(true);
       toast({
-        title: "Subscription Successful",
-        description: "Welcome to VideoScript Pro!",
+        title: t('messages.subscriptionSuccess'),
+        description: t('subscription.welcomePro'),
       });
     }
 
@@ -85,7 +85,7 @@ const SubscribeForm = ({ email }: { email: string }) => {
         {isProcessing ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            t('subscription.processing')
+            {t('subscription.processing')}
           </>
         ) : (
           t('subscription.subscribeNow')
@@ -109,8 +109,8 @@ export default function Subscribe() {
     
     if (!email) {
       toast({
-        title: "Email Required",
-        description: "Please enter your email address",
+        title: t('messages.error'),
+        description: t('messages.emailRequired'),
         variant: "destructive",
       });
       return;
@@ -129,8 +129,8 @@ export default function Subscribe() {
       setIsSetupComplete(true);
     } catch (error: any) {
       toast({
-        title: "Setup Error",
-        description: error.message || "Failed to setup subscription",
+        title: t('subscription.setupError'),
+        description: error.message || t('subscription.setupErrorDesc'),
         variant: "destructive",
       });
     } finally {
