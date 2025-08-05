@@ -24,15 +24,24 @@ function RouterWithLanguage() {
     try {
       console.log('Router effect triggered:', { location, language, windowPath: window.location.pathname });
       
+      // Handle GitHub Pages base path - strip it first
+      let cleanLocation = location;
+      if (location.startsWith('/video-transcript')) {
+        cleanLocation = location.replace('/video-transcript', '') || '/';
+        console.log('Stripped GitHub Pages base path:', location, '->', cleanLocation);
+        setLocation(cleanLocation);
+        return;
+      }
+      
       // Simple language routing - check URL for language prefix
-      const pathMatch = location.match(/^\/(en|es)(\/.*|$)/);
+      const pathMatch = cleanLocation.match(/^\/(en|es)(\/.*|$)/);
       if (pathMatch) {
         const urlLang = pathMatch[1] as 'en' | 'es';
         if (urlLang !== language) {
           console.log(`Setting language to ${urlLang} from URL`);
           setLanguage(urlLang);
         }
-      } else if (location === '/') {
+      } else if (cleanLocation === '/') {
         // Redirect root to default language
         const defaultPath = `/${language}`;
         console.log(`Redirecting root to: ${defaultPath}`);
