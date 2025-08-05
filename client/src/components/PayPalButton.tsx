@@ -147,20 +147,28 @@ export default function PayPalButton({
 
       const onClick = async () => {
         try {
+          console.log("PayPal Button: Button clicked, creating order...");
           const checkoutOptionsPromise = createOrder();
+          console.log("PayPal Button: Starting PayPal checkout...");
           await paypalCheckout.start(
             { paymentFlow: "auto" },
             checkoutOptionsPromise,
           );
         } catch (e) {
-          console.error(e);
+          console.error("PayPal Button: Checkout error:", e);
         }
       };
 
       const paypalButton = document.getElementById("paypal-button");
+      console.log("PayPal Button: Button element found:", !!paypalButton);
 
       if (paypalButton) {
+        // Remove any existing listeners first
+        paypalButton.removeEventListener("click", onClick);
         paypalButton.addEventListener("click", onClick);
+        console.log("PayPal Button: Click handler attached successfully");
+      } else {
+        console.error("PayPal Button: Button element not found!");
       }
 
       return () => {
@@ -178,6 +186,24 @@ export default function PayPalButton({
     }
   };
 
-  return <paypal-button id="paypal-button"></paypal-button>;
+  return <paypal-button 
+    id="paypal-button" 
+    style={{
+      display: 'block',
+      width: '100%',
+      minHeight: '40px',
+      backgroundColor: '#0070ba',
+      color: 'white',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      padding: '10px 20px',
+      fontSize: '16px',
+      fontWeight: 'bold',
+      textAlign: 'center' as const
+    }}
+  >
+    Pay with PayPal
+  </paypal-button>;
 }
 // <END_EXACT_CODE>
