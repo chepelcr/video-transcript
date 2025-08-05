@@ -3,6 +3,7 @@
 This is a video transcription service application built with a full-stack TypeScript architecture, now optimized for GitHub Pages deployment. The app allows users to submit video URLs for transcription with a freemium pricing model - users get 3 free transcriptions before requiring a paid subscription. The system integrates with both Stripe and PayPal for payment processing and features a modern React frontend with shadcn/ui components.
 
 ## Recent Changes (August 2025)
+- ✅ **STRIPE CONFIG CENTRALIZED**: Fixed missing VITE_STRIPE_PUBLIC_KEY error with centralized config system
 - ✅ **SUBDIRECTORY DEPLOYMENT FIXED**: Configured for `https://jcampos.dev/video-transcript/` with proper asset paths
 - ✅ **SPA ROUTING SOLUTION**: Added 404.html redirect handling for GitHub Pages single-page app routing
 - ✅ **CORS UPDATED**: Set correct domain `https://jcampos.dev` for production CORS
