@@ -291,6 +291,19 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof window !== 'undefined') {
+      // For GitHub Pages, check URL first to determine initial language
+      const isGitHubPages = window.location.pathname.includes('/video-transcript');
+      if (isGitHubPages) {
+        if (window.location.pathname.includes('/es')) return 'es';
+        if (window.location.pathname.includes('/en')) return 'en';
+        // For base URL direct access, default to English to prevent redirect loops
+        if (window.location.pathname.endsWith('/video-transcript') || 
+            window.location.pathname.endsWith('/video-transcript/')) {
+          return 'en';
+        }
+      }
+      
+      // Development environment: use saved preference or detect from browser
       const saved = localStorage.getItem('language') as Language;
       if (saved) return saved;
       const browserLang = navigator.language.toLowerCase();

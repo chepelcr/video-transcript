@@ -76,9 +76,11 @@ function RouterWithLanguage() {
                            window.location.pathname.includes('/video-transcript') ||
                            (window as any).ghPagesDebug;
       
+      // For GitHub Pages, don't auto-redirect to Spanish to avoid URL confusion
+      // Users can manually switch language using the toggle
       if (isGitHubPages && language === 'es' && location === '/' && !pathFromQuery) {
-        console.log('GitHub Pages: redirecting to Spanish without browser URL change');
-        setLocation('/es');
+        console.log('GitHub Pages: Preventing auto-redirect to Spanish, staying on English');
+        // Keep router on English but don't change the stored language preference
         return;
       }
       
