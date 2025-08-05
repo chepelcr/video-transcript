@@ -36,7 +36,7 @@ export default function PayPalButton({
       currency: currency,
       intent: intent,
     };
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/paypal/order`, {
+    const response = await fetch("/api/paypal/order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderPayload),
@@ -46,7 +46,7 @@ export default function PayPalButton({
   };
 
   const captureOrder = async (orderId: string) => {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/paypal/order/${orderId}/capture`, {
+    const response = await fetch(`/api/paypal/order/${orderId}/capture`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export default function PayPalButton({
   }, []);
   const initPayPal = async () => {
     try {
-      const clientToken: string = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/paypal/setup`)
+      const clientToken: string = await fetch("/api/paypal/setup")
         .then((res) => res.json())
         .then((data) => {
           return data.clientToken;
