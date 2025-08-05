@@ -24,28 +24,43 @@ function RouterWithLanguage() {
     try {
       console.log('Router effect triggered:', { location, language, windowPath: window.location.pathname });
       
-      // Handle GitHub Pages base path - strip it first
-      let cleanLocation = location;
-      if (location.startsWith('/video-transcript')) {
-        cleanLocation = location.replace('/video-transcript', '') || '/';
-        console.log('Stripped GitHub Pages base path:', location, '->', cleanLocation);
-        setLocation(cleanLocation);
-        return;
+      // Check if we're in GitHub Pages environment
+      const isGitHubPages = window.location.pathname.includes('/video-transcript');
+      
+      // For GitHub Pages, handle base path preservation
+      if (isGitHubPages && !location.startsWith('/video-transcript')) {
+        // If router location doesn't have base path but browser does, sync them
+        const browserPath = window.location.pathname;
+        if (browserPath !== location) {
+          console.log('Syncing router with browser path:', location, '->', browserPath);
+          setLocation(browserPath);
+          return;
+        }
+      }
+      
+      // Extract the route part for language detection (strip base path temporarily)
+      let routePart = location;
+      if (routePart.startsWith('/video-transcript')) {
+        routePart = routePart.replace('/video-transcript', '') || '/';
       }
       
       // Simple language routing - check URL for language prefix
-      const pathMatch = cleanLocation.match(/^\/(en|es)(\/.*|$)/);
+      const pathMatch = routePart.match(/^\/(en|es)(\/.*|$)/);
       if (pathMatch) {
         const urlLang = pathMatch[1] as 'en' | 'es';
         if (urlLang !== language) {
           console.log(`Setting language to ${urlLang} from URL`);
           setLanguage(urlLang);
         }
-      } else if (cleanLocation === '/') {
-        // Redirect root to default language
-        const defaultPath = `/${language}`;
-        console.log(`Redirecting root to: ${defaultPath}`);
-        setLocation(defaultPath);
+      } else if (routePart === '/') {
+        // Redirect root to default language, preserving base path
+        const newPath = isGitHubPages ? `/video-transcript/${language}` : `/${language}`;
+        console.log(`Redirecting root to: ${newPath}`);
+        setLocation(newPath);
+        // Also update browser URL to maintain base path
+        if (isGitHubPages) {
+          window.history.replaceState({}, '', newPath);
+        }
       }
       
       // Mark as initialized after processing
@@ -58,10 +73,15 @@ function RouterWithLanguage() {
   }, [location, language, setLanguage, setLocation, isInitialized]);
 
   const stripLanguagePrefix = (path: string) => {
-    return path.replace(/^\/(en|es)/, '') || '/';
+    // First remove base path if present, then remove language prefix
+    let cleanPath = path;
+    if (cleanPath.startsWith('/video-transcript')) {
+      cleanPath = cleanPath.replace('/video-transcript', '') || '/';
+    }
+    return cleanPath.replace(/^\/(en|es)/, '') || '/';
   };
 
-  // Get current path without language prefix
+  // Get current path without base path and language prefix for routing
   const currentPath = stripLanguagePrefix(location);
 
   // Debug current routing state
