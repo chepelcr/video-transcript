@@ -182,7 +182,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Free Tier */}
             <Card className="pricing-card bg-white dark:bg-gray-800 flex flex-col">
               <CardContent className="p-8 flex-grow flex flex-col">
@@ -258,44 +258,6 @@ export default function Home() {
                 </div>
                 <Button onClick={() => handleUpgrade('pro')} className="w-full bg-primary text-white hover:bg-indigo-600 mt-auto">
                   {t('pricing.pro.button')}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Enterprise Tier */}
-            <Card className="pricing-card bg-white dark:bg-gray-800 flex flex-col">
-              <CardContent className="p-8 flex-grow flex flex-col">
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('pricing.enterprise.title')}</h3>
-                  <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Custom</div>
-                  <p className="text-gray-600 dark:text-gray-300">{t('pricing.enterprise.subtitle')}</p>
-                </div>
-                <div className="flex-grow">
-                  <ul className="space-y-4 mb-8">
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
-                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.everything')}</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
-                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.api')}</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
-                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.whitelabel')}</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
-                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.phone')}</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
-                      <span className="text-gray-700 dark:text-gray-300">{t('pricing.enterprise.sla')}</span>
-                    </li>
-                  </ul>
-                </div>
-                <Button onClick={() => handleUpgrade('enterprise')} className="w-full bg-secondary text-white hover:bg-violet-600 mt-auto">
-                  {t('pricing.enterprise.button')}
                 </Button>
               </CardContent>
             </Card>
