@@ -33,16 +33,26 @@ function RouterWithLanguage() {
         return;
       }
 
+      // Prevent infinite redirect loops
+      if (location.includes('/es/es') || location.includes('/en/en')) {
+        console.warn('Detected duplicate language prefix, fixing...');
+        const cleanPath = location.replace(/^\/(en|es)\/(en|es)/, '/$2');
+        setLocation(cleanPath);
+        return;
+      }
+
       // Check if URL starts with language prefix
       const pathMatch = location.match(/^\/(en|es)(\/.*|$)/);
       if (pathMatch) {
         const urlLang = pathMatch[1] as 'en' | 'es';
         if (urlLang !== language) {
+          console.log(`Setting language to ${urlLang} from URL`);
           setLanguage(urlLang);
         }
-      } else if (language === 'es' && !location.startsWith('/es')) {
-        // If Spanish is selected but URL doesn't have /es, redirect
-        setLocation(`/es${location}`);
+      } else if (language === 'es' && !location.startsWith('/es') && location === '/') {
+        // Only redirect root path to Spanish, avoid other paths
+        console.log(`Redirecting root to Spanish: /es`);
+        setLocation('/es');
       }
     } catch (error) {
       console.error('Router error:', error);

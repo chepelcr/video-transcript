@@ -300,6 +300,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   });
 
   const handleSetLanguage = (lang: Language) => {
+    if (lang === language) {
+      console.log(`Language already set to ${lang}, skipping update`);
+      return;
+    }
+    console.log(`Language context: changing from ${language} to ${lang}`);
     setLanguage(lang);
     if (typeof window !== 'undefined') {
       localStorage.setItem('language', lang);
