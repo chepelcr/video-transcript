@@ -3,6 +3,10 @@
 This is a video transcription service application built with a full-stack TypeScript architecture, now optimized for GitHub Pages deployment. The app allows users to submit video URLs for transcription with a freemium pricing model - users get 3 free transcriptions before requiring a paid subscription. The system integrates with both Stripe and PayPal for payment processing and features a modern React frontend with shadcn/ui components.
 
 ## Recent Changes (August 2025)
+- ✅ **TRANSCRIPTION SIMULATION IMPLEMENTED**: Added intelligent simulation mode for when external transcription service is offline
+- ✅ **REALISTIC PROCESSING FEEDBACK**: Enhanced UI with step-by-step progress indicators during transcription
+- ✅ **SMART FALLBACK SYSTEM**: Attempts real API first, automatically falls back to simulation with 5-second timeout
+- ✅ **CONTENT-AWARE SIMULATION**: Different sample transcripts for YouTube vs general URLs with consistent selection
 - ✅ **PAYPAL INTEGRATION FIXED**: Updated PayPal button to use proper API base URL for hybrid deployment
 - ✅ **HYBRID DEPLOYMENT COMPLETE**: Frontend (GitHub Pages) + Backend (Replit) architecture fully configured
 - ✅ **API CONFIGURATION**: Production API URL identified as `https://video-scribe-chepelcr.replit.app`

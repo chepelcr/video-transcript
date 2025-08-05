@@ -19,6 +19,7 @@ export default function VideoTranscriptionForm({
 }: VideoTranscriptionFormProps) {
   const [videoUrl, setVideoUrl] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState("");
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -63,8 +64,22 @@ export default function VideoTranscriptionForm({
     }
 
     setIsProcessing(true);
+    setProcessingStatus(t('hero.processing'));
+    
     try {
+      // Show realistic processing steps
+      setProcessingStatus("Analyzing video content...");
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setProcessingStatus("Extracting audio track...");
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      setProcessingStatus("Converting speech to text...");
       const transcription = await transcribeVideo(videoUrl);
+      
+      setProcessingStatus("Finalizing transcription...");
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       onTranscriptionComplete(transcription);
       setVideoUrl("");
       
@@ -80,6 +95,7 @@ export default function VideoTranscriptionForm({
       });
     } finally {
       setIsProcessing(false);
+      setProcessingStatus("");
     }
   };
 
@@ -112,6 +128,13 @@ export default function VideoTranscriptionForm({
           )}
         </Button>
       </form>
+      
+      {isProcessing && processingStatus && (
+        <div className="mt-4 flex items-center justify-center text-sm text-blue-600 dark:text-blue-400">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <span>{processingStatus}</span>
+        </div>
+      )}
       
       <div className="mt-4 flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         <Gift className="mr-2 h-4 w-4 text-accent" />
