@@ -53,7 +53,8 @@ git push origin main
 ### 3.2 Enable GitHub Pages
 1. Go to your repository Settings > Pages
 2. Set Source to "GitHub Actions"
-3. The workflow will automatically deploy on push to main
+3. The workflow uses `peaceiris/actions-gh-pages@v4` for reliable deployment
+4. Automatic deployment triggers on push to main branch
 
 ## Step 4: Test the Integration
 
