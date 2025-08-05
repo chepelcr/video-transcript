@@ -3,19 +3,14 @@
 This is a video transcription service application built with a full-stack TypeScript architecture, now optimized for GitHub Pages deployment. The app allows users to submit video URLs for transcription with a freemium pricing model - users get 3 free transcriptions before requiring a paid subscription. The system integrates with both Stripe and PayPal for payment processing and features a modern React frontend with shadcn/ui components.
 
 ## Recent Changes (August 2025)
-- ✅ **PAYPAL INTEGRATION FIXED**: Updated PayPal button to use proper API base URL for hybrid deployment
-- ✅ **HYBRID DEPLOYMENT COMPLETE**: Frontend (GitHub Pages) + Backend (Replit) architecture fully configured
-- ✅ **API CONFIGURATION**: Production API URL identified as `https://video-scribe-chepelcr.replit.app`
-- ✅ **BASE PATH PRESERVATION**: Fixed /video-transcript subdirectory URL preservation in spa-github-pages routing
-- ✅ **CORS CONFIGURED**: Backend properly configured for https://jcampos.dev domain
-- ✅ **ENVIRONMENT VARIABLES**: VITE_API_BASE_URL and VITE_STRIPE_PUBLIC_KEY properly configured
-- ✅ **SECURITY DOCUMENTATION**: Created SECURITY.md clarifying Stripe public vs secret key separation
-- ✅ **STRIPE CONFIG CENTRALIZED**: Fixed missing VITE_STRIPE_PUBLIC_KEY error with proper frontend-only config
-- ✅ **SUBDIRECTORY DEPLOYMENT FIXED**: Configured for `https://jcampos.dev/video-transcript/` with proper asset paths
-- ✅ **SPA ROUTING SOLUTION**: Added 404.html redirect handling for GitHub Pages single-page app routing
-- ✅ **GITHUB WORKFLOW UPGRADED**: Updated to proven working deployment configuration with proper permissions
-- ✅ **OFFICIAL ACTIONS**: Using `actions/deploy-pages@v4` instead of third-party action for reliability  
-- ✅ **FLAG-BASED LANGUAGE UI**: Clean flag icons (🇺🇸/🇪🇸) with right-aligned dropdown
+- ✅ **FRONTEND-ONLY ARCHITECTURE**: Completely removed backend dependencies for frontend-only testing
+- ✅ **MOCK API SERVICES**: Created comprehensive mock API that simulates all backend functionality
+- ✅ **COMPLETE SIMULATION**: PayPal, Stripe, transcription, and user management all work with mock data
+- ✅ **PAYPAL MOCK**: Simplified PayPal button that demonstrates payment flow without external dependencies
+- ✅ **STRIPE MOCK**: Functional Stripe integration simulation for subscription testing
+- ✅ **TRANSCRIPTION MOCK**: Video transcription service with realistic processing simulation
+- ✅ **USER SIMULATION**: Complete user authentication and subscription status management
+- ✅ **VITE FRONTEND**: Pure frontend application running on Vite dev server for easy testing
 
 # User Preferences
 
@@ -32,11 +27,11 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 - **Forms**: React Hook Form with Zod validation schemas
 - **Payment Integration**: Stripe Elements for subscription payments and custom PayPal button component
 
-## Backend Architecture
-- **Express.js Server**: RESTful API with TypeScript, featuring request logging middleware and error handling
-- **Development Setup**: Vite dev server integration for hot module replacement in development
-- **Payment Processing**: Dual payment provider support with Stripe for subscriptions and PayPal for one-time payments
-- **Session Management**: Express sessions with PostgreSQL session store using connect-pg-simple
+## Backend Architecture (Mock Implementation)
+- **Mock API Services**: Complete frontend simulation of all backend functionality in `client/src/services/mockApi.ts`
+- **Fetch Interceptor**: Automatic request interception that routes API calls to mock functions
+- **Payment Processing**: Simulated PayPal and Stripe payment flows with realistic delays and responses
+- **Local Storage**: Mock user data and transcriptions stored in memory for testing purposes
 
 ## Data Layer
 - **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
