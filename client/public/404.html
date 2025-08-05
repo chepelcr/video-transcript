@@ -1,51 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html>
+  <head>
+    <meta charset="utf-8">
     <title>Video Transcription Service</title>
-    <script>
-        // GitHub Pages SPA redirect handling for subdirectory deployment
-        console.log('404.html activated for:', window.location.pathname);
-        console.log('Full URL:', window.location.href);
-        
-        const fullPath = window.location.pathname;
-        const basePath = '/video-transcript';
-        
-        // Check if we're accessing the base path directly
-        if (fullPath === basePath || fullPath === basePath + '/') {
-            console.log('Direct access to base path - redirecting to index');
-            window.location.replace(basePath + '/');
-            return;
-        }
-        
-        // Extract the route after removing base path
-        let route = fullPath;
-        if (fullPath.startsWith(basePath)) {
-            route = fullPath.replace(basePath, '') || '/';
-        }
-        
-        const query = window.location.search;
-        const hash = window.location.hash;
-        
-        // Handle direct language routes like /video-transcript/es
-        if (route === '/es' || route === '/en') {
-            console.log('Direct language route access:', route);
-        } else if (route.startsWith('/es/') || route.startsWith('/en/')) {
-            console.log('Language subpath route access:', route);
-        }
-        
-        // Always redirect through query parameter for SPA routing
-        const redirectUrl = basePath + '/?p=' + encodeURIComponent(route + query + hash);
-        console.log('404 redirect:', fullPath, '→', redirectUrl);
-        
-        // Use window.location.href instead of replace to ensure proper redirect
-        window.location.href = redirectUrl;
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // MIT License
+      // https://github.com/rafgraph/spa-github-pages
+      // This script takes the current url and converts the path and query
+      // string into just a query string, and then redirects the browser
+      // to the new url with only a query string and hash fragment
+      
+      // For Project Pages site (subdirectory deployment)
+      // Set pathSegmentsToKeep to 1 to preserve /video-transcript
+      var pathSegmentsToKeep = 1;
+
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
     </script>
-</head>
-<body>
-    <noscript>
-        <meta http-equiv="refresh" content="0; url=/video-transcript/">
-    </noscript>
-</body>
+  </head>
+  <body>
+  </body>
 </html>
