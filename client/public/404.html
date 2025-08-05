@@ -7,9 +7,17 @@
     <script>
         // GitHub Pages SPA redirect handling for subdirectory deployment
         console.log('404.html activated for:', window.location.pathname);
+        console.log('Full URL:', window.location.href);
         
         const fullPath = window.location.pathname;
         const basePath = '/video-transcript';
+        
+        // Check if we're accessing the base path directly
+        if (fullPath === basePath || fullPath === basePath + '/') {
+            console.log('Direct access to base path - redirecting to index');
+            window.location.replace(basePath + '/');
+            return;
+        }
         
         // Extract the route after removing base path
         let route = fullPath;
@@ -20,15 +28,10 @@
         const query = window.location.search;
         const hash = window.location.hash;
         
-        // Only redirect if we're not already on the main page
-        if (route !== '/' || query || hash) {
-            const redirectUrl = basePath + '/?p=' + encodeURIComponent(route + query + hash);
-            console.log('Redirecting from 404:', fullPath, 'to:', redirectUrl);
-            window.location.replace(redirectUrl);
-        } else {
-            // Direct access to base path - show main page
-            console.log('Direct access to base path, loading main application');
-        }
+        // Always redirect through query parameter for SPA routing
+        const redirectUrl = basePath + '/?p=' + encodeURIComponent(route + query + hash);
+        console.log('404 redirect:', fullPath, '→', redirectUrl);
+        window.location.replace(redirectUrl);
     </script>
 </head>
 <body>
