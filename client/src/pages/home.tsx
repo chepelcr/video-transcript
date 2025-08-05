@@ -24,7 +24,7 @@ interface Transcription {
 
 export default function Home() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<'pro' | 'enterprise'>('pro');
+  const [selectedPlan, setSelectedPlan] = useState<'pro'>('pro');
   const [transcriptionsUsed, setTranscriptionsUsed] = useLocalStorage('transcriptionsUsed', 0);
   const [currentTranscription, setCurrentTranscription] = useState<Transcription | null>(null);
   const [showResults, setShowResults] = useState(false);
@@ -44,7 +44,7 @@ export default function Home() {
     }, 100);
   };
 
-  const handleUpgrade = (plan: 'pro' | 'enterprise') => {
+  const handleUpgrade = (plan: 'pro') => {
     setSelectedPlan(plan);
     setIsPaymentModalOpen(true);
   };

@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  planType: 'pro' | 'enterprise';
+  planType: 'pro';
 }
 
 export default function PaymentModal({ isOpen, onClose, planType }: PaymentModalProps) {
@@ -19,11 +19,6 @@ export default function PaymentModal({ isOpen, onClose, planType }: PaymentModal
       name: "Pro",
       price: "19.00",
       description: "Monthly subscription for unlimited transcriptions"
-    },
-    enterprise: {
-      name: "Enterprise", 
-      price: "99.00",
-      description: "Custom enterprise solution"
     }
   };
 
@@ -38,19 +33,16 @@ export default function PaymentModal({ isOpen, onClose, planType }: PaymentModal
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center justify-between">
+          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
             Choose Payment Method
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="font-semibold text-gray-900">{plan.name} Plan</h4>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h4 className="font-semibold text-gray-900 dark:text-white">{plan.name} Plan</h4>
             <p className="text-2xl font-bold text-primary">${plan.price}/month</p>
-            <p className="text-sm text-gray-600">{plan.description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{plan.description}</p>
           </div>
           
           <div className="space-y-4">
@@ -62,18 +54,28 @@ export default function PaymentModal({ isOpen, onClose, planType }: PaymentModal
               Pay with Stripe
             </Button>
             
-            <div className="w-full bg-blue-600 text-white py-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center">
-              <div className="mr-3 text-xl font-bold">PayPal</div>
-              <PayPalButton 
-                amount={plan.price}
-                currency="USD"
-                intent="CAPTURE"
-              />
+            <div className="w-full bg-blue-600 text-white rounded-lg relative overflow-hidden cursor-pointer hover:bg-blue-700 transition-colors">
+              <div className="flex items-center justify-between p-4 pointer-events-none">
+                <div className="flex items-center">
+                  <div className="mr-3 text-xl font-bold">PayPal</div>
+                  <span className="text-sm">Pay with PayPal</span>
+                </div>
+                <div className="bg-yellow-400 px-3 py-1 rounded text-blue-900 font-bold text-sm">
+                  PayPal
+                </div>
+              </div>
+              <div className="absolute inset-0 opacity-0 pointer-events-auto">
+                <PayPalButton 
+                  amount={plan.price}
+                  currency="USD"
+                  intent="CAPTURE"
+                />
+              </div>
             </div>
           </div>
           
           <div className="text-center">
-            <p className="text-sm text-gray-500 flex items-center justify-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center">
               <Lock className="mr-1 h-4 w-4" />
               Secured by 256-bit SSL encryption
             </p>
