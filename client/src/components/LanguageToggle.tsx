@@ -31,7 +31,7 @@ export function LanguageToggle() {
       
       // Then strip any language prefix
       const currentPath = cleanLocation.replace(/^\/(en|es)/, '') || '/';
-      const newPath = `/${newLang}${currentPath}`;
+      const newPath = currentPath === '/' ? `/${newLang}` : `/${newLang}${currentPath}`;
       const fullPath = `${basePath}${newPath}`;
       
       console.log('Language change in GitHub Pages:', { 
@@ -50,7 +50,7 @@ export function LanguageToggle() {
     } else {
       // Development environment - normal routing with both /en and /es
       const currentPath = location.replace(/^\/(en|es)/, '') || '/';
-      const newPath = `/${newLang}${currentPath}`;
+      const newPath = currentPath === '/' ? `/${newLang}` : `/${newLang}${currentPath}`;
       setLocation(newPath);
     }
   };
