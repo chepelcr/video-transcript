@@ -31,7 +31,6 @@
         // Handle direct language routes like /video-transcript/es
         if (route === '/es' || route === '/en') {
             console.log('Direct language route access:', route);
-            // For direct language routes, preserve them as-is in the redirect
         } else if (route.startsWith('/es/') || route.startsWith('/en/')) {
             console.log('Language subpath route access:', route);
         }
@@ -39,7 +38,9 @@
         // Always redirect through query parameter for SPA routing
         const redirectUrl = basePath + '/?p=' + encodeURIComponent(route + query + hash);
         console.log('404 redirect:', fullPath, '→', redirectUrl);
-        window.location.replace(redirectUrl);
+        
+        // Use window.location.href instead of replace to ensure proper redirect
+        window.location.href = redirectUrl;
     </script>
 </head>
 <body>

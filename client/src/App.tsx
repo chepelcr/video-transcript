@@ -136,10 +136,15 @@ function RouterWithLanguage() {
   // Debug current routing state
   console.log('Router rendering with:', { location, pathWithoutBase, currentPath, language, isInitialized });
   
-  // Show loading state until initialized, but only for a short time to prevent infinite loading
+  // Show loading state until initialized
+  React.useEffect(() => {
+    if (!isInitialized) {
+      const timer = setTimeout(() => setIsInitialized(true), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialized]);
+
   if (!isInitialized) {
-    // Auto-initialize after a brief moment to prevent stuck loading states
-    setTimeout(() => setIsInitialized(true), 100);
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" aria-label="Loading"/>
