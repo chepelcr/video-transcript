@@ -9,13 +9,20 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
     'https://jcampos.dev', // Your actual domain
     process.env.FRONTEND_URL
   ].filter(Boolean);
 
   const origin = req.headers.origin;
+  console.log(`CORS check: origin=${origin}, allowed=${allowedOrigins.includes(origin || '')}`);
   if (origin && allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    // Allow all origins in development for now
+    res.setHeader('Access-Control-Allow-Origin', '*');
   }
   
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');

@@ -112,13 +112,20 @@ export default function PayPalButton({
         .then((res) => {
           console.log("PayPal Button: Setup response status:", res.status);
           if (!res.ok) {
-            throw new Error(`Setup request failed: ${res.status}`);
+            throw new Error(`Setup request failed: ${res.status} ${res.statusText}`);
           }
           return res.json();
         })
         .then((data) => {
           console.log("PayPal Button: Received client token:", data.clientToken ? "✓" : "✗");
+          if (!data.clientToken) {
+            throw new Error("No client token received from server");
+          }
           return data.clientToken;
+        })
+        .catch((error) => {
+          console.error("PayPal Button: Failed to get client token:", error);
+          throw error;
         });
       const sdkInstance = await (window as any).paypal.createInstance({
         clientToken,
@@ -156,7 +163,12 @@ export default function PayPalButton({
         }
       };
     } catch (e) {
-      console.error(e);
+      console.error("PayPal Button: Initialization failed:", e);
+      // Show user-friendly error
+      const paypalButton = document.getElementById("paypal-button");
+      if (paypalButton) {
+        paypalButton.innerHTML = '<div style="padding: 10px; background: #f44336; color: white; border-radius: 4px; text-align: center;">PayPal temporarily unavailable</div>';
+      }
     }
   };
 
