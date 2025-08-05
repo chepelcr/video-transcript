@@ -19,8 +19,11 @@ export const isDevelopment = !isProduction;
 // Stripe configuration - ONLY public key for frontend
 export const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
-if (!STRIPE_PUBLIC_KEY && import.meta.env.MODE === 'production') {
-  console.error('Missing VITE_STRIPE_PUBLIC_KEY environment variable. Stripe payments will not work.');
-} else if (!STRIPE_PUBLIC_KEY) {
-  console.warn('VITE_STRIPE_PUBLIC_KEY not set. Using development fallback.');
+// Graceful handling of missing Stripe key
+if (!STRIPE_PUBLIC_KEY) {
+  if (import.meta.env.MODE === 'production') {
+    console.error('Missing VITE_STRIPE_PUBLIC_KEY environment variable. Stripe payments will not work.');
+  } else {
+    console.warn('VITE_STRIPE_PUBLIC_KEY not set in development.');
+  }
 }

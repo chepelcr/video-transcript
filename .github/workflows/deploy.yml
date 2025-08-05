@@ -47,6 +47,9 @@ jobs:
         # Fix asset paths for subdirectory deployment
         sed -i 's|src="/assets/|src="/video-transcript/assets/|g' dist/gh-pages/index.html
         sed -i 's|href="/assets/|href="/video-transcript/assets/|g' dist/gh-pages/index.html
+        
+        # Add debug script to help troubleshoot white screen issues
+        sed -i 's|<head>|<head><script>window.ghPagesDebug=true;console.log("🚀 GitHub Pages deployment loaded");console.log("Base path:",window.location.pathname);</script>|g' dist/gh-pages/index.html
       env:
         VITE_STRIPE_PUBLIC_KEY: ${{ secrets.VITE_STRIPE_PUBLIC_KEY }}
         VITE_PYTHON_API_URL: ${{ secrets.VITE_PYTHON_API_URL }}

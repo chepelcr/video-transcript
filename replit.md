@@ -13,6 +13,14 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **HYBRID DEPLOYMENT CONFIGURED**: Set up GitHub Pages frontend + Replit backend architecture
 - ✅ **STRIPE INTEGRATION FIXED**: Secret key properly configured, payments working
 - ✅ **FLAG-BASED LANGUAGE UI**: Clean flag icons (🇺🇸/🇪🇸) with right-aligned dropdown
+- ✅ **SUBDIRECTORY DEPLOYMENT FIXED**: Configured for `https://jcampos.dev/video-transcript/` with proper asset paths
+- ✅ **SPA ROUTING SOLUTION**: Added 404.html redirect handling for GitHub Pages single-page app routing
+- ✅ **CORS UPDATED**: Set correct domain `https://jcampos.dev` for production CORS
+- ✅ **GITHUB WORKFLOW UPGRADED**: Updated to proven working deployment configuration with proper permissions
+- ✅ **OFFICIAL ACTIONS**: Using `actions/deploy-pages@v4` instead of third-party action for reliability  
+- ✅ **HYBRID DEPLOYMENT CONFIGURED**: Set up GitHub Pages frontend + Replit backend architecture
+- ✅ **STRIPE INTEGRATION FIXED**: Secret key properly configured, payments working
+- ✅ **FLAG-BASED LANGUAGE UI**: Clean flag icons (🇺🇸/🇪🇸) with right-aligned dropdown
 
 # User Preferences
 

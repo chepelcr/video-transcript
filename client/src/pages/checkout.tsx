@@ -12,10 +12,7 @@ import { STRIPE_PUBLIC_KEY } from "@/lib/config";
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
-if (!STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-}
-const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
+const stripePromise = STRIPE_PUBLIC_KEY ? loadStripe(STRIPE_PUBLIC_KEY) : null;
 
 const CheckoutForm = () => {
   const stripe = useStripe();

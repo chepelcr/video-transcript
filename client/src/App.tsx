@@ -9,34 +9,43 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
+import { DebugInfo } from "@/components/DebugInfo";
 import { useEffect } from "react";
+
+// Log component initialization
+console.log('📦 App components loaded');
 
 function RouterWithLanguage() {
   const [location, setLocation] = useLocation();
   const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
-    // Handle GitHub Pages query parameter redirect
-    const urlParams = new URLSearchParams(window.location.search);
-    const pathFromQuery = urlParams.get('p');
-    if (pathFromQuery) {
-      const decodedPath = decodeURIComponent(pathFromQuery);
-      setLocation(decodedPath);
-      // Clean URL by removing the query parameter
-      window.history.replaceState({}, '', window.location.pathname + decodedPath);
-      return;
-    }
-
-    // Check if URL starts with language prefix
-    const pathMatch = location.match(/^\/(en|es)(\/.*|$)/);
-    if (pathMatch) {
-      const urlLang = pathMatch[1] as 'en' | 'es';
-      if (urlLang !== language) {
-        setLanguage(urlLang);
+    try {
+      // Handle GitHub Pages query parameter redirect
+      const urlParams = new URLSearchParams(window.location.search);
+      const pathFromQuery = urlParams.get('p');
+      if (pathFromQuery) {
+        const decodedPath = decodeURIComponent(pathFromQuery);
+        setLocation(decodedPath);
+        // Clean URL by removing the query parameter
+        const newUrl = window.location.pathname.replace('/video-transcript', '') + decodedPath;
+        window.history.replaceState({}, '', newUrl);
+        return;
       }
-    } else if (language === 'es' && !location.startsWith('/es')) {
-      // If Spanish is selected but URL doesn't have /es, redirect
-      setLocation(`/es${location}`);
+
+      // Check if URL starts with language prefix
+      const pathMatch = location.match(/^\/(en|es)(\/.*|$)/);
+      if (pathMatch) {
+        const urlLang = pathMatch[1] as 'en' | 'es';
+        if (urlLang !== language) {
+          setLanguage(urlLang);
+        }
+      } else if (language === 'es' && !location.startsWith('/es')) {
+        // If Spanish is selected but URL doesn't have /es, redirect
+        setLocation(`/es${location}`);
+      }
+    } catch (error) {
+      console.error('Router error:', error);
     }
   }, [location, language, setLanguage, setLocation]);
 
@@ -63,6 +72,7 @@ function RouterWithLanguage() {
 }
 
 function Router() {
+  console.log('🔗 Router initializing...');
   return (
     <LanguageProvider>
       <RouterWithLanguage />
@@ -71,12 +81,18 @@ function Router() {
 }
 
 function App() {
+  console.log('🏠 App component rendering...');
+  
+  // Show debug info when debug=true is in URL (for GitHub Pages debugging)
+  const showDebug = window.location.search.includes('debug=true');
+  
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <TooltipProvider>
-          <Toaster />
+          {showDebug && <DebugInfo />}
           <Router />
+          <Toaster />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
