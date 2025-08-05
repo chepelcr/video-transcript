@@ -13,7 +13,7 @@ This is a video transcription service application built with a full-stack TypeSc
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
-UI Design: Prefers flag icons over text indicators for language selection in navigation. Prefers compact, well-aligned interface elements with proper spacing.
+UI Design: Prefers flag icons over text indicators for language selection in navigation. Prefers compact, well-aligned interface elements with proper spacing. Flags should be aligned to the right side of dropdown menus to match navbar icon alignment.
 
 # System Architecture
 

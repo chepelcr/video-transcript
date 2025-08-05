@@ -35,17 +35,17 @@ export function LanguageToggle() {
       <DropdownMenuContent align="end" className="min-w-[120px]">
         <DropdownMenuItem
           onClick={() => switchLanguage('en')}
-          className={`flex items-center ${language === 'en' ? 'bg-accent' : ''}`}
+          className={`flex items-center justify-between ${language === 'en' ? 'bg-accent' : ''}`}
         >
-          <span className="mr-2">🇺🇸</span>
           <span>English</span>
+          <span className="ml-2">🇺🇸</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => switchLanguage('es')}
-          className={`flex items-center ${language === 'es' ? 'bg-accent' : ''}`}
+          className={`flex items-center justify-between ${language === 'es' ? 'bg-accent' : ''}`}
         >
-          <span className="mr-2">🇪🇸</span>
           <span>Español</span>
+          <span className="ml-2">🇪🇸</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
