@@ -43,19 +43,29 @@ export async function transcribeVideo(videoUrl: string): Promise<TranscriptionRe
     console.log('Attempting to contact transcription service...');
     
     try {
-      // Create an AbortController for proper cleanup
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
-      const response = await fetch(`${PYTHON_API_BASE_URL}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal,
+      // Simple fetch with timeout - no AbortController to avoid promise rejection issues
+      const fetchWithTimeout = new Promise((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          reject(new Error('Request timeout'));
+        }, 5000);
+        
+        fetch(`${PYTHON_API_BASE_URL}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(response => {
+          clearTimeout(timeoutId);
+          resolve(response);
+        })
+        .catch(error => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
       });
-      
-      clearTimeout(timeoutId);
+
+      const response = await fetchWithTimeout as Response;
 
       if (response.ok) {
         const data = await response.json();
@@ -76,10 +86,7 @@ export async function transcribeVideo(videoUrl: string): Promise<TranscriptionRe
       }
     } catch (apiError: any) {
       console.log('Transcription service unavailable, using simulation mode');
-      // Handle AbortError or other fetch errors gracefully
-      if (apiError.name === 'AbortError') {
-        console.log('Request timed out, falling back to simulation');
-      }
+      // All errors are handled here - no unhandled promises
     }
 
     // Fallback to simulation with realistic processing time
