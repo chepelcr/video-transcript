@@ -10,7 +10,7 @@ import Home from "@/pages/home";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
 import { DebugInfo } from "@/components/DebugInfo";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 // Log component initialization
 console.log('📦 App components loaded');
@@ -18,6 +18,7 @@ console.log('📦 App components loaded');
 function RouterWithLanguage() {
   const [location, setLocation] = useLocation();
   const { language, setLanguage } = useLanguage();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     try {
@@ -33,18 +34,29 @@ function RouterWithLanguage() {
         
         // Handle language detection from redirected path
         if (decodedPath.startsWith('/es')) {
-          console.log('Setting language to Spanish from redirect');
+          console.log('Setting language to Spanish from redirect:', decodedPath);
           setLanguage('es');
         } else if (decodedPath.startsWith('/en')) {
-          console.log('Setting language to English from redirect');
+          console.log('Setting language to English from redirect:', decodedPath);
           setLanguage('en');
         }
+        
+        // Ensure the route is processed correctly
+        console.log('GitHub Pages redirect processing complete:', {
+          originalQuery: pathFromQuery,
+          decodedPath,
+          newLocation: decodedPath,
+          languageSet: decodedPath.startsWith('/es') ? 'es' : decodedPath.startsWith('/en') ? 'en' : 'none'
+        });
         
         // Clean URL by preserving the base path and adding the decoded path
         const basePath = window.location.pathname.includes('/video-transcript') ? '/video-transcript' : '';
         const newUrl = basePath + decodedPath;
         window.history.replaceState({}, '', newUrl);
         console.log('GitHub Pages redirect completed:', newUrl);
+        
+        // Ensure component re-renders with new route after redirect
+        setTimeout(() => setIsInitialized(true), 0);
         return;
       }
 
@@ -96,10 +108,15 @@ function RouterWithLanguage() {
       
       // Log current routing state for debugging
       console.log('Development routing state:', { location, language, windowPath: window.location.pathname });
+      
+      // Mark as initialized after processing
+      if (!isInitialized) {
+        setIsInitialized(true);
+      }
     } catch (error) {
       console.error('Router error:', error);
     }
-  }, [location, language, setLanguage, setLocation]);
+  }, [location, language, setLanguage, setLocation, isInitialized]);
 
   const stripBasePath = (path: string) => {
     // Remove GitHub Pages base path first
@@ -118,7 +135,16 @@ function RouterWithLanguage() {
   const currentPath = stripLanguagePrefix(pathWithoutBase);
 
   // Debug current routing state
-  console.log('Router rendering with:', { location, pathWithoutBase, currentPath, language });
+  console.log('Router rendering with:', { location, pathWithoutBase, currentPath, language, isInitialized });
+  
+  // Show loading state until initialized
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" aria-label="Loading"/>
+      </div>
+    );
+  }
   
   // Use the path without base for routing
   const routePath = pathWithoutBase;
