@@ -5,11 +5,11 @@ const config = {
   },
   production: {
     // Replit backend API for hybrid deployment
-    apiBaseUrl: 'https://rest-express--jcampos8.replit.app',
+    apiBaseUrl: 'https://video-scribe-chepelcr.replit.app',
   }
 };
 
-// Back to development mode since production API is not accessible
+// Back to development - production API has internal server error
 const environment = import.meta.env.MODE === 'production' ? 'production' : 'development';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || config[environment].apiBaseUrl;

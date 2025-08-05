@@ -5,7 +5,7 @@ This is a video transcription service application built with a full-stack TypeSc
 ## Recent Changes (August 2025)
 - ✅ **PAYPAL INTEGRATION FIXED**: Updated PayPal button to use proper API base URL for hybrid deployment
 - ✅ **HYBRID DEPLOYMENT COMPLETE**: Frontend (GitHub Pages) + Backend (Replit) architecture fully configured
-- ✅ **API CONFIGURATION**: Production API URL set to `https://rest-express--jcampos8.replit.app`
+- ✅ **API CONFIGURATION**: Production API URL identified as `https://video-scribe-chepelcr.replit.app`
 - ✅ **BASE PATH PRESERVATION**: Fixed /video-transcript subdirectory URL preservation in spa-github-pages routing
 - ✅ **CORS CONFIGURED**: Backend properly configured for https://jcampos.dev domain
 - ✅ **ENVIRONMENT VARIABLES**: VITE_API_BASE_URL and VITE_STRIPE_PUBLIC_KEY properly configured
