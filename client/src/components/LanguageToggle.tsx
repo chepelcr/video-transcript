@@ -20,30 +20,37 @@ export function LanguageToggle() {
     const isGitHubPages = window.location.pathname.includes('/video-transcript') || (window as any).ghPagesDebug;
     
     if (isGitHubPages) {
-      // For GitHub Pages, preserve base path in browser URL
+      // For GitHub Pages, handle language routes properly
       const basePath = '/video-transcript';
-      const currentPath = location.replace(/^\/(en|es)/, '') || '/';
-      const newPath = newLang === 'en' ? currentPath : `/es${currentPath}`;
       
-      // Build the correct full path - don't double the base path
-      let fullPath;
-      if (newPath === '/') {
-        fullPath = basePath + '/';
-      } else if (newPath.startsWith('/es/')) {
-        fullPath = basePath + newPath;
-      } else {
-        fullPath = basePath + newPath;
+      // First strip the base path from location if it exists
+      let cleanLocation = location;
+      if (cleanLocation.startsWith('/video-transcript')) {
+        cleanLocation = cleanLocation.replace('/video-transcript', '') || '/';
       }
       
-      console.log('Language change in GitHub Pages:', { newLang, currentPath, newPath, fullPath, currentLocation: location });
+      // Then strip any language prefix
+      const currentPath = cleanLocation.replace(/^\/(en|es)/, '') || '/';
+      const newPath = `/${newLang}${currentPath}`;
+      const fullPath = `${basePath}${newPath}`;
+      
+      console.log('Language change in GitHub Pages:', { 
+        newLang, 
+        originalLocation: location,
+        cleanLocation,
+        currentPath, 
+        newPath, 
+        fullPath,
+        windowPath: window.location.pathname
+      });
       
       // Update both router state and browser URL
       setLocation(newPath);
       window.history.pushState({}, '', fullPath);
     } else {
-      // Development environment - normal routing
+      // Development environment - normal routing with both /en and /es
       const currentPath = location.replace(/^\/(en|es)/, '') || '/';
-      const newPath = newLang === 'en' ? currentPath : `/es${currentPath}`;
+      const newPath = `/${newLang}${currentPath}`;
       setLocation(newPath);
     }
   };
