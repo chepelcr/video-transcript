@@ -20,6 +20,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { SiYoutube, SiVimeo } from 'react-icons/si';
 
+
 interface Transcription {
   id: string;
   videoUrl: string;
@@ -459,9 +460,11 @@ export default function Dashboard() {
                                     });
                                   }
                                 }}
-                                disabled={!transcription.transcript}
+                                disabled={transcription.status !== 'completed' || !transcription.transcript}
                                 className="flex-1 sm:flex-none"
+                                title={transcription.status === 'completed' ? t('history.copyText') : "Transcript not ready"}
                               >
+                                <Icons.copy className="h-4 w-4 mr-1" />
                                 {t('history.copyText')}
                               </Button>
                               <Button
@@ -473,14 +476,16 @@ export default function Dashboard() {
                                     const url = URL.createObjectURL(blob);
                                     const a = document.createElement('a');
                                     a.href = url;
-                                    a.download = `transcription-${transcription.id}.txt`;
+                                    a.download = `transcription-${transcription.videoTitle || transcription.id}.txt`;
                                     a.click();
                                     URL.revokeObjectURL(url);
                                   }
                                 }}
-                                disabled={!transcription.transcript}
+                                disabled={transcription.status !== 'completed' || !transcription.transcript}
                                 className="flex-1 sm:flex-none"
+                                title={transcription.status === 'completed' ? t('history.download') : "Transcript not ready"}
                               >
+                                <Icons.download className="h-4 w-4 mr-1" />
                                 {t('history.download')}
                               </Button>
                             </div>

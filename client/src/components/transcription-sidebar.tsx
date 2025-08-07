@@ -270,26 +270,28 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                     <span className="text-xs text-gray-500">
                       {formatDistanceToNow(new Date(transcription.createdAt), { addSuffix: true })}
                     </span>
-                    {transcription.status === 'completed' && (
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCopyTranscript(transcription.transcript)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDownloadTranscript(transcription)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Download className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleCopyTranscript(transcription.transcript)}
+                        disabled={transcription.status !== 'completed' || !transcription.transcript}
+                        className="h-8 w-8 p-0"
+                        title={transcription.status === 'completed' ? "Copy transcript" : "Transcript not ready"}
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDownloadTranscript(transcription)}
+                        disabled={transcription.status !== 'completed' || !transcription.transcript}
+                        className="h-8 w-8 p-0"
+                        title={transcription.status === 'completed' ? "Download transcript" : "Transcript not ready"}
+                      >
+                        <Download className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
