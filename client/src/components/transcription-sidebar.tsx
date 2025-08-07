@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { X, FileText, Download, Copy, Clock, BarChart3, RefreshCw } from 'lucide-react';
+import { X, FileText, Download, Copy, Clock, BarChart3, RefreshCw, Video } from 'lucide-react';
+import { SiYoutube, SiVimeo } from 'react-icons/si';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -163,9 +164,27 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
       if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
         return 'YouTube Video';
       }
+      if (urlObj.hostname.includes('vimeo.com')) {
+        return 'Vimeo Video';
+      }
       return urlObj.hostname;
     } catch {
       return 'Video';
+    }
+  };
+
+  const getVideoProviderIcon = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+        return <SiYoutube className="h-4 w-4 text-red-600" />;
+      }
+      if (urlObj.hostname.includes('vimeo.com')) {
+        return <SiVimeo className="h-4 w-4 text-blue-500" />;
+      }
+      return <Video className="h-4 w-4 text-gray-500" />;
+    } catch {
+      return <Video className="h-4 w-4 text-gray-500" />;
     }
   };
 
@@ -208,7 +227,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
+                      {getVideoProviderIcon(transcription.videoUrl)}
                       {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
                     </span>
                     <div className="flex gap-2">

@@ -18,6 +18,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Icons } from '@/components/ui/icons';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { SiYoutube, SiVimeo } from 'react-icons/si';
 
 interface Transcription {
   id: string;
@@ -61,6 +62,21 @@ export default function Dashboard() {
       return 'Video';
     }
   };
+
+  const getVideoProviderIcon = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+        return <SiYoutube className="h-4 w-4 text-red-600" />;
+      }
+      if (urlObj.hostname.includes('vimeo.com')) {
+        return <SiVimeo className="h-4 w-4 text-blue-500" />;
+      }
+      return <Icons.fileText className="h-4 w-4 text-gray-500" />;
+    } catch {
+      return <Icons.fileText className="h-4 w-4 text-gray-500" />;
+    }
+  };
   
   // Transcription form state
   const [videoUrl, setVideoUrl] = useState('');
@@ -88,9 +104,9 @@ export default function Dashboard() {
       }
       return failureCount < 3;
     },
-    refetchInterval: (query) => {
+    refetchInterval: (data) => {
       // Auto-refresh every 5 seconds if there are processing transcriptions
-      const hasProcessing = query.data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
+      const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
       return hasProcessing ? 5000 : false;
     },
   });
@@ -401,9 +417,12 @@ export default function Dashboard() {
                         <div key={transcription.id}>
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
-                              </p>
+                              <div className="flex items-center gap-2">
+                                {getVideoProviderIcon(transcription.videoUrl)}
+                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                  {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
+                                </p>
+                              </div>
                               <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500 dark:text-gray-400">
                                 {transcription.status === 'completed' && (
                                   <>
