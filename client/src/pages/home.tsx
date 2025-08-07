@@ -147,7 +147,7 @@ export default function Home() {
                   {user?.firstName}
                 </Button>
               ) : (
-                <Button size="sm" onClick={() => navigate(`/${language}/register`)}>
+                <Button size="sm" onClick={() => navigate(`/${language}/login`)}>
                   Get Started
                 </Button>
               )}
