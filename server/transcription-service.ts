@@ -177,21 +177,23 @@ export class TranscriptionService {
         signal: AbortSignal.timeout(30000) // 30 second timeout
       });
 
-      const result = await response.json();
       const processingTime = (Date.now() - startTime) / 1000;
 
       if (!response.ok) {
-        // Handle structured error response
-        if (result.message === '004') {
+        // Error response - handle structured error format
+        const errorData = await response.json();
+        if (errorData.message === '004') {
           throw new Error('El video tiene una duración muy larga. Por favor, usa un video de máximo 3 minutos.');
         }
-        throw new Error(result.error || `Transcription service returned ${response.status}: ${response.statusText}`);
+        throw new Error(errorData.error || `Transcription service returned ${response.status}: ${response.statusText}`);
       }
 
+      // Success response - handle original format
+      const result = await response.json();
       return {
         transcript: result.transcript || '',
         duration: result.duration || 0,
-        wordCount: result.word_count || result.transcript?.split(' ').length || 0,
+        wordCount: result.wordCount || result.transcript?.split(' ').length || 0,
         processingTime,
         accuracy: result.accuracy || 0.95,
       };

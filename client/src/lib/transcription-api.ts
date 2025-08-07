@@ -67,10 +67,12 @@ export async function transcribeVideo(videoUrl: string): Promise<TranscriptionRe
     clearTimeout(timeoutId);
     
     if (response.ok) {
+      // Success response - use original format
       const result = await response.json();
       console.log('Successfully received transcription from API');
       return result;
     } else {
+      // Error response - use structured format
       const errorData = await response.json() as TranscriptionApiError;
       console.log('API returned error:', errorData);
       
