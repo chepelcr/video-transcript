@@ -91,9 +91,9 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
   };
 
   const transcriptionContent = (
-    <div className="flex-1 overflow-hidden">
+    <div className="flex-1 overflow-hidden bg-white dark:bg-gray-900">
       {!isAuthenticated ? (
-        <div className="flex h-full items-center justify-center p-6">
+        <div className="flex h-full items-center justify-center p-6 bg-white dark:bg-gray-900">
           <div className="text-center">
             <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -105,11 +105,11 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
           </div>
         </div>
       ) : isLoading ? (
-        <div className="flex items-center justify-center p-6">
+        <div className="flex items-center justify-center p-6 bg-white dark:bg-gray-900">
           <div className="animate-spin w-6 h-6 border-4 border-primary border-t-transparent rounded-full" />
         </div>
       ) : transcriptions.length === 0 ? (
-        <div className="flex h-full items-center justify-center p-6">
+        <div className="flex h-full items-center justify-center p-6 bg-white dark:bg-gray-900">
           <div className="text-center">
             <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -121,8 +121,8 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
           </div>
         </div>
       ) : (
-        <ScrollArea className="h-full">
-          <div className="space-y-4 p-4">
+        <ScrollArea className="h-full bg-white dark:bg-gray-900">
+          <div className="space-y-4 p-4 bg-white dark:bg-gray-900">
             {transcriptions.map((transcription: Transcription) => (
               <Card key={transcription.id} className="border border-gray-200 dark:border-gray-700">
                 <CardHeader className="pb-3">
