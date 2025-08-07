@@ -99,10 +99,10 @@ export default function Home() {
             body: JSON.stringify({
               videoUrl: transcription.videoUrl || "Unknown URL",
               transcript: transcription.transcript,
-              duration: transcription.duration,
-              wordCount: transcription.wordCount,
-              processingTime: transcription.processingTime,
-              accuracy: transcription.accuracy,
+              duration: Math.round(Number(transcription.duration) || 0),
+              wordCount: Math.round(Number(transcription.wordCount) || 0),
+              processingTime: Math.round(Number(transcription.processingTime) || 0),
+              accuracy: Math.round(Number(transcription.accuracy) || 0),
             }),
           });
 
