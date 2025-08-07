@@ -43,6 +43,7 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **DATABASE STORAGE MIGRATION**: Completely resolved database storage issue by switching all transcription routes from MemStorage to AuthStorage (database-backed) (August 7, 2025)
 - ✅ **TRANSCRIPTION PERSISTENCE**: Updated transcription creation, retrieval, and webhook endpoints to use proper database persistence
 - ✅ **PRE-LOGIN URL PRESERVATION**: Fixed app losing pre-login URL input after authentication by persisting pending video URL in localStorage across page navigation
+- ✅ **DASHBOARD REFRESH ERROR FIX**: Fixed null pointer exception when refreshing dashboard - added null safety for transcript substring operations and disabled buttons for processing transcriptions (August 7, 2025)
 
 # User Preferences
 

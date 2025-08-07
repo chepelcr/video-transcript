@@ -393,7 +393,10 @@ export default function Dashboard() {
                                 <span className="hidden sm:inline">{new Date(transcription.createdAt).toLocaleDateString()}</span>
                               </div>
                               <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                                {transcription.transcript.substring(0, 150)}...
+                                {transcription.transcript 
+                                  ? `${transcription.transcript.substring(0, 150)}...`
+                                  : t(`status.${transcription.status}`) || 'Processing...'
+                                }
                               </p>
                             </div>
                             <div className="flex gap-2 sm:ml-4">
@@ -401,8 +404,15 @@ export default function Dashboard() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                  navigator.clipboard.writeText(transcription.transcript);
+                                  if (transcription.transcript) {
+                                    navigator.clipboard.writeText(transcription.transcript);
+                                    toast({
+                                      title: t('messages.success'),
+                                      description: t('history.copied'),
+                                    });
+                                  }
                                 }}
+                                disabled={!transcription.transcript}
                                 className="flex-1 sm:flex-none"
                               >
                                 {t('history.copyText')}
@@ -411,14 +421,17 @@ export default function Dashboard() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                  const blob = new Blob([transcription.transcript], { type: 'text/plain' });
-                                  const url = URL.createObjectURL(blob);
-                                  const a = document.createElement('a');
-                                  a.href = url;
-                                  a.download = `transcription-${transcription.id}.txt`;
-                                  a.click();
-                                  URL.revokeObjectURL(url);
+                                  if (transcription.transcript) {
+                                    const blob = new Blob([transcription.transcript], { type: 'text/plain' });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = `transcription-${transcription.id}.txt`;
+                                    a.click();
+                                    URL.revokeObjectURL(url);
+                                  }
                                 }}
+                                disabled={!transcription.transcript}
                                 className="flex-1 sm:flex-none"
                               >
                                 {t('history.download')}
