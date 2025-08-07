@@ -84,15 +84,36 @@ export default function Home() {
     // Save transcription to database if authenticated
     if (isAuthenticated) {
       try {
-        await apiRequest("POST", "/api/transcriptions", {
-          videoUrl: transcription.videoUrl || "Unknown URL",
-          transcript: transcription.transcript,
-          duration: transcription.duration,
-          wordCount: transcription.wordCount,
-          processingTime: transcription.processingTime,
-          accuracy: transcription.accuracy,
-        });
-        console.log("Transcription saved to database successfully");
+        // Get tokens and make authenticated request
+        const tokens = JSON.parse(localStorage.getItem('auth_tokens') || '{}');
+        if (tokens.accessToken) {
+          const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${tokens.accessToken}`
+          };
+
+          const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+          const response = await fetch(`${baseUrl}/api/transcriptions`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              videoUrl: transcription.videoUrl || "Unknown URL",
+              transcript: transcription.transcript,
+              duration: transcription.duration,
+              wordCount: transcription.wordCount,
+              processingTime: transcription.processingTime,
+              accuracy: transcription.accuracy,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+          }
+          
+          console.log("Transcription saved to database successfully");
+        } else {
+          console.error("No access token found for saving transcription");
+        }
       } catch (error) {
         console.error("Failed to save transcription to database:", error);
         // Don't show error to user as the transcription still works
