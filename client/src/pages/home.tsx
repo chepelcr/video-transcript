@@ -93,14 +93,16 @@ export default function Home() {
               <button onClick={() => scrollToSection('contact')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
                 {t('nav.contact')}
               </button>
-              <Button
-                variant="outline"
-                onClick={() => setIsSidebarOpen(true)}
-                className="flex items-center gap-2"
-              >
-                <History className="h-4 w-4" />
-                History
-              </Button>
+              {isAuthenticated && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <History className="h-4 w-4" />
+                  History
+                </Button>
+              )}
               {isAuthenticated ? (
                 <>
                   <Button
@@ -116,26 +118,23 @@ export default function Home() {
                   </Button>
                 </>
               ) : (
-                <>
-                  <Button variant="outline" onClick={() => navigate(`/${language}/login`)}>
-                    Sign In
-                  </Button>
-                  <Button onClick={() => navigate(`/${language}/register`)}>
-                    {t('nav.getStarted')}
-                  </Button>
-                </>
+                <Button onClick={() => navigate(`/${language}/register`)}>
+                  Get Started
+                </Button>
               )}
               <ThemeToggle />
               <LanguageToggle />
             </div>
             <div className="md:hidden flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsSidebarOpen(true)}
-              >
-                <History className="h-4 w-4" />
-              </Button>
+              {isAuthenticated && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsSidebarOpen(true)}
+                >
+                  <History className="h-4 w-4" />
+                </Button>
+              )}
               {isAuthenticated ? (
                 <Button
                   variant="outline"
@@ -504,10 +503,12 @@ export default function Home() {
         planType={selectedPlan}
       />
 
-      <TranscriptionSidebar 
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
+      {isAuthenticated && (
+        <TranscriptionSidebar 
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }
