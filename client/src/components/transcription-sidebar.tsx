@@ -186,43 +186,49 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
 
   return (
     <>
-      {/* Mobile/Tablet Modal */}
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="lg:hidden max-w-xs sm:max-w-md md:max-w-lg mx-auto h-[85vh] sm:h-[80vh] flex flex-col p-0 bg-white dark:bg-gray-900">
-          <DialogHeader className="p-4 border-b">
-            <DialogTitle className="text-lg font-semibold">
-              Recent Transcriptions
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              View and manage your transcription history
-            </DialogDescription>
-          </DialogHeader>
-          {transcriptionContent}
-        </DialogContent>
-      </Dialog>
-
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:block fixed inset-0 z-50 flex">
-        {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-        
-        {/* Sidebar */}
-        <div className="relative ml-auto w-full max-w-lg xl:max-w-xl bg-white dark:bg-gray-900 shadow-xl border-l border-gray-200 dark:border-gray-700">
-          <div className="flex h-full flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-900">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+      {/* Mobile/Tablet Modal - Only render on smaller screens */}
+      <div className="lg:hidden">
+        <Dialog open={isOpen} onOpenChange={onClose}>
+          <DialogContent className="max-w-xs sm:max-w-md md:max-w-lg mx-auto h-[85vh] sm:h-[80vh] flex flex-col p-0 bg-white dark:bg-gray-900">
+            <DialogHeader className="p-4 border-b">
+              <DialogTitle className="text-lg font-semibold">
                 Recent Transcriptions
-              </h2>
-              <Button variant="ghost" size="sm" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Content */}
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                View and manage your transcription history
+              </DialogDescription>
+            </DialogHeader>
             {transcriptionContent}
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Desktop Sidebar - Only render on larger screens */}
+      <div className="hidden lg:block">
+        {isOpen && (
+          <div className="fixed inset-0 z-50 flex">
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+            
+            {/* Sidebar */}
+            <div className="relative ml-auto w-full max-w-lg xl:max-w-xl bg-white dark:bg-gray-900 shadow-xl border-l border-gray-200 dark:border-gray-700">
+              <div className="flex h-full flex-col">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-900">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Recent Transcriptions
+                  </h2>
+                  <Button variant="ghost" size="sm" onClick={onClose}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Content */}
+                {transcriptionContent}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );
