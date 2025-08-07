@@ -16,43 +16,21 @@ export function LanguageToggle() {
   const switchLanguage = (newLang: 'en' | 'es') => {
     setLanguage(newLang);
     
-    // Check if we're in GitHub Pages environment
-    const isGitHubPages = window.location.pathname.includes('/video-transcript') || (window as any).ghPagesDebug;
+    // Simple language routing for custom domain deployment
+    // Remove any existing language prefix from current path
+    const currentPath = location.replace(/^\/(en|es)/, '') || '/';
+    const newPath = currentPath === '/' ? `/${newLang}` : `/${newLang}${currentPath}`;
     
-    if (isGitHubPages) {
-      // For GitHub Pages, handle language routes properly
-      const basePath = '/video-transcript';
-      
-      // First strip the base path from location if it exists
-      let cleanLocation = location;
-      if (cleanLocation.startsWith('/video-transcript')) {
-        cleanLocation = cleanLocation.replace('/video-transcript', '') || '/';
-      }
-      
-      // Then strip any language prefix
-      const currentPath = cleanLocation.replace(/^\/(en|es)/, '') || '/';
-      const newPath = currentPath === '/' ? `/${newLang}` : `/${newLang}${currentPath}`;
-      const fullPath = `${basePath}${newPath}`;
-      
-      console.log('Language change in GitHub Pages:', { 
-        newLang, 
-        originalLocation: location,
-        cleanLocation,
-        currentPath, 
-        newPath, 
-        fullPath,
-        windowPath: window.location.pathname
-      });
-      
-      // Update both router state and browser URL
-      setLocation(newPath);
-      window.history.pushState({}, '', fullPath);
-    } else {
-      // Development environment - normal routing with both /en and /es
-      const currentPath = location.replace(/^\/(en|es)/, '') || '/';
-      const newPath = currentPath === '/' ? `/${newLang}` : `/${newLang}${currentPath}`;
-      setLocation(newPath);
-    }
+    console.log('Language switch:', { 
+      newLang, 
+      originalLocation: location,
+      currentPath, 
+      newPath,
+      windowPath: window.location.pathname
+    });
+    
+    // Update router location
+    setLocation(newPath);
   };
 
   return (
