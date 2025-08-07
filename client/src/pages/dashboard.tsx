@@ -48,6 +48,11 @@ export default function Dashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Calculate limit status early
+  const dailyUsage = user?.transcriptionsUsed || 0;
+  const dailyLimit = 3;
+  const isLimitReached = dailyUsage >= dailyLimit;
+
   // Helper function to get video title with fallback
   const getVideoTitle = (url: string) => {
     try {
@@ -194,9 +199,6 @@ export default function Dashboard() {
   }
 
   const transcriptions = transcriptionData?.transcriptions || [];
-  const dailyUsage = user?.transcriptionsUsed || 0;
-  const dailyLimit = 3;
-  const isLimitReached = dailyUsage >= dailyLimit;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
