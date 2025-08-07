@@ -59,28 +59,29 @@ export default function Home() {
   // Auto-transcribe pending video URL after login
   useEffect(() => {
     if (isAuthenticated && pendingVideoUrl && remainingTranscriptions > 0) {
-      // Auto-submit the pending URL for transcription
+      // Auto-submit the pending URL for transcription via new SQS system
       const autoTranscribe = async () => {
         try {
-          const transcription = await transcribeVideo(pendingVideoUrl);
-          handleTranscriptionComplete({
-            ...transcription,
-            videoUrl: pendingVideoUrl
+          const createResponse = await apiRequest('POST', '/api/transcriptions/create', {
+            videoUrl: pendingVideoUrl.trim(),
           });
-          setPendingVideoUrl(""); // Clear pending URL
+
           toast({
-            title: t('messages.success'),
-            description: t('messages.transcribed'),
+            title: t('transcription.queued.title'),
+            description: t('transcription.queued.description').replace('{{title}}', createResponse.videoTitle),
           });
-        } catch (error: any) {
-          const errorMessage = error.message === 'VIDEO_TOO_LONG' 
-            ? t('messages.videoTooLong')
-            : error.message || t('messages.failed');
+
+          setPendingVideoUrl(""); // Clear pending URL
           
+          // Navigate to dashboard to see processing status
+          navigate(`/${language}/dashboard`);
+          
+        } catch (error: any) {
+          console.error('Auto-transcription error:', error);
           toast({
             title: t('messages.error'),
-            description: errorMessage,
-            variant: "destructive",
+            description: error.message || t('messages.unknownError'),
+            variant: 'destructive',
           });
           setPendingVideoUrl(""); // Clear pending URL even on error
         }
@@ -88,7 +89,7 @@ export default function Home() {
       
       autoTranscribe();
     }
-  }, [isAuthenticated, pendingVideoUrl, remainingTranscriptions]);
+  }, [isAuthenticated, pendingVideoUrl, remainingTranscriptions, t, toast, navigate, language]);
 
   const handleTranscriptionComplete = async (transcription: Transcription) => {
     setCurrentTranscription(transcription);
@@ -346,6 +347,7 @@ export default function Home() {
                 setPendingVideoUrl(videoUrl);
                 navigate(`/${language}/login`);
               }}
+              onNavigateToResults={() => navigate(`/${language}/dashboard`)}
             />
           </div>
         </div>

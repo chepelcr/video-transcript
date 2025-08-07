@@ -37,6 +37,9 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **WEBHOOK SECURITY**: Added secure webhook endpoint with TRANSCRIPTION_WEBHOOK_SECRET verification for receiving processed transcriptions
 - ✅ **REAL-TIME STATUS TRACKING**: Enhanced frontend with auto-refresh functionality, status badges, and processing indicators in both sidebar and dashboard
 - ✅ **TRANSCRIPTION STATUS WORKFLOW**: Implemented pending → processing → completed/failed status tracking with bilingual support
+- ✅ **HOME PAGE WORKFLOW FIX**: Updated home page transcription form to use new SQS-based API instead of old synchronous endpoint (August 7, 2025)
+- ✅ **USER FLOW CONSISTENCY**: Fixed workflow inconsistency - home page now queues transcriptions via SQS and redirects to dashboard like the rest of the system
+- ✅ **TRANSLATION COMPLETION**: Fixed all remaining hardcoded strings - "Get Started" buttons, navigation elements fully translate across desktop/mobile views
 
 # User Preferences
 

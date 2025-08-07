@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Play, Gift, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { transcribeVideo } from "@/lib/transcription-api";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -12,6 +12,7 @@ interface VideoTranscriptionFormProps {
   onUpgradeRequired: () => void;
   isAuthenticated: boolean;
   onLoginRequired: (videoUrl: string) => void;
+  onNavigateToResults: () => void;
 }
 
 export default function VideoTranscriptionForm({
@@ -19,7 +20,8 @@ export default function VideoTranscriptionForm({
   remainingTranscriptions,
   onUpgradeRequired,
   isAuthenticated,
-  onLoginRequired
+  onLoginRequired,
+  onNavigateToResults
 }: VideoTranscriptionFormProps) {
   const [videoUrl, setVideoUrl] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -77,30 +79,23 @@ export default function VideoTranscriptionForm({
     setProcessingStatus(t('hero.processing'));
     
     try {
-      // Show realistic processing steps
-      setProcessingStatus("Analyzing video content...");
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setProcessingStatus("Extracting audio track...");
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      setProcessingStatus("Converting speech to text...");
-      const transcription = await transcribeVideo(videoUrl);
-      
-      setProcessingStatus("Finalizing transcription...");
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Add videoUrl to the transcription object
-      onTranscriptionComplete({
-        ...transcription,
-        videoUrl: videoUrl
+      // Use new SQS-based endpoint to queue transcription
+      const response = await apiRequest('POST', '/api/transcriptions/create', {
+        videoUrl: videoUrl.trim(),
       });
+
+      const createResponse = await response.json();
+
+      toast({
+        title: t('transcription.queued.title'),
+        description: t('transcription.queued.description').replace('{{title}}', createResponse.videoTitle),
+      });
+
       setVideoUrl("");
       
-      toast({
-        title: t('messages.success'),
-        description: t('messages.transcribed'),
-      });
+      // Navigate to dashboard to see processing status
+      onNavigateToResults();
+      
     } catch (error: any) {
       const errorMessage = error.message === 'VIDEO_TOO_LONG' 
         ? t('messages.videoTooLong')
