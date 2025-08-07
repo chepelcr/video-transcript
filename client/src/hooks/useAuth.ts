@@ -170,9 +170,13 @@ export function useAuth() {
     mutationFn: async (data: LoginRequest) => {
       console.log('Attempting login...');
       const response = await apiRequest('POST', '/api/auth/login', data);
-      const authData = response as unknown as AuthResponse;
+      const authData = await response.json() as AuthResponse;
       
-      console.log('Login response received:', { hasUser: !!authData.user, hasTokens: !!(authData.accessToken && authData.refreshToken) });
+      console.log('Login response received:', { 
+        hasUser: !!authData.user, 
+        hasTokens: !!(authData.accessToken && authData.refreshToken),
+        actualData: authData 
+      });
       
       // Store tokens
       const tokens = {
