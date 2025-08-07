@@ -389,15 +389,25 @@ export default function Dashboard() {
                                 {transcription.videoTitle || transcription.videoUrl}
                               </p>
                               <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500 dark:text-gray-400">
-                                <span>{transcription.duration}s</span>
-                                <span>{transcription.wordCount} {t('history.words')}</span>
-                                <span>{transcription.accuracy}% {t('history.accuracy')}</span>
+                                {transcription.status === 'completed' && (
+                                  <>
+                                    <span>{transcription.duration}s</span>
+                                    <span>{transcription.wordCount} {t('history.words')}</span>
+                                    <span>{transcription.accuracy}% {t('history.accuracy')}</span>
+                                  </>
+                                )}
                                 <span className="hidden sm:inline">{new Date(transcription.createdAt).toLocaleDateString()}</span>
                               </div>
                               <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                                 {transcription.transcript 
                                   ? `${transcription.transcript.substring(0, 150)}...`
-                                  : t(`status.${transcription.status}`) || 'Processing...'
+                                  : transcription.status === 'processing' 
+                                    ? t('status.processing')
+                                    : transcription.status === 'pending'
+                                    ? t('status.pending') 
+                                    : transcription.status === 'failed'
+                                    ? t('status.failed')
+                                    : t('status.processing')
                                 }
                               </p>
                             </div>

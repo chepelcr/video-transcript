@@ -159,7 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         videoUrl,
         videoTitle: videoInfo.title,
         status: "processing",
-      });
+      } as any);
 
       // Queue transcription for asynchronous processing
       try {
@@ -170,14 +170,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Mark as failed if we can't queue it
         await authStorage.updateTranscription(transcription.id, {
           status: "failed",
-        });
+        } as any);
         return res.status(500).json({ error: "Failed to queue transcription for processing" });
       }
 
       res.json({ 
         id: transcription.id,
         videoTitle: videoInfo.title,
-        status: transcription.status
+        status: (transcription as any).status || "processing"
       });
 
     } catch (error) {
@@ -205,7 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied" });
       }
 
-      if (transcription.status !== "processing") {
+      if ((transcription as any).status !== "processing") {
         return res.status(400).json({ error: "Transcription is not in processing state" });
       }
 
@@ -216,12 +216,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update transcription with results
         const updatedTranscription = await authStorage.updateTranscription(id, {
           transcript: result.transcript,
-          duration: result.duration.toString(),
-          wordCount: result.wordCount,
-          processingTime: result.processingTime.toString(),
-          accuracy: result.accuracy.toString(),
+          duration: result.duration || 0,
+          wordCount: result.wordCount || 0,
+          processingTime: result.processingTime || 0,
+          accuracy: result.accuracy || 0,
           status: "completed",
-        });
+        } as any);
 
         // Increment user's transcription count
         await authStorage.incrementUserTranscriptions(userId);
@@ -234,7 +234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Mark transcription as failed
         await authStorage.updateTranscription(id, {
           status: "failed",
-        });
+        } as any);
 
         // Pass through specific error messages from transcription service
         const errorMessage = (transcriptionError as Error).message;
@@ -286,12 +286,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update transcription with successful results
         const updatedTranscription = await authStorage.updateTranscription(id, {
           transcript: transcript || "",
-          duration: duration?.toString() || "0",
+          duration: duration || 0,
           wordCount: wordCount || 0,
-          processingTime: processingTime?.toString() || "0",
-          accuracy: accuracy?.toString() || "0",
+          processingTime: processingTime || 0,
+          accuracy: accuracy || 0,
           status: "completed",
-        });
+        } as any);
 
         // Increment user's transcription count
         await authStorage.incrementUserTranscriptions(transcription.userId);
@@ -301,7 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update transcription as failed
         await authStorage.updateTranscription(id, {
           status: "failed",
-        });
+        } as any);
 
         console.log(`Transcription ${id} failed:`, error);
       }

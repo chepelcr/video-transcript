@@ -66,6 +66,7 @@ export const insertTranscriptionSchema = createInsertSchema(transcriptions).pick
   videoUrl: true,
   videoTitle: true,
   userId: true,
+  status: true,
 });
 
 export const insertRefreshTokenSchema = createInsertSchema(refreshTokens).pick({

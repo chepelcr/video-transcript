@@ -188,6 +188,30 @@ export class AuthStorage {
     return transcription || null;
   }
 
+  // Get transcription by ID (without user restriction)
+  async getTranscription(id: string): Promise<Transcription | null> {
+    const [transcription] = await db
+      .select()
+      .from(transcriptions)
+      .where(eq(transcriptions.id, id));
+    return transcription || null;
+  }
+
+  // Update transcription
+  async updateTranscription(id: string, updates: Partial<Transcription>): Promise<Transcription | null> {
+    const [transcription] = await db
+      .update(transcriptions)
+      .set(updates)
+      .where(eq(transcriptions.id, id))
+      .returning();
+    return transcription || null;
+  }
+
+  // Increment user transcriptions (alias for incrementTranscriptionsUsed)
+  async incrementUserTranscriptions(userId: string): Promise<void> {
+    return this.incrementTranscriptionsUsed(userId);
+  }
+
   // Refresh token operations
   async createRefreshToken(tokenData: Omit<InsertRefreshToken, 'id' | 'createdAt'>): Promise<RefreshToken> {
     const [token] = await db
