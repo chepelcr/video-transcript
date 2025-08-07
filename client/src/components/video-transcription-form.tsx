@@ -10,12 +10,16 @@ interface VideoTranscriptionFormProps {
   onTranscriptionComplete: (transcription: any) => void;
   remainingTranscriptions: number;
   onUpgradeRequired: () => void;
+  isAuthenticated: boolean;
+  onLoginRequired: (videoUrl: string) => void;
 }
 
 export default function VideoTranscriptionForm({
   onTranscriptionComplete,
   remainingTranscriptions,
-  onUpgradeRequired
+  onUpgradeRequired,
+  isAuthenticated,
+  onLoginRequired
 }: VideoTranscriptionFormProps) {
   const [videoUrl, setVideoUrl] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -50,6 +54,12 @@ export default function VideoTranscriptionForm({
         description: t('messages.invalidUrl'),
         variant: "destructive",
       });
+      return;
+    }
+
+    // Check if user is authenticated before processing
+    if (!isAuthenticated) {
+      onLoginRequired(videoUrl);
       return;
     }
 

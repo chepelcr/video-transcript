@@ -117,6 +117,9 @@ const translations = {
     'auth.login.success.title': 'Welcome Back',
     'auth.login.success.description': 'Successfully signed in',
     'auth.login.error': 'Invalid email or password',
+    'auth.loginRequired': 'Sign in required',
+    'auth.loginMessage': 'Please sign in to start transcribing your videos',
+    'auth.signIn': 'Sign In',
     'testimonials.mike.text': 'As a student, VideoScript helps me convert lecture videos to text for better studying. The free tier is perfect for my needs.',
     'testimonials.mike.name': 'Mike Chen',
     'testimonials.mike.role': 'University Student',
@@ -317,6 +320,9 @@ const translations = {
     'auth.login.success.title': 'Bienvenido de Vuelta',
     'auth.login.success.description': 'Sesión iniciada exitosamente',
     'auth.login.error': 'Email o contraseña inválidos',
+    'auth.loginRequired': 'Se requiere iniciar sesión',
+    'auth.loginMessage': 'Por favor inicia sesión para comenzar a transcribir tus videos',
+    'auth.signIn': 'Iniciar Sesión',
     
     // Results
     'results.title': 'Tu Transcripción',

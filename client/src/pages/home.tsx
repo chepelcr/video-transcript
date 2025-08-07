@@ -16,6 +16,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import { transcribeVideo } from "@/lib/transcription-api";
 
 interface Transcription {
   id: string;
@@ -35,6 +36,7 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [pendingVideoUrl, setPendingVideoUrl] = useState<string>("");
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const { user, isAuthenticated, logout } = useAuth();
@@ -44,6 +46,36 @@ export default function Home() {
   const userTranscriptionsUsed = isAuthenticated ? (user?.transcriptionsUsed || 0) : transcriptionsUsed;
   const isProUser = isAuthenticated ? user?.isPro : false;
   const remainingTranscriptions = isProUser ? Infinity : Math.max(0, 3 - userTranscriptionsUsed);
+
+  // Auto-transcribe pending video URL after login
+  useEffect(() => {
+    if (isAuthenticated && pendingVideoUrl && remainingTranscriptions > 0) {
+      // Auto-submit the pending URL for transcription
+      const autoTranscribe = async () => {
+        try {
+          const transcription = await transcribeVideo(pendingVideoUrl);
+          handleTranscriptionComplete({
+            ...transcription,
+            videoUrl: pendingVideoUrl
+          });
+          setPendingVideoUrl(""); // Clear pending URL
+          toast({
+            title: t('messages.success'),
+            description: t('messages.transcribed'),
+          });
+        } catch (error: any) {
+          toast({
+            title: t('messages.error'),
+            description: error.message || t('messages.failed'),
+            variant: "destructive",
+          });
+          setPendingVideoUrl(""); // Clear pending URL even on error
+        }
+      };
+      
+      autoTranscribe();
+    }
+  }, [isAuthenticated, pendingVideoUrl, remainingTranscriptions]);
 
   const handleTranscriptionComplete = async (transcription: Transcription) => {
     setCurrentTranscription(transcription);
@@ -271,28 +303,16 @@ export default function Home() {
               {t('hero.description')}
             </p>
             
-            {isAuthenticated ? (
-              <VideoTranscriptionForm 
-                onTranscriptionComplete={handleTranscriptionComplete}
-                remainingTranscriptions={remainingTranscriptions}
-                onUpgradeRequired={() => handleUpgrade('pro')}
-              />
-            ) : (
-              <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 text-center">
-                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                  {t('auth.loginRequired') || 'Sign in required'}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  {t('auth.loginMessage') || 'Please sign in to start transcribing your videos'}
-                </p>
-                <Button 
-                  onClick={() => navigate(`/${language}/login`)}
-                  className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg font-medium"
-                >
-                  {t('auth.signIn') || 'Sign In'}
-                </Button>
-              </div>
-            )}
+            <VideoTranscriptionForm 
+              onTranscriptionComplete={handleTranscriptionComplete}
+              remainingTranscriptions={remainingTranscriptions}
+              onUpgradeRequired={() => handleUpgrade('pro')}
+              isAuthenticated={isAuthenticated}
+              onLoginRequired={(videoUrl) => {
+                setPendingVideoUrl(videoUrl);
+                navigate(`/${language}/login`);
+              }}
+            />
           </div>
         </div>
       </section>
