@@ -58,6 +58,8 @@ export class SQSService {
       const command = new SendMessageCommand({
         QueueUrl: this.queueUrl,
         MessageBody: JSON.stringify(message),
+        MessageGroupId: 'transcription-processing', // Required for FIFO queues
+        MessageDeduplicationId: transcriptionId, // Use transcription ID for deduplication
         MessageAttributes: {
           transcriptionId: {
             DataType: 'String',
