@@ -236,14 +236,18 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {formatDuration(transcription.duration)}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <BarChart3 className="h-3 w-3" />
-                      {transcription.wordCount} {t('history.words')}
-                    </div>
+                    {transcription.duration && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatDuration(transcription.duration)}
+                      </div>
+                    )}
+                    {transcription.status === 'completed' && transcription.wordCount && (
+                      <div className="flex items-center gap-1">
+                        <BarChart3 className="h-3 w-3" />
+                        {transcription.wordCount} {t('history.words')}
+                      </div>
+                    )}
                   </div>
                   {transcription.status === 'completed' && transcription.transcript && (
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">

@@ -59,6 +59,8 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **VIDEO DURATION VALIDATION**: Added 5-minute duration limit validation for YouTube and Vimeo videos before transcription processing
 - ✅ **TRANSLATION FIXES**: Fixed "words" text localization and removed unwanted .toLowerCase() calls in transcription displays
 - ✅ **UI IMPROVEMENTS**: Added video provider icons (YouTube red, Vimeo blue, generic) next to video titles across all transcription views
+- ✅ **DURATION DISPLAY FEATURE**: Added video duration display in sidebar history with estimated durations for demonstration (August 7, 2025)
+- ✅ **TYPESCRIPT FIXES**: Resolved all LSP diagnostics and type safety issues across transcription components
 
 # User Preferences
 

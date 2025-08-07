@@ -165,6 +165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId, 
         videoUrl, 
         videoTitle: videoInfo.title, 
+        duration: videoInfo.duration,
         status: "processing" 
       });
       
@@ -173,6 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         videoUrl,
         videoTitle: videoInfo.title,
         status: "processing",
+        duration: videoInfo.duration || null,
       } as any);
       
       console.log('Transcription created:', transcription);
