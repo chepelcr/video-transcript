@@ -428,46 +428,63 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <ScrollArea className="h-96">
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {transcriptions.map((transcription, index) => (
-                        <div key={transcription.id}>
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  {getVideoProviderIcon(transcription.videoUrl)}
-                                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                    {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
-                                  </p>
-                                </div>
-                                {getStatusBadge(transcription.status)}
+                        <div key={transcription.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+                          {/* Video Title Row */}
+                          <div className="flex items-center gap-2 min-w-0 mb-3">
+                            {getVideoProviderIcon(transcription.videoUrl)}
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate flex-1 min-w-0">
+                              {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
+                            </h4>
+                          </div>
+
+                          {/* Duration and Word Count Info */}
+                          <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            {transcription.duration && (
+                              <div className="flex items-center gap-1">
+                                <Icons.clock className="h-3 w-3" />
+                                {transcription.duration}s
                               </div>
-                              <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500 dark:text-gray-400">
-                                {transcription.status === 'completed' && (
-                                  <>
-                                    <span>{transcription.duration}s</span>
-                                    <span>{transcription.wordCount} {t('history.words')}</span>
-                                    <span>{transcription.accuracy}% {t('history.accuracy')}</span>
-                                  </>
-                                )}
-                                <span className="hidden sm:inline">{new Date(transcription.createdAt).toLocaleDateString()}</span>
+                            )}
+                            {transcription.status === 'completed' && transcription.wordCount && (
+                              <div className="flex items-center gap-1">
+                                <Icons.barChart className="h-3 w-3" />
+                                {transcription.wordCount} {t('history.words')}
                               </div>
-                              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                                {transcription.transcript 
-                                  ? `${transcription.transcript.substring(0, 150)}...`
-                                  : transcription.status === 'processing' 
-                                    ? t('status.processing')
-                                    : transcription.status === 'pending'
-                                    ? t('status.pending') 
-                                    : transcription.status === 'failed'
-                                    ? t('status.failed')
-                                    : t('status.processing')
-                                }
-                              </p>
+                            )}
+                          </div>
+
+                          {/* Transcript Preview or Status */}
+                          {transcription.status === 'completed' && transcription.transcript && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
+                              {transcription.transcript}
+                            </p>
+                          )}
+                          {transcription.status === 'processing' && (
+                            <p className="text-sm text-yellow-600 dark:text-yellow-400 italic mb-3">
+                              Your transcription is being processed. This may take a few minutes...
+                            </p>
+                          )}
+                          {transcription.status === 'failed' && (
+                            <p className="text-sm text-red-600 dark:text-red-400 italic mb-3">
+                              Transcription failed. Please try again with a different video.
+                            </p>
+                          )}
+
+                          {/* Status Badge and Action Buttons Row */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex gap-1 flex-wrap">
+                              {getStatusBadge(transcription.status)}
+                              {transcription.status === 'completed' && transcription.accuracy && (
+                                <Badge variant="secondary" className="text-xs whitespace-nowrap">
+                                  {Math.round(transcription.accuracy)}%
+                                </Badge>
+                              )}
                             </div>
-                            <div className="flex gap-2 sm:ml-4">
+                            <div className="flex gap-1">
                               <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
                                 onClick={() => {
                                   if (transcription.transcript) {
@@ -479,14 +496,13 @@ export default function Dashboard() {
                                   }
                                 }}
                                 disabled={transcription.status !== 'completed' || !transcription.transcript}
-                                className="flex-1 sm:flex-none"
-                                title={transcription.status === 'completed' ? t('history.copyText') : "Transcript not ready"}
+                                className="h-8 w-8 p-0"
+                                title={transcription.status === 'completed' ? "Copy transcript" : "Transcript not ready"}
                               >
-                                <Icons.copy className="h-4 w-4 mr-1" />
-                                {t('history.copyText')}
+                                <Icons.copy className="h-3 w-3" />
                               </Button>
                               <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
                                 onClick={() => {
                                   if (transcription.transcript) {
@@ -500,15 +516,13 @@ export default function Dashboard() {
                                   }
                                 }}
                                 disabled={transcription.status !== 'completed' || !transcription.transcript}
-                                className="flex-1 sm:flex-none"
-                                title={transcription.status === 'completed' ? t('history.download') : "Transcript not ready"}
+                                className="h-8 w-8 p-0"
+                                title={transcription.status === 'completed' ? "Download transcript" : "Transcript not ready"}
                               >
-                                <Icons.download className="h-4 w-4 mr-1" />
-                                {t('history.download')}
+                                <Icons.download className="h-3 w-3" />
                               </Button>
                             </div>
                           </div>
-                          {index < transcriptions.length - 1 && <Separator className="mt-4" />}
                         </div>
                       ))}
                     </div>
