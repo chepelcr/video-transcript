@@ -45,6 +45,22 @@ export default function Dashboard() {
   const { t, language } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Helper function to get video title with fallback
+  const getVideoTitle = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+        return 'YouTube Video';
+      }
+      if (urlObj.hostname.includes('vimeo.com')) {
+        return 'Vimeo Video';
+      }
+      return urlObj.hostname;
+    } catch {
+      return 'Video';
+    }
+  };
   
   // Transcription form state
   const [videoUrl, setVideoUrl] = useState('');
@@ -72,9 +88,9 @@ export default function Dashboard() {
       }
       return failureCount < 3;
     },
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
       // Auto-refresh every 5 seconds if there are processing transcriptions
-      const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
+      const hasProcessing = query.data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
       return hasProcessing ? 5000 : false;
     },
   });
@@ -386,7 +402,7 @@ export default function Dashboard() {
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                {transcription.videoTitle || transcription.videoUrl}
+                                {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
                               </p>
                               <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500 dark:text-gray-400">
                                 {transcription.status === 'completed' && (

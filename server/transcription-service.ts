@@ -47,7 +47,7 @@ export class TranscriptionService {
       // Extract video ID from YouTube URL
       const videoId = this.extractYouTubeVideoId(url);
       if (!videoId) {
-        return this.fallbackTitle(url);
+        return 'YouTube Video';
       }
 
       // Try to get title from oEmbed API (no API key required)
@@ -56,13 +56,13 @@ export class TranscriptionService {
       const response = await fetch(oembedUrl);
       if (response.ok) {
         const data = await response.json();
-        return data.title || this.fallbackTitle(url);
+        return data.title || 'YouTube Video';
       }
       
-      return this.fallbackTitle(url);
+      return 'YouTube Video';
     } catch (error) {
       console.error('Error extracting YouTube title:', error);
-      return this.fallbackTitle(url);
+      return 'YouTube Video';
     }
   }
 
@@ -77,7 +77,7 @@ export class TranscriptionService {
       // Extract video ID from Vimeo URL
       const videoId = this.extractVimeoVideoId(url);
       if (!videoId) {
-        return this.fallbackTitle(url);
+        return 'Vimeo Video';
       }
 
       // Try to get title from oEmbed API
@@ -86,13 +86,13 @@ export class TranscriptionService {
       const response = await fetch(oembedUrl);
       if (response.ok) {
         const data = await response.json();
-        return data.title || this.fallbackTitle(url);
+        return data.title || 'Vimeo Video';
       }
       
-      return this.fallbackTitle(url);
+      return 'Vimeo Video';
     } catch (error) {
       console.error('Error extracting Vimeo title:', error);
-      return this.fallbackTitle(url);
+      return 'Vimeo Video';
     }
   }
 
@@ -136,6 +136,16 @@ export class TranscriptionService {
   private fallbackTitle(url: string): string {
     try {
       const urlObj = new URL(url);
+      
+      // Check platform type and return appropriate fallback
+      if (this.isYouTubeUrl(urlObj)) {
+        return 'YouTube Video';
+      }
+      
+      if (this.isVimeoUrl(urlObj)) {
+        return 'Vimeo Video';
+      }
+      
       const path = urlObj.pathname;
       const segments = path.split('/').filter(Boolean);
       
