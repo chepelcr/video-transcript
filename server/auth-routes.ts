@@ -176,7 +176,14 @@ export function setupAuthRoutes(app: Express) {
   // Refresh token
   app.post("/api/auth/refresh", async (req, res) => {
     try {
-      const { refreshToken } = refreshTokenRequestSchema.parse(req.body);
+      // Handle both body and query parameters for refresh token
+      const tokenFromBody = req.body?.refreshToken;
+      const tokenFromQuery = req.query?.refreshToken;
+      const refreshToken = tokenFromBody || tokenFromQuery;
+      
+      if (!refreshToken) {
+        return res.status(400).json({ error: 'Refresh token is required' });
+      }
       
       // Verify refresh token
       const decoded = verifyRefreshToken(refreshToken);

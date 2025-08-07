@@ -106,10 +106,16 @@ export function useAuth() {
     queryKey: ['/api/auth/me'],
     queryFn: async () => {
       const tokens = getStoredTokens();
-      if (!tokens) return null;
+      if (!tokens?.accessToken) {
+        console.log('No access token found');
+        return null;
+      }
 
+      console.log('Attempting to fetch user with token:', tokens.accessToken.substring(0, 20) + '...');
+      
       const response = await authenticatedRequest('GET', '/api/auth/me');
       if (!response.ok) {
+        console.log('Auth request failed with status:', response.status);
         if (response.status === 401 || response.status === 403) {
           setStoredTokens(null);
           return null;
@@ -118,6 +124,7 @@ export function useAuth() {
       }
       
       const result = await response.json() as UserResponse;
+      console.log('User fetched successfully:', result.username);
       return result;
     },
     retry: false,
@@ -162,10 +169,11 @@ export function useAuth() {
         refreshToken: authData.refreshToken,
       });
       
-      // Invalidate user query to refetch
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      
       return authData;
+    },
+    onSuccess: () => {
+      // Force refetch user data immediately after successful login
+      queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
     },
   });
 
