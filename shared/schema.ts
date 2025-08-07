@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, boolean, numeric } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -27,10 +27,10 @@ export const transcriptions = pgTable("transcriptions", {
   videoUrl: text("video_url").notNull(),
   transcript: text("transcript"),
   status: text("status").default("processing"), // processing, completed, failed
-  duration: integer("duration"), // in seconds
+  duration: numeric("duration", { precision: 10, scale: 2 }), // in seconds with decimals
   wordCount: integer("word_count"),
-  processingTime: integer("processing_time"), // in seconds
-  accuracy: integer("accuracy"), // transcription accuracy percentage
+  processingTime: numeric("processing_time", { precision: 10, scale: 2 }), // in seconds with decimals
+  accuracy: numeric("accuracy", { precision: 5, scale: 2 }), // transcription accuracy percentage with decimals
   createdAt: timestamp("created_at").defaultNow(),
 });
 
