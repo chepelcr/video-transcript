@@ -80,7 +80,11 @@ export default function VideoTranscriptionForm({
       setProcessingStatus("Finalizing transcription...");
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      onTranscriptionComplete(transcription);
+      // Add videoUrl to the transcription object
+      onTranscriptionComplete({
+        ...transcription,
+        videoUrl: videoUrl
+      });
       setVideoUrl("");
       
       toast({

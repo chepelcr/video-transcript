@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
 
 interface Transcription {
   id: string;
@@ -23,6 +24,7 @@ interface Transcription {
   wordCount: number;
   processingTime: number;
   accuracy: number;
+  videoUrl?: string;
 }
 
 export default function Home() {
@@ -43,12 +45,28 @@ export default function Home() {
   const isProUser = isAuthenticated ? user?.isPro : false;
   const remainingTranscriptions = isProUser ? Infinity : Math.max(0, 3 - userTranscriptionsUsed);
 
-  const handleTranscriptionComplete = (transcription: Transcription) => {
+  const handleTranscriptionComplete = async (transcription: Transcription) => {
     setCurrentTranscription(transcription);
     setShowResults(true);
     
-    // Only update localStorage if not authenticated (server will handle authenticated users)
-    if (!isAuthenticated) {
+    // Save transcription to database if authenticated
+    if (isAuthenticated) {
+      try {
+        await apiRequest("POST", "/api/transcriptions", {
+          videoUrl: transcription.videoUrl || "Unknown URL",
+          transcript: transcription.transcript,
+          duration: transcription.duration,
+          wordCount: transcription.wordCount,
+          processingTime: transcription.processingTime,
+          accuracy: transcription.accuracy,
+        });
+        console.log("Transcription saved to database successfully");
+      } catch (error) {
+        console.error("Failed to save transcription to database:", error);
+        // Don't show error to user as the transcription still works
+      }
+    } else {
+      // Only update localStorage if not authenticated
       setTranscriptionsUsed((prev: number) => prev + 1);
     }
     
