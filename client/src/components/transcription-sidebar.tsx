@@ -48,13 +48,6 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Refresh transcriptions when sidebar opens
-  useEffect(() => {
-    if (isOpen && isAuthenticated) {
-      refetch();
-    }
-  }, [isOpen, isAuthenticated, refetch]);
-
   const { data: transcriptionData, isLoading, refetch } = useQuery({
     queryKey: ['/api/users/transcriptions'],
     enabled: isAuthenticated,
@@ -80,6 +73,13 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
       return response.json();
     },
   });
+
+  // Refresh transcriptions when sidebar opens
+  useEffect(() => {
+    if (isOpen && isAuthenticated) {
+      refetch();
+    }
+  }, [isOpen, isAuthenticated, refetch]);
 
   const transcriptions = (transcriptionData as any)?.transcriptions || [];
 
