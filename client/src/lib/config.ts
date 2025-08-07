@@ -31,8 +31,8 @@ console.log('API Config Debug:', {
   apiBaseUrl: API_BASE_URL
 });
 
-// Base path configuration for GitHub Pages subdirectory deployment
-export const BASE_PATH = import.meta.env.MODE === 'production' ? '/video-transcript' : '';
+// Base path configuration for GitHub Pages custom domain deployment
+export const BASE_PATH = '';
 
 // Helper function to create proper URLs for the subdirectory deployment
 export const createUrl = (path: string) => {

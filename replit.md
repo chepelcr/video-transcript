@@ -20,6 +20,11 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **DATABASE CREDENTIALS**: Added AWS RDS secrets (DATABASE_URL, USERNAME, PASSWORD, DATABASE_NAME)
 - ✅ **SSL CONFIGURATION**: Proper SSL configuration for production AWS RDS connections
 - ✅ **DATA PRESERVATION**: Existing user and transcription data preserved during migration
+- ✅ **CUSTOM DOMAIN CONFIGURATION**: Configured GitHub Pages for custom subdomain `video-transcript.jcampos.dev` (August 7, 2025)
+- ✅ **BASE PATH CLEANUP**: Removed `/video-transcript` subfolder from all routes and configurations
+- ✅ **EMAIL TEMPLATE UPDATE**: Updated password reset emails to use custom domain URLs
+- ✅ **BILINGUAL FORGOT PASSWORD**: Complete Spanish and English translation support for password reset flow
+- ✅ **DNS DOCUMENTATION**: Created comprehensive DNS configuration guide for custom domain setup
 
 # User Preferences
 

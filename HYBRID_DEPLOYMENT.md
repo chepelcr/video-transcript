@@ -36,9 +36,9 @@ VITE_API_BASE_URL=https://your-replit-app.replit.app
 ```
 
 ### 2.2 Configure Base Path for Subdirectory
-Since your site is deployed at `https://jcampos.dev/video-transcript/`, the build command in the GitHub workflow automatically sets:
+Since your site is deployed at `https://video-transcript.jcampos.dev/`, the build command in the GitHub workflow uses the root path:
 ```bash
-npm run build -- --base=/video-transcript/
+npm run build
 ```
 
 This ensures all asset paths are correctly prefixed for the subdirectory deployment.

@@ -26,14 +26,14 @@ After settings are configured:
 
 ## Expected Result
 After successful deployment:
-- ✅ `https://jcampos.dev/video-transcript/` (English)
-- ✅ `https://jcampos.dev/video-transcript/es` (Spanish) 
-- ✅ `https://jcampos.dev/video-transcript/en` (English explicit)
+- ✅ `https://video-transcript.jcampos.dev/` (English)
+- ✅ `https://video-transcript.jcampos.dev/es` (Spanish) 
+- ✅ `https://video-transcript.jcampos.dev/en` (English explicit)
 
 ## Current Configuration Status
 - ✅ Workflow file exists (`.github/workflows/deploy.yml`)
 - ✅ Permissions configured correctly
-- ✅ Asset paths fixed for subdirectory
+- ✅ Asset paths configured for custom domain
 - ✅ SPA routing configured
 - ❌ **Repository Pages not enabled** ← THIS IS THE ISSUE
 

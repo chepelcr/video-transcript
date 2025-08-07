@@ -70,7 +70,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string, 
   try {
     const transporter = createTransporter();
     
-    const resetUrl = `${process.env.FRONTEND_URL || 'https://videotranscript.com'}/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'https://video-transcript.jcampos.dev'}/reset-password?token=${resetToken}`;
     
     const mailOptions = {
       from: process.env.FROM_EMAIL || 'noreply@videotranscript.com',

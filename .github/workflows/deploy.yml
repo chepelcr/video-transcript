@@ -43,13 +43,11 @@ jobs:
         mkdir -p dist/gh-pages
         cp -r dist/public/* dist/gh-pages/
         cp client/public/404.html dist/gh-pages/
-        # Fix asset paths for subdirectory deployment
-        sed -i 's|src="/assets/|src="/video-transcript/assets/|g' dist/gh-pages/index.html
-        sed -i 's|href="/assets/|href="/video-transcript/assets/|g' dist/gh-pages/index.html
+        # Copy CNAME file for custom domain
+        cp client/public/CNAME dist/gh-pages/
         
-        # Add debug script and fix favicon path
-        sed -i 's|<head>|<head><script>window.ghPagesDebug=true;console.log("🚀 GitHub Pages deployment loaded");console.log("Base path:",window.location.pathname);</script>|g' dist/gh-pages/index.html
-        sed -i 's|href="/favicon.ico"|href="/video-transcript/favicon.ico"|g' dist/gh-pages/index.html
+        # Add debug script for deployment verification
+        sed -i 's|<head>|<head><script>window.ghPagesDebug=true;console.log("🚀 GitHub Pages deployment loaded");console.log("Custom domain:",window.location.hostname);</script>|g' dist/gh-pages/index.html
         
         # Verify deployment files exist and show structure
         echo "=== GitHub Pages Deployment Structure ==="
@@ -64,9 +62,8 @@ jobs:
         echo "=== Index.html Content Check ==="
         head -10 dist/gh-pages/index.html
         echo ""
-        echo "Asset paths fixed for subdirectory deployment:"
-        echo "✓ JavaScript and CSS: /video-transcript/assets/"
-        echo "✓ Favicon: /video-transcript/favicon.ico"
+        echo "Custom domain deployment configured:"
+        echo "✓ CNAME file: $(cat dist/gh-pages/CNAME)"
         echo "✓ 404.html routing configured"
         echo "✓ Debug logging enabled"
       env:
