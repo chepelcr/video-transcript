@@ -89,15 +89,9 @@ export async function optionalAuth(req: Request, res: Response, next: NextFuncti
 // Clean user object (remove sensitive fields)
 export function cleanUserObject(user: User): any {
   const { password, emailVerificationCode, ...cleanUser } = user;
-  // Extract first and last name from username for frontend compatibility
-  const nameParts = user.username.split(/(?=[A-Z])/);
-  const firstName = nameParts[0] || user.username;
-  const lastName = nameParts.slice(1).join('') || '';
   
   return {
     ...cleanUser,
-    firstName,
-    lastName,
     isPro: user.subscriptionTier !== 'free'
   };
 }
