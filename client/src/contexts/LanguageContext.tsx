@@ -22,6 +22,8 @@ const translations = {
     'common.back': 'Back',
     'common.backToHome': 'Back to Home',
     'common.logout': 'Sign Out',
+    'common.upgrade': 'Upgrade',
+    'common.upgradeForUnlimited': 'Upgrade for unlimited transcriptions.',
     'common.cancel': 'Cancel',
     'common.continue': 'Continue',
     'common.save': 'Save',
@@ -208,6 +210,17 @@ const translations = {
     'history.view': 'View Details',
     'history.createdAt': 'Created',
 
+    // Transcription Form
+    'transcription.newTranscription': 'New Transcription',
+    'transcription.enterVideoUrl': 'Enter a video URL to start transcribing',
+    'transcription.videoUrl': 'Video URL',
+    'transcription.videoUrlPlaceholder': 'https://www.youtube.com/watch?v=...',
+    'transcription.processing': 'Processing...',
+    'transcription.success.title': 'Transcription Complete',
+    'transcription.success.description': 'Your video has been transcribed successfully!',
+    'transcription.error.title': 'Transcription Failed',
+    'transcription.error.description': 'There was an error processing your video. Please try again.',
+
     // Profile translations
     'profile.title': 'Profile',
     'profile.description': 'Manage your account information and preferences.',
@@ -285,6 +298,8 @@ const translations = {
     'common.back': 'Atrás',
     'common.backToHome': 'Volver al Inicio',
     'common.logout': 'Cerrar Sesión',
+    'common.upgrade': 'Actualizar',
+    'common.upgradeForUnlimited': 'Actualizar para transcripciones ilimitadas.',
     'common.cancel': 'Cancelar',
     'common.continue': 'Continuar',
     'common.save': 'Guardar',
@@ -470,6 +485,17 @@ const translations = {
     'history.download': 'Descargar',
     'history.view': 'Ver Detalles',
     'history.createdAt': 'Creado',
+
+    // Transcription Form Spanish
+    'transcription.newTranscription': 'Nueva Transcripción',
+    'transcription.enterVideoUrl': 'Ingresa una URL de video para comenzar a transcribir',
+    'transcription.videoUrl': 'URL del Video',
+    'transcription.videoUrlPlaceholder': 'https://www.youtube.com/watch?v=...',
+    'transcription.processing': 'Procesando...',
+    'transcription.success.title': 'Transcripción Completa',
+    'transcription.success.description': '¡Tu video ha sido transcrito exitosamente!',
+    'transcription.error.title': 'Error en Transcripción',
+    'transcription.error.description': 'Hubo un error procesando tu video. Por favor, inténtalo de nuevo.',
 
     // Profile translations Spanish
     'profile.title': 'Perfil',

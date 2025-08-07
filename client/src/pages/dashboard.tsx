@@ -66,35 +66,50 @@ export default function Dashboard() {
     navigate(`/${language}/`);
   };
 
-  // Transcription mutation
-  const transcribeMutation = useMutation({
-    mutationFn: async (videoUrl: string) => {
-      return apiRequest('POST', '/api/transcriptions', { videoUrl });
-    },
-    onSuccess: () => {
+  const handleTranscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!videoUrl.trim()) {
+      toast({
+        title: t('messages.error'),
+        description: t('messages.enterUrl'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (isLimitReached && !user?.isPro) {
+      toast({
+        title: t('messages.error'),
+        description: t('messages.limitReached'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsTranscribing(true);
+    
+    try {
+      await apiRequest('POST', '/api/transcriptions/transcribe', {
+        videoUrl: videoUrl.trim(),
+      });
+
       toast({
         title: t('transcription.success.title'),
         description: t('transcription.success.description'),
       });
+
+      // Clear form and refresh data
       setVideoUrl('');
       queryClient.invalidateQueries({ queryKey: ['/api/users/transcriptions'] });
-    },
-    onError: (error: any) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+    } catch (error) {
+      console.error('Transcription error:', error);
       toast({
         title: t('transcription.error.title'),
-        description: error.message || t('transcription.error.description'),
+        description: t('transcription.error.description'),
         variant: 'destructive',
       });
-    },
-  });
-
-  const handleTranscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!videoUrl.trim()) return;
-    
-    setIsTranscribing(true);
-    try {
-      await transcribeMutation.mutateAsync(videoUrl);
     } finally {
       setIsTranscribing(false);
     }
@@ -168,7 +183,7 @@ export default function Dashboard() {
         </div>
 
         {/* New Transcription Form */}
-        <Card className="mb-6 md:mb-8">
+        <Card className="mb-6 md:mb-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Icons.fileText className="h-5 w-5" />
@@ -241,7 +256,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 md:grid-rows-1">
           {/* Account Overview */}
           <div className="lg:col-span-1">
-            <Card className="h-full">
+            <Card className="h-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Icons.user className="h-5 w-5" />
@@ -297,7 +312,7 @@ export default function Dashboard() {
 
           {/* Transcription History */}
           <div className="md:col-span-2 lg:col-span-2">
-            <Card className="h-full">
+            <Card className="h-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Icons.fileText className="h-5 w-5" />
