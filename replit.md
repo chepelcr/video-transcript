@@ -46,6 +46,9 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **DASHBOARD REFRESH ERROR FIX**: Fixed null pointer exception when refreshing dashboard - added null safety for transcript substring operations and disabled buttons for processing transcriptions (August 7, 2025)
 - ✅ **VIDEO TITLE DISPLAY FIX**: Fixed video title display in transcription history - added proper TypeScript typing and improved API response handling (August 7, 2025)
 - ✅ **REFRESH BUTTON TRANSLATIONS**: Added complete Spanish and English translations for refresh button and status indicators in dashboard (August 7, 2025)
+- ✅ **TOKEN EXPIRATION FIX**: Implemented automatic access token refresh when 401/403 errors occur - seamless session continuation without user intervention (August 7, 2025)
+- ✅ **UI FIELD VISIBILITY**: Fixed dashboard to hide inappropriate fields (duration, words, accuracy) for pending/processing transcriptions
+- ✅ **TYPE SAFETY IMPROVEMENTS**: Resolved all TypeScript LSP diagnostics with proper schema alignment and type casting
 
 # User Preferences
 
