@@ -39,15 +39,15 @@ export default function ForgotPassword() {
       console.log("Forgot password request successful");
       setIsSubmitted(true);
       toast({
-        title: t("resetLinkSent"),
-        description: t("checkEmailForResetLink"),
+        title: t("auth.forgot.success.title"),
+        description: t("auth.forgot.success.description"),
       });
     },
     onError: (error: any) => {
       console.error("Forgot password error:", error);
       toast({
-        title: t("error"),
-        description: error.message || t("errorSendingResetLink"),
+        title: t("messages.error"),
+        description: error.message || t("auth.forgot.error"),
         variant: "destructive",
       });
     },
@@ -63,16 +63,16 @@ export default function ForgotPassword() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{t("checkYourEmail")}</CardTitle>
+            <CardTitle className="text-2xl font-bold">{t("auth.forgot.success.title")}</CardTitle>
             <CardDescription>
-              {t("resetLinkSentDescription")}
+              {t("auth.forgot.success.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
               <Link href="/login">
                 <Button variant="outline" className="w-full">
-                  {t("backToLogin")}
+                  {t("auth.forgot.backToLogin")}
                 </Button>
               </Link>
             </div>
@@ -86,19 +86,19 @@ export default function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">{t("forgotPassword")}</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t("auth.forgot.title")}</CardTitle>
           <CardDescription>
-            {t("enterEmailForReset")}
+            {t("auth.forgot.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">{t("emailAddress")}</Label>
+              <Label htmlFor="email">{t("auth.forgot.email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder={t("enterEmail")}
+                placeholder={t("auth.forgot.emailPlaceholder")}
                 {...form.register("email")}
                 className={form.formState.errors.email ? "border-red-500" : ""}
               />
@@ -114,13 +114,13 @@ export default function ForgotPassword() {
               className="w-full"
               disabled={forgotPasswordMutation.isPending}
             >
-              {forgotPasswordMutation.isPending ? t("sending") + "..." : t("sendResetLink")}
+              {forgotPasswordMutation.isPending ? t("auth.forgot.sending") + "..." : t("auth.forgot.submit")}
             </Button>
 
             <div className="text-center">
               <Link href="/login">
                 <Button variant="link" className="p-0">
-                  {t("backToLogin")}
+                  {t("auth.forgot.backToLogin")}
                 </Button>
               </Link>
             </div>

@@ -47,8 +47,8 @@ export default function ResetPassword() {
     
     if (!resetToken) {
       toast({
-        title: t("error"),
-        description: t("invalidResetLink"),
+        title: t("messages.error"),
+        description: t("auth.reset.invalidLink"),
         variant: "destructive",
       });
       navigate("/forgot-password");
@@ -73,15 +73,15 @@ export default function ResetPassword() {
       console.log("Password reset successful");
       setIsSubmitted(true);
       toast({
-        title: t("passwordResetSuccess"),
-        description: t("canNowLoginWithNewPassword"),
+        title: t("auth.reset.success.title"),
+        description: t("auth.reset.success.description"),
       });
     },
     onError: (error: any) => {
       console.error("Reset password error:", error);
       toast({
-        title: t("error"),
-        description: error.message || t("errorResettingPassword"),
+        title: t("messages.error"),
+        description: error.message || t("auth.reset.error"),
         variant: "destructive",
       });
     },
@@ -97,16 +97,16 @@ export default function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{t("passwordResetSuccess")}</CardTitle>
+            <CardTitle className="text-2xl font-bold">{t("auth.reset.success.title")}</CardTitle>
             <CardDescription>
-              {t("passwordResetSuccessDescription")}
+              {t("auth.reset.success.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
               <Link href="/login">
                 <Button className="w-full">
-                  {t("loginNow")}
+                  {t("auth.reset.loginNow")}
                 </Button>
               </Link>
             </div>
@@ -121,16 +121,16 @@ export default function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{t("error")}</CardTitle>
+            <CardTitle className="text-2xl font-bold">{t("messages.error")}</CardTitle>
             <CardDescription>
-              {t("invalidResetLink")}
+              {t("auth.reset.invalidLink")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
               <Link href="/forgot-password">
                 <Button className="w-full">
-                  {t("requestNewResetLink")}
+                  {t("auth.reset.requestNewLink")}
                 </Button>
               </Link>
             </div>
@@ -144,20 +144,20 @@ export default function ResetPassword() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">{t("resetPassword")}</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t("auth.reset.title")}</CardTitle>
           <CardDescription>
-            {t("enterNewPassword")}
+            {t("auth.reset.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="newPassword">{t("newPassword")}</Label>
+              <Label htmlFor="newPassword">{t("auth.reset.newPassword")}</Label>
               <div className="relative">
                 <Input
                   id="newPassword"
                   type={showPassword ? "text" : "password"}
-                  placeholder={t("enterNewPassword")}
+                  placeholder={t("auth.reset.newPasswordPlaceholder")}
                   {...form.register("newPassword")}
                   className={form.formState.errors.newPassword ? "border-red-500 pr-10" : "pr-10"}
                 />
@@ -167,7 +167,7 @@ export default function ResetPassword() {
                   size="sm"
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+                  aria-label={showPassword ? t("auth.reset.hidePassword") : t("auth.reset.showPassword")}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-500" />
@@ -184,12 +184,12 @@ export default function ResetPassword() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
+              <Label htmlFor="confirmPassword">{t("auth.reset.confirmPassword")}</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder={t("confirmNewPassword")}
+                  placeholder={t("auth.reset.confirmPasswordPlaceholder")}
                   {...form.register("confirmPassword")}
                   className={form.formState.errors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
                 />
@@ -199,7 +199,7 @@ export default function ResetPassword() {
                   size="sm"
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  aria-label={showConfirmPassword ? t("hidePassword") : t("showPassword")}
+                  aria-label={showConfirmPassword ? t("auth.reset.hidePassword") : t("auth.reset.showPassword")}
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-500" />
@@ -220,13 +220,13 @@ export default function ResetPassword() {
               className="w-full"
               disabled={resetPasswordMutation.isPending}
             >
-              {resetPasswordMutation.isPending ? t("resetting") + "..." : t("resetPassword")}
+              {resetPasswordMutation.isPending ? t("auth.reset.resetting") + "..." : t("auth.reset.submit")}
             </Button>
 
             <div className="text-center">
               <Link href="/login">
                 <Button variant="link" className="p-0">
-                  {t("backToLogin")}
+                  {t("auth.reset.backToLogin")}
                 </Button>
               </Link>
             </div>
