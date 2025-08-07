@@ -215,26 +215,33 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
         </div>
       ) : (
         <ScrollArea className="h-full bg-white dark:bg-gray-900">
-          <div className="space-y-4 p-4 bg-white dark:bg-gray-900">
+          <div className="space-y-3 p-3 bg-white dark:bg-gray-900">
             {transcriptions.map((transcription: Transcription) => (
               <Card key={transcription.id} className="border border-gray-200 dark:border-gray-700">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center justify-between">
-                    <span className="flex items-center gap-2 min-w-0">
+                <CardHeader className="pb-2 px-3 pt-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       {getVideoProviderIcon(transcription.videoUrl)}
-                      <span className="truncate">{transcription.videoTitle || getVideoTitle(transcription.videoUrl)}</span>
-                    </span>
-                    <div className="flex gap-2">
-                      {getStatusBadge(transcription.status)}
-                      {transcription.status === 'completed' && (
-                        <Badge variant="secondary" className="text-xs">
-                          {Math.round(transcription.accuracy)}% accuracy
-                        </Badge>
-                      )}
+                      <CardTitle className="text-sm font-medium truncate flex-1 min-w-0">
+                        {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
+                      </CardTitle>
                     </div>
-                  </CardTitle>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex gap-1 flex-wrap">
+                        {getStatusBadge(transcription.status)}
+                        {transcription.status === 'completed' && transcription.accuracy && (
+                          <Badge variant="secondary" className="text-xs whitespace-nowrap">
+                            {Math.round(transcription.accuracy)}%
+                          </Badge>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        {formatDistanceToNow(new Date(transcription.createdAt), { addSuffix: true })}
+                      </span>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-3 px-3 pb-3">
                   <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
                     {transcription.duration && (
                       <div className="flex items-center gap-1">
@@ -264,10 +271,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                       Transcription failed. Please try again with a different video.
                     </p>
                   )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
-                      {formatDistanceToNow(new Date(transcription.createdAt), { addSuffix: true })}
-                    </span>
+                  <div className="flex items-center justify-end">
                     <div className="flex gap-1">
                       <Button
                         variant="ghost"
