@@ -271,11 +271,28 @@ export default function Home() {
               {t('hero.description')}
             </p>
             
-            <VideoTranscriptionForm 
-              onTranscriptionComplete={handleTranscriptionComplete}
-              remainingTranscriptions={remainingTranscriptions}
-              onUpgradeRequired={() => handleUpgrade('pro')}
-            />
+            {isAuthenticated ? (
+              <VideoTranscriptionForm 
+                onTranscriptionComplete={handleTranscriptionComplete}
+                remainingTranscriptions={remainingTranscriptions}
+                onUpgradeRequired={() => handleUpgrade('pro')}
+              />
+            ) : (
+              <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 text-center">
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                  {t('auth.loginRequired') || 'Sign in required'}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
+                  {t('auth.loginMessage') || 'Please sign in to start transcribing your videos'}
+                </p>
+                <Button 
+                  onClick={() => navigate(`/${language}/login`)}
+                  className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg font-medium"
+                >
+                  {t('auth.signIn') || 'Sign In'}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </section>
