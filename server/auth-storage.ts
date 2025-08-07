@@ -142,11 +142,18 @@ export class AuthStorage {
 
   // Transcription operations
   async createTranscription(transcriptionData: Omit<InsertTranscription, 'id' | 'createdAt'>): Promise<Transcription> {
-    const [transcription] = await db
-      .insert(transcriptions)
-      .values(transcriptionData)
-      .returning();
-    return transcription;
+    console.log('Creating transcription with data:', transcriptionData);
+    
+    const [transcription] = await db.execute(sql`
+      INSERT INTO transcriptions (user_id, video_url, video_title, status)
+      VALUES (${transcriptionData.userId}, ${transcriptionData.videoUrl}, ${transcriptionData.videoTitle}, ${transcriptionData.status})
+      RETURNING id, user_id as "userId", video_url as "videoUrl", video_title as "videoTitle", 
+               transcript, status, duration, word_count as "wordCount", 
+               processing_time as "processingTime", accuracy, created_at as "createdAt"
+    `);
+    
+    console.log('Created transcription:', transcription);
+    return transcription.rows[0] as Transcription;
   }
 
   // Get user transcriptions with pagination
@@ -154,24 +161,32 @@ export class AuthStorage {
     transcriptions: Transcription[];
     total: number;
   }> {
-    const [transcriptionsResult, countResult] = await Promise.all([
-      db
-        .select()
-        .from(transcriptions)
-        .where(eq(transcriptions.userId, userId))
-        .orderBy(desc(transcriptions.createdAt))
-        .limit(limit)
-        .offset(offset),
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(transcriptions)
-        .where(eq(transcriptions.userId, userId))
-    ]);
+    try {
+      const [transcriptionsResult, countResult] = await Promise.all([
+        db.execute(sql`
+          SELECT id, user_id as "userId", video_url as "videoUrl", video_title as "videoTitle", 
+                 transcript, status, duration, word_count as "wordCount", 
+                 processing_time as "processingTime", accuracy, created_at as "createdAt"
+          FROM transcriptions 
+          WHERE user_id = ${userId}
+          ORDER BY created_at DESC 
+          LIMIT ${limit} OFFSET ${offset}
+        `),
+        db.execute(sql`
+          SELECT COUNT(*) as count 
+          FROM transcriptions 
+          WHERE user_id = ${userId}
+        `)
+      ]);
 
-    return {
-      transcriptions: transcriptionsResult,
-      total: countResult[0]?.count || 0
-    };
+      return {
+        transcriptions: transcriptionsResult.rows as Transcription[],
+        total: parseInt((countResult.rows[0] as any)?.count || '0')
+      };
+    } catch (error) {
+      console.error('Get transcriptions error:', error);
+      throw new Error('Failed to get transcriptions');
+    }
   }
 
   // Get transcription by ID

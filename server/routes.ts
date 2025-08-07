@@ -154,12 +154,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create transcription record with initial status
+      console.log('Creating transcription with video info:', { 
+        userId, 
+        videoUrl, 
+        videoTitle: videoInfo.title, 
+        status: "processing" 
+      });
+      
       const transcription = await authStorage.createTranscription({
         userId,
         videoUrl,
         videoTitle: videoInfo.title,
         status: "processing",
       } as any);
+      
+      console.log('Transcription created:', transcription);
 
       // Queue transcription for asynchronous processing
       try {
