@@ -122,10 +122,10 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 md:items-stretch">
           {/* Account Overview */}
-          <div className="lg:col-span-1">
-            <Card>
+          <div className="lg:col-span-1 flex">
+            <Card className="flex-1">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Icons.user className="h-5 w-5" />
@@ -180,8 +180,8 @@ export default function Dashboard() {
           </div>
 
           {/* Transcription History */}
-          <div className="md:col-span-2 lg:col-span-2">
-            <Card>
+          <div className="md:col-span-2 lg:col-span-2 flex">
+            <Card className="flex-1">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Icons.fileText className="h-5 w-5" />
