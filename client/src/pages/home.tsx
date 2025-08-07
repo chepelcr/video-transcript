@@ -119,7 +119,7 @@ export default function Home() {
                   </Button>
                 </>
               ) : (
-                <Button onClick={() => navigate(`/${language}/register`)}>
+                <Button onClick={() => navigate(`/${language}/login`)}>
                   Get Started
                 </Button>
               )}
