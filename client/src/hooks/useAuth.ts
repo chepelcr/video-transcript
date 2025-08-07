@@ -152,16 +152,25 @@ export function useAuth() {
       const response = await apiRequest('POST', '/api/auth/verify-email', data);
       const authData = response as unknown as AuthResponse;
       
+      console.log('Verify email response:', { 
+        hasUser: !!authData.user, 
+        hasTokens: !!(authData.accessToken && authData.refreshToken),
+        username: authData.user?.username 
+      });
+      
       // Store tokens
       setStoredTokens({
         accessToken: authData.accessToken,
         refreshToken: authData.refreshToken,
       });
       
-      // Invalidate user query to refetch
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      
       return authData;
+    },
+    onSuccess: (authData) => {
+      console.log('Verify email success, refetching user data...');
+      // Force immediate refetch of user data
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
     },
   });
 

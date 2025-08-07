@@ -66,8 +66,10 @@ export default function VerifyEmail() {
         description: t('auth.verify.success.description'),
       });
 
-      // Redirect to home after successful verification
-      navigate(`/${language}/`);
+      // Small delay to ensure authentication state updates properly
+      setTimeout(() => {
+        navigate(`/${language}/`);
+      }, 500);
     } catch (error: any) {
       toast({
         title: t('common.error'),

@@ -39,8 +39,17 @@ export default function Home() {
   const [pendingVideoUrl, setPendingVideoUrl] = useState<string>("");
   const { toast } = useToast();
   const { t, language } = useLanguage();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [, navigate] = useLocation();
+
+  // Debug authentication state
+  useEffect(() => {
+    console.log('Home page auth state:', { 
+      isAuthenticated, 
+      isLoading, 
+      user: user ? { username: user.username, id: user.id } : null 
+    });
+  }, [isAuthenticated, isLoading, user]);
 
   // Use server data if authenticated, otherwise fallback to localStorage
   const userTranscriptionsUsed = isAuthenticated ? (user?.transcriptionsUsed || 0) : transcriptionsUsed;
