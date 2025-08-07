@@ -261,11 +261,7 @@ export function setupAuthRoutes(app: Express) {
         });
       }
 
-      const response: UserResponse = {
-        user: cleanUserObject(user)
-      };
-
-      res.json(response);
+      res.json(cleanUserObject(user));
     } catch (error: any) {
       console.error("Get user error:", error);
       res.status(400).json({ 
@@ -281,8 +277,7 @@ export function setupAuthRoutes(app: Express) {
       const { firstName, lastName } = req.body;
 
       const user = await authStorage.updateUser(userId, {
-        firstName,
-        lastName
+        username: `${firstName} ${lastName}` // Update username instead since we're using username field
       });
 
       if (!user) {
@@ -291,11 +286,7 @@ export function setupAuthRoutes(app: Express) {
         });
       }
 
-      const response: UserResponse = {
-        user: cleanUserObject(user)
-      };
-
-      res.json(response);
+      res.json(cleanUserObject(user));
     } catch (error: any) {
       console.error("Update profile error:", error);
       res.status(400).json({ 
@@ -317,7 +308,9 @@ export function setupAuthRoutes(app: Express) {
       }
 
       // Check if user has reached free tier limit
-      if (!user.isPro && user.transcriptionsUsed >= 3) {
+      const isPro = user.subscriptionTier === 'pro';
+      const transcriptionsUsed = user.transcriptionsUsed || 0;
+      if (!isPro && transcriptionsUsed >= 3) {
         return res.status(403).json({ 
           error: "Daily transcription limit reached. Upgrade to Pro for unlimited transcriptions." 
         });

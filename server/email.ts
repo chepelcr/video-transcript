@@ -1,8 +1,8 @@
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 
 // Email configuration using AWS SES SMTP
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: 'email-smtp.us-east-1.amazonaws.com', // AWS SES SMTP endpoint
     port: 587,
     secure: false, // Use STARTTLS
