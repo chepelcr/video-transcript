@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Play, Gift, Bolt, Target, Shield, Star, Download, Copy, Lock, Check } from "lucide-react";
+import { Play, Gift, Bolt, Target, Shield, Star, Download, Copy, Lock, Check, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +12,8 @@ import PaymentModal from "@/components/payment-modal";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 
 interface Transcription {
   id: string;
@@ -29,19 +31,36 @@ export default function Home() {
   const [currentTranscription, setCurrentTranscription] = useState<Transcription | null>(null);
   const [showResults, setShowResults] = useState(false);
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [, navigate] = useLocation();
 
-  const remainingTranscriptions = Math.max(0, 3 - transcriptionsUsed);
+  // Use server data if authenticated, otherwise fallback to localStorage
+  const userTranscriptionsUsed = isAuthenticated ? (user?.transcriptionsUsed || 0) : transcriptionsUsed;
+  const isProUser = isAuthenticated ? user?.isPro : false;
+  const remainingTranscriptions = isProUser ? Infinity : Math.max(0, 3 - userTranscriptionsUsed);
 
   const handleTranscriptionComplete = (transcription: Transcription) => {
     setCurrentTranscription(transcription);
     setShowResults(true);
-    setTranscriptionsUsed((prev: number) => prev + 1);
+    
+    // Only update localStorage if not authenticated (server will handle authenticated users)
+    if (!isAuthenticated) {
+      setTranscriptionsUsed((prev: number) => prev + 1);
+    }
     
     // Scroll to results
     setTimeout(() => {
       document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    toast({
+      title: "Signed Out",
+      description: "You have been successfully signed out.",
+    });
   };
 
   const handleUpgrade = (plan: 'pro') => {
@@ -72,13 +91,49 @@ export default function Home() {
               <button onClick={() => scrollToSection('contact')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
                 {t('nav.contact')}
               </button>
+              {isAuthenticated ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate(`/${language}/dashboard`)}
+                    className="flex items-center gap-2"
+                  >
+                    <User className="h-4 w-4" />
+                    {user?.firstName}
+                  </Button>
+                  <Button variant="outline" onClick={handleLogout}>
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" onClick={() => navigate(`/${language}/login`)}>
+                    Sign In
+                  </Button>
+                  <Button onClick={() => navigate(`/${language}/register`)}>
+                    {t('nav.getStarted')}
+                  </Button>
+                </>
+              )}
               <ThemeToggle />
               <LanguageToggle />
-              <Button onClick={() => handleUpgrade('pro')} className="bg-primary text-white hover:bg-indigo-600">
-                {t('nav.getStarted')}
-              </Button>
             </div>
             <div className="md:hidden flex items-center space-x-2">
+              {isAuthenticated ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate(`/${language}/dashboard`)}
+                  className="flex items-center gap-1"
+                >
+                  <User className="h-4 w-4" />
+                  {user?.firstName}
+                </Button>
+              ) : (
+                <Button size="sm" onClick={() => navigate(`/${language}/register`)}>
+                  {t('nav.getStarted')}
+                </Button>
+              )}
               <ThemeToggle />
               <LanguageToggle />
             </div>

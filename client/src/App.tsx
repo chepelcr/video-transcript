@@ -9,6 +9,10 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
+import Register from "@/pages/register";
+import VerifyEmail from "@/pages/verify-email";
+import Login from "@/pages/login";
+import Dashboard from "@/pages/dashboard";
 import { DebugInfo } from "@/components/DebugInfo";
 import React, { useEffect, useState } from "react";
 
@@ -114,6 +118,10 @@ function RouterWithLanguage() {
       <Route path="/" component={Home} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/subscribe" component={Subscribe} />
+      <Route path="/register" component={Register} />
+      <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/login" component={Login} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>
   );

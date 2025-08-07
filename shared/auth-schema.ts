@@ -1,0 +1,138 @@
+import { sql } from 'drizzle-orm';
+import {
+  boolean,
+  index,
+  pgTable,
+  text,
+  timestamp,
+  varchar,
+  integer,
+  json,
+} from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+
+// Users table for authentication
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email", { length: 255 }).unique().notNull(),
+  password: varchar("password", { length: 255 }).notNull(),
+  firstName: varchar("first_name", { length: 100 }).notNull(),
+  lastName: varchar("last_name", { length: 100 }).notNull(),
+  isEmailVerified: boolean("is_email_verified").default(false),
+  emailVerificationCode: varchar("email_verification_code", { length: 6 }),
+  emailVerificationExpires: timestamp("email_verification_expires"),
+  transcriptionsUsed: integer("transcriptions_used").default(0),
+  isPro: boolean("is_pro").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("users_email_idx").on(table.email),
+]);
+
+// Transcriptions table to track user transcription history
+export const transcriptions = pgTable("transcriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  videoUrl: text("video_url").notNull(),
+  transcript: text("transcript").notNull(),
+  duration: integer("duration").notNull(), // in seconds
+  wordCount: integer("word_count").notNull(),
+  processingTime: integer("processing_time").notNull(), // in seconds
+  accuracy: integer("accuracy").notNull(), // percentage
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("transcriptions_user_id_idx").on(table.userId),
+  index("transcriptions_created_at_idx").on(table.createdAt),
+]);
+
+// Refresh tokens table
+export const refreshTokens = pgTable("refresh_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  token: varchar("token", { length: 500 }).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("refresh_tokens_user_id_idx").on(table.userId),
+  index("refresh_tokens_token_idx").on(table.token),
+]);
+
+// Insert and Select schemas for validation
+export const insertUserSchema = createInsertSchema(users, {
+  email: z.string().email(),
+  password: z.string().min(8),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+});
+
+export const selectUserSchema = createSelectSchema(users);
+
+export const insertTranscriptionSchema = createInsertSchema(transcriptions);
+export const selectTranscriptionSchema = createSelectSchema(transcriptions);
+
+export const insertRefreshTokenSchema = createInsertSchema(refreshTokens);
+export const selectRefreshTokenSchema = createSelectSchema(refreshTokens);
+
+// API Request/Response types
+export const registerRequestSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+});
+
+export const verifyEmailRequestSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
+});
+
+export const loginRequestSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export const refreshTokenRequestSchema = z.object({
+  refreshToken: z.string(),
+});
+
+export const createTranscriptionRequestSchema = z.object({
+  videoUrl: z.string().url(),
+  transcript: z.string(),
+  duration: z.number().positive(),
+  wordCount: z.number().positive(),
+  processingTime: z.number().positive(),
+  accuracy: z.number().min(0).max(100),
+});
+
+// Types
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+export type Transcription = typeof transcriptions.$inferSelect;
+export type InsertTranscription = typeof transcriptions.$inferInsert;
+export type RefreshToken = typeof refreshTokens.$inferSelect;
+export type InsertRefreshToken = typeof refreshTokens.$inferInsert;
+
+export type RegisterRequest = z.infer<typeof registerRequestSchema>;
+export type VerifyEmailRequest = z.infer<typeof verifyEmailRequestSchema>;
+export type LoginRequest = z.infer<typeof loginRequestSchema>;
+export type RefreshTokenRequest = z.infer<typeof refreshTokenRequestSchema>;
+export type CreateTranscriptionRequest = z.infer<typeof createTranscriptionRequestSchema>;
+
+// API Response types
+export interface AuthResponse {
+  user: Omit<User, 'password' | 'emailVerificationCode'>;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface UserResponse {
+  user: Omit<User, 'password' | 'emailVerificationCode'>;
+}
+
+export interface TranscriptionHistoryResponse {
+  transcriptions: Transcription[];
+  total: number;
+  page: number;
+  limit: number;
+}
