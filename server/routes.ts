@@ -220,7 +220,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: "failed",
         });
 
-        res.status(500).json({ error: "Transcription processing failed" });
+        // Pass through specific error messages from transcription service
+        const errorMessage = (transcriptionError as Error).message;
+        
+        // Check if it's a specific user-facing error (like video too long)
+        if (errorMessage === 'El video tiene una duración muy larga. Por favor, usa un video de máximo 3 minutos.') {
+          res.status(400).json({ error: errorMessage });
+        } else {
+          // For other errors, provide a generic message but log the specific error
+          res.status(500).json({ error: "Transcription processing failed" });
+        }
       }
 
     } catch (error) {
