@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -188,11 +188,14 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
     <>
       {/* Mobile/Tablet Modal */}
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="lg:hidden max-w-sm mx-auto h-[80vh] flex flex-col p-0">
+        <DialogContent className="lg:hidden max-w-xs sm:max-w-md md:max-w-lg mx-auto h-[85vh] sm:h-[80vh] flex flex-col p-0">
           <DialogHeader className="p-4 border-b">
             <DialogTitle className="text-lg font-semibold">
               Recent Transcriptions
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              View and manage your transcription history
+            </DialogDescription>
           </DialogHeader>
           {transcriptionContent}
         </DialogContent>
