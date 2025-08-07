@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
+import { authStorage } from "./auth-storage";
 import { setupAuthRoutes } from "./auth-routes";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { transcriptionService } from "./transcription-service";
@@ -133,14 +134,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Video URL is required" });
       }
 
-      // Get user and check limits
-      const user = await storage.getUser(userId);
+      // Get user and check limits  
+      const user = await authStorage.getUserById(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
 
       // Check if user has reached daily limit (3 transcriptions for free users)
-      if (user.subscriptionTier === "free" && (user.transcriptionsUsed || 0) >= 3) {
+      if (user.subscriptionTier === "free" && (user.dailyTranscriptionsUsed || 0) >= 3) {
         return res.status(403).json({ 
           error: "Daily transcription limit reached. Upgrade to Pro for unlimited transcriptions." 
         });
@@ -223,7 +224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
         // Increment user's transcription count
-        await storage.incrementUserTranscriptions(userId);
+        await authStorage.incrementUserTranscriptions(userId);
 
         res.json(updatedTranscription);
 
@@ -293,7 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
         // Increment user's transcription count
-        await storage.incrementUserTranscriptions(transcription.userId);
+        await authStorage.incrementUserTranscriptions(transcription.userId);
 
         console.log(`Transcription ${id} completed successfully`);
       } else {
@@ -322,7 +323,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "User not authenticated" });
       }
 
-      const transcriptions = await storage.getTranscriptionsByUserId(userId);
+      const transcriptions = await authStorage.getTranscriptionsByUserId(userId);
       
       res.json({
         transcriptions,
