@@ -16,8 +16,8 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 import { Icons } from '@/components/ui/icons';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { LanguageToggle } from '@/components/LanguageToggle';
+// import { ThemeToggle } from '@/components/ThemeToggle';
+// import { LanguageToggle } from '@/components/LanguageToggle';
 import { SiYoutube, SiVimeo } from 'react-icons/si';
 
 
@@ -212,8 +212,8 @@ export default function Dashboard() {
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-3">
-              <ThemeToggle />
-              <LanguageToggle />
+              {/* <ThemeToggle />
+              <LanguageToggle /> */}
               <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/profile`)}>
                 {t('profile.editProfile')}
               </Button>
@@ -227,8 +227,8 @@ export default function Dashboard() {
 
             {/* Mobile/Tablet Navigation */}
             <div className="lg:hidden flex items-center gap-1">
-              <ThemeToggle />
-              <LanguageToggle />
+              {/* <ThemeToggle />
+              <LanguageToggle /> */}
               <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/profile`)}>
                 <Icons.user className="h-4 w-4" />
               </Button>

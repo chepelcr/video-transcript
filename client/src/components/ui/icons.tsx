@@ -10,7 +10,9 @@ import {
   ChevronDown,
   Copy,
   Download,
-  ExternalLink
+  ExternalLink,
+  Clock,
+  BarChart3
 } from "lucide-react";
 
 export const Icons = {
@@ -26,4 +28,6 @@ export const Icons = {
   copy: Copy,
   download: Download,
   externalLink: ExternalLink,
+  clock: Clock,
+  barChart: BarChart3,
 };
