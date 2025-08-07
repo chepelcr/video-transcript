@@ -171,14 +171,14 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
     try {
       const urlObj = new URL(url);
       if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
-        return <SiYoutube className="h-4 w-4 text-red-600" />;
+        return <SiYoutube className="h-4 w-4 text-red-600 flex-shrink-0" />;
       }
       if (urlObj.hostname.includes('vimeo.com')) {
-        return <SiVimeo className="h-4 w-4 text-blue-500" />;
+        return <SiVimeo className="h-4 w-4 text-blue-500 flex-shrink-0" />;
       }
-      return <Video className="h-4 w-4 text-gray-500" />;
+      return <Video className="h-4 w-4 text-gray-500 flex-shrink-0" />;
     } catch {
-      return <Video className="h-4 w-4 text-gray-500" />;
+      return <Video className="h-4 w-4 text-gray-500 flex-shrink-0" />;
     }
   };
 
@@ -220,9 +220,9 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
               <Card key={transcription.id} className="border border-gray-200 dark:border-gray-700">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center justify-between">
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2 min-w-0">
                       {getVideoProviderIcon(transcription.videoUrl)}
-                      {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
+                      <span className="truncate">{transcription.videoTitle || getVideoTitle(transcription.videoUrl)}</span>
                     </span>
                     <div className="flex gap-2">
                       {getStatusBadge(transcription.status)}

@@ -61,6 +61,7 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **UI IMPROVEMENTS**: Added video provider icons (YouTube red, Vimeo blue, generic) next to video titles across all transcription views
 - ✅ **DURATION DISPLAY FEATURE**: Added video duration display in sidebar history with estimated durations for demonstration (August 7, 2025)
 - ✅ **TYPESCRIPT FIXES**: Resolved all LSP diagnostics and type safety issues across transcription components
+- ✅ **ICON SIZING FIX**: Fixed inconsistent YouTube icon sizes by adding flex-shrink-0 and standardizing icon dimensions across all views (August 7, 2025)
 
 # User Preferences
 

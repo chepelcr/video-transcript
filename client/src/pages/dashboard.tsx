@@ -68,14 +68,14 @@ export default function Dashboard() {
     try {
       const urlObj = new URL(url);
       if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
-        return <SiYoutube className="h-4 w-4 text-red-600" />;
+        return <SiYoutube className="h-4 w-4 text-red-600 flex-shrink-0" />;
       }
       if (urlObj.hostname.includes('vimeo.com')) {
-        return <SiVimeo className="h-4 w-4 text-blue-500" />;
+        return <SiVimeo className="h-4 w-4 text-blue-500 flex-shrink-0" />;
       }
-      return <Icons.fileText className="h-4 w-4 text-gray-500" />;
+      return <Icons.fileText className="h-4 w-4 text-gray-500 flex-shrink-0" />;
     } catch {
-      return <Icons.fileText className="h-4 w-4 text-gray-500" />;
+      return <Icons.fileText className="h-4 w-4 text-gray-500 flex-shrink-0" />;
     }
   };
   
@@ -434,7 +434,7 @@ export default function Dashboard() {
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 min-w-0">
                                   {getVideoProviderIcon(transcription.videoUrl)}
                                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                                     {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
