@@ -150,12 +150,13 @@ export function useAuth() {
   const verifyEmailMutation = useMutation({
     mutationFn: async (data: VerifyEmailRequest) => {
       const response = await apiRequest('POST', '/api/auth/verify-email', data);
-      const authData = response as unknown as AuthResponse;
+      const authData = await response.json() as AuthResponse;
       
       console.log('Verify email response:', { 
         hasUser: !!authData.user, 
         hasTokens: !!(authData.accessToken && authData.refreshToken),
-        username: authData.user?.username 
+        username: authData.user?.username,
+        actualData: authData
       });
       
       // Store tokens
