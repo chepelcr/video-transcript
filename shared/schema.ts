@@ -67,6 +67,9 @@ export const insertTranscriptionSchema = createInsertSchema(transcriptions).pick
   videoTitle: true,
   userId: true,
   status: true,
+}).extend({
+  videoTitle: z.string().optional(),
+  status: z.string().optional(),
 });
 
 export const insertRefreshTokenSchema = createInsertSchema(refreshTokens).pick({

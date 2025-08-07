@@ -352,6 +352,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
+
+
   const httpServer = createServer(app);
   return httpServer;
 }

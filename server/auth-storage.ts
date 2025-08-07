@@ -141,19 +141,21 @@ export class AuthStorage {
   }
 
   // Transcription operations
-  async createTranscription(transcriptionData: Omit<InsertTranscription, 'id' | 'createdAt'>): Promise<Transcription> {
+  async createTranscription(transcriptionData: any): Promise<Transcription> {
     console.log('Creating transcription with data:', transcriptionData);
     
-    const [transcription] = await db.execute(sql`
+    const result = await db.execute(sql`
       INSERT INTO transcriptions (user_id, video_url, video_title, status)
-      VALUES (${transcriptionData.userId}, ${transcriptionData.videoUrl}, ${transcriptionData.videoTitle}, ${transcriptionData.status})
+      VALUES (${transcriptionData.userId}, ${transcriptionData.videoUrl}, ${transcriptionData.videoTitle || null}, ${transcriptionData.status || 'processing'})
       RETURNING id, user_id as "userId", video_url as "videoUrl", video_title as "videoTitle", 
                transcript, status, duration, word_count as "wordCount", 
                processing_time as "processingTime", accuracy, created_at as "createdAt"
     `);
     
-    console.log('Created transcription:', transcription);
-    return transcription.rows[0] as Transcription;
+    console.log('Created transcription result:', result);
+    const transcription = result.rows[0] as Transcription;
+    console.log('Returning transcription:', transcription);
+    return transcription;
   }
 
   // Get user transcriptions with pagination
@@ -214,12 +216,17 @@ export class AuthStorage {
 
   // Update transcription
   async updateTranscription(id: string, updates: Partial<Transcription>): Promise<Transcription | null> {
-    const [transcription] = await db
-      .update(transcriptions)
-      .set(updates)
-      .where(eq(transcriptions.id, id))
-      .returning();
-    return transcription || null;
+    try {
+      const [transcription] = await db
+        .update(transcriptions)
+        .set(updates)
+        .where(eq(transcriptions.id, id))
+        .returning();
+      return transcription || null;
+    } catch (error) {
+      console.error('Update transcription error:', error);
+      throw error;
+    }
   }
 
   // Increment user transcriptions (alias for incrementTranscriptionsUsed)
