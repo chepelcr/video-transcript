@@ -185,7 +185,7 @@ export default function Home() {
                   className="flex items-center gap-2"
                 >
                   <History className="h-4 w-4" />
-                  History
+                  {t('nav.history')}
                 </Button>
               )}
               {isAuthenticated ? (
@@ -199,12 +199,12 @@ export default function Home() {
                     {user?.username}
                   </Button>
                   <Button variant="outline" onClick={handleLogout}>
-                    Sign Out
+                    {t('common.logout')}
                   </Button>
                 </>
               ) : (
                 <Button onClick={() => navigate(`/${language}/login`)}>
-                  Get Started
+                  {t('nav.getStarted')}
                 </Button>
               )}
               <ThemeToggle />
@@ -232,7 +232,7 @@ export default function Home() {
                 </Button>
               ) : (
                 <Button size="sm" onClick={() => navigate(`/${language}/login`)}>
-                  Get Started
+                  {t('nav.getStarted')}
                 </Button>
               )}
               <ThemeToggle />
@@ -288,7 +288,7 @@ export default function Home() {
                     }} 
                     className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
                   >
-                    History
+                    {t('nav.history')}
                   </button>
                   <button 
                     onClick={() => {
@@ -297,7 +297,7 @@ export default function Home() {
                     }} 
                     className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
                   >
-                    Profile
+                    {t('nav.profile')}
                   </button>
                   <button 
                     onClick={() => {
@@ -306,7 +306,7 @@ export default function Home() {
                     }} 
                     className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
                   >
-                    Sign Out
+                    {t('common.logout')}
                   </button>
                 </>
               ) : (
@@ -317,7 +317,7 @@ export default function Home() {
                   }} 
                   className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
                 >
-                  Sign In
+                  {t('nav.getStarted')}
                 </button>
               )}
             </div>
