@@ -12,19 +12,22 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Users table for authentication
+// Users table for authentication - matching existing schema
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email", { length: 255 }).unique().notNull(),
-  password: varchar("password", { length: 255 }).notNull(),
-  firstName: varchar("first_name", { length: 100 }).notNull(),
-  lastName: varchar("last_name", { length: 100 }).notNull(),
+  username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  subscriptionTier: text("subscription_tier").default("free"),
+  transcriptionsUsed: integer("transcriptions_used").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  isActive: boolean("is_active").default(true),
+  // Auth specific fields - we'll add these to the existing table
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationCode: varchar("email_verification_code", { length: 6 }),
   emailVerificationExpires: timestamp("email_verification_expires"),
-  transcriptionsUsed: integer("transcriptions_used").default(0),
-  isPro: boolean("is_pro").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("users_email_idx").on(table.email),
@@ -62,8 +65,7 @@ export const refreshTokens = pgTable("refresh_tokens", {
 export const insertUserSchema = createInsertSchema(users, {
   email: z.string().email(),
   password: z.string().min(8),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
+  username: z.string().min(1),
 });
 
 export const selectUserSchema = createSelectSchema(users);
@@ -121,13 +123,24 @@ export type CreateTranscriptionRequest = z.infer<typeof createTranscriptionReque
 
 // API Response types
 export interface AuthResponse {
-  user: Omit<User, 'password' | 'emailVerificationCode'>;
+  user: UserResponse;
   accessToken: string;
   refreshToken: string;
 }
 
 export interface UserResponse {
-  user: Omit<User, 'password' | 'emailVerificationCode'>;
+  id: string;
+  username: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  subscriptionTier?: string;
+  transcriptionsUsed?: number;
+  isEmailVerified?: boolean;
+  isPro?: boolean;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface TranscriptionHistoryResponse {

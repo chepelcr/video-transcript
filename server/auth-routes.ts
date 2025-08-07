@@ -42,17 +42,20 @@ export function setupAuthRoutes(app: Express) {
       const verificationCode = generateVerificationCode();
       const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
+      // Create username from first and last name
+      const username = `${validatedData.firstName}${validatedData.lastName}`.toLowerCase().replace(/\s+/g, '');
+      
       // Create user
       const user = await authStorage.createUser({
         email: validatedData.email,
         password: hashedPassword,
-        firstName: validatedData.firstName,
-        lastName: validatedData.lastName,
+        username: username,
         emailVerificationCode: verificationCode,
         emailVerificationExpires: verificationExpires,
         isEmailVerified: false,
         transcriptionsUsed: 0,
-        isPro: false,
+        subscriptionTier: 'free',
+        isActive: true,
       });
 
       // TODO: Send verification email with code
