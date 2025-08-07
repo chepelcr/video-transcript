@@ -215,6 +215,20 @@ const translations = {
     'profile.update.success.title': 'Profile Updated',
     'profile.update.success.description': 'Your profile has been updated successfully.',
     'profile.update.error': 'Failed to update profile',
+    'profile.editProfile': 'Edit Profile',
+    
+    // Dashboard Page
+    'dashboard.welcomeBack': 'Welcome back, {{name}}!',
+    'dashboard.description': 'Manage your transcriptions and account settings',
+    'dashboard.accountOverview': 'Account Overview',
+    'dashboard.plan': 'Plan',
+    'dashboard.free': 'Free',
+    'dashboard.pro': 'Pro',
+    'dashboard.upgrade': 'Upgrade',
+    'dashboard.dailyUsage': 'Daily Usage',
+    'dashboard.dailyLimitReached': 'Daily limit reached',
+    'dashboard.totalTranscriptions': 'Total Transcriptions',
+    'dashboard.memberSince': 'Member Since',
     
     // Subscription Page
     'subscription.title': 'Subscribe to VideoScript Pro',
@@ -451,6 +465,20 @@ const translations = {
     'profile.update.success.title': 'Perfil Actualizado',
     'profile.update.success.description': 'Tu perfil ha sido actualizado exitosamente.',
     'profile.update.error': 'Error al actualizar perfil',
+    'profile.editProfile': 'Editar Perfil',
+    
+    // Dashboard Page
+    'dashboard.welcomeBack': '¡Bienvenido de nuevo, {{name}}!',
+    'dashboard.description': 'Gestiona tus transcripciones y configuración de cuenta',
+    'dashboard.accountOverview': 'Resumen de Cuenta',
+    'dashboard.plan': 'Plan',
+    'dashboard.free': 'Gratuito',
+    'dashboard.pro': 'Pro',
+    'dashboard.upgrade': 'Actualizar',
+    'dashboard.dailyUsage': 'Uso Diario',
+    'dashboard.dailyLimitReached': 'Límite diario alcanzado',
+    'dashboard.totalTranscriptions': 'Transcripciones Totales',
+    'dashboard.memberSince': 'Miembro Desde',
     
     // Subscription Page
     'subscription.title': 'Suscríbete a VideoScript Pro',

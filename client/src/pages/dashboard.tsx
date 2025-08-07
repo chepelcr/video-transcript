@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Icons } from '@/components/ui/icons';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { LanguageToggle } from '@/components/LanguageToggle';
 
 interface Transcription {
   id: string;
@@ -72,21 +74,23 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Welcome back, {user?.firstName}!
+              {t('dashboard.welcomeBack').replace('{{name}}', user?.firstName || user?.username || '')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Manage your transcriptions and account settings
+              {t('dashboard.description')}
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <LanguageToggle />
             <Button variant="outline" onClick={() => navigate(`/${language}/profile`)}>
               {t('profile.editProfile')}
             </Button>
             <Button variant="outline" onClick={() => navigate(`/${language}/`)}>
-              Back to Home
+              {t('common.backToHome')}
             </Button>
             <Button variant="outline" onClick={handleLogout}>
-              Sign Out
+              {t('common.logout')}
             </Button>
           </div>
         </div>
@@ -98,15 +102,15 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Icons.user className="h-5 w-5" />
-                  Account Overview
+                  {t('dashboard.accountOverview')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Plan</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.plan')}</p>
                   <div className="flex items-center gap-2">
                     <Badge variant={user?.isPro ? "default" : "secondary"}>
-                      {user?.isPro ? 'Pro' : 'Free'}
+                      {user?.isPro ? t('dashboard.pro') : t('dashboard.free')}
                     </Badge>
                     {!user?.isPro && (
                       <Button
@@ -115,31 +119,31 @@ export default function Dashboard() {
                         className="p-0 h-auto"
                         onClick={() => navigate(`/${language}/subscribe`)}
                       >
-                        Upgrade
+                        {t('dashboard.upgrade')}
                       </Button>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Daily Usage</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.dailyUsage')}</p>
                   <p className="text-lg font-semibold">
                     {dailyUsage} / {user?.isPro ? '∞' : dailyLimit}
                   </p>
                   {isLimitReached && (
                     <p className="text-sm text-red-600 dark:text-red-400">
-                      Daily limit reached
+                      {t('dashboard.dailyLimitReached')}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Transcriptions</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.totalTranscriptions')}</p>
                   <p className="text-lg font-semibold">{transcriptions.length}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Member Since</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.memberSince')}</p>
                   <p className="text-sm">
                     {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                   </p>
@@ -154,10 +158,10 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Icons.fileText className="h-5 w-5" />
-                  Transcription History
+                  {t('history.title')}
                 </CardTitle>
                 <CardDescription>
-                  Your recent video transcriptions
+                  {t('history.empty.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -169,13 +173,13 @@ export default function Dashboard() {
                   <div className="text-center py-8">
                     <Icons.fileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600 dark:text-gray-400">
-                      No transcriptions yet
+                      {t('history.empty')}
                     </p>
                     <Button
                       className="mt-4"
                       onClick={() => navigate(`/${language}/`)}
                     >
-                      Create Your First Transcription
+                      {t('hero.transcribe')}
                     </Button>
                   </div>
                 ) : (
@@ -190,8 +194,8 @@ export default function Dashboard() {
                               </p>
                               <div className="mt-1 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                                 <span>{transcription.duration}s</span>
-                                <span>{transcription.wordCount} words</span>
-                                <span>{transcription.accuracy}% accuracy</span>
+                                <span>{transcription.wordCount} {t('history.words')}</span>
+                                <span>{transcription.accuracy}% {t('history.accuracy')}</span>
                                 <span>{new Date(transcription.createdAt).toLocaleDateString()}</span>
                               </div>
                               <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
@@ -206,7 +210,7 @@ export default function Dashboard() {
                                   navigator.clipboard.writeText(transcription.transcript);
                                 }}
                               >
-                                Copy
+                                {t('history.copyText')}
                               </Button>
                               <Button
                                 variant="outline"
@@ -221,7 +225,7 @@ export default function Dashboard() {
                                   URL.revokeObjectURL(url);
                                 }}
                               >
-                                Download
+                                {t('history.download')}
                               </Button>
                             </div>
                           </div>
