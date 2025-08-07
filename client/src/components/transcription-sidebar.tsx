@@ -219,19 +219,12 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
             {transcriptions.map((transcription: Transcription) => (
               <Card key={transcription.id} className="border border-gray-200 dark:border-gray-700">
                 <CardHeader className="pb-2 px-3 pt-3">
-                  <div className="space-y-2">
                     <div className="flex items-center gap-2 min-w-0">
                       {getVideoProviderIcon(transcription.videoUrl)}
                       <CardTitle className="text-sm font-medium truncate flex-1 min-w-0">
                         {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
                       </CardTitle>
                     </div>
-                    <div className="flex items-center justify-end">
-                      <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                        {formatDistanceToNow(new Date(transcription.createdAt), { addSuffix: true })}
-                      </span>
-                    </div>
-                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3 px-3 pb-3">
                   <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
