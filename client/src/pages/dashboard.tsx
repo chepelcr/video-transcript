@@ -22,7 +22,9 @@ import { LanguageToggle } from '@/components/LanguageToggle';
 interface Transcription {
   id: string;
   videoUrl: string;
+  videoTitle?: string;
   transcript: string;
+  status: string;
   duration: number;
   wordCount: number;
   processingTime: number;
@@ -90,24 +92,44 @@ export default function Dashboard() {
     setIsTranscribing(true);
     
     try {
-      await apiRequest('POST', '/api/transcriptions/transcribe', {
+      // Step 1: Create transcription record and validate URL
+      const createResponse = await apiRequest('POST', '/api/transcriptions/create', {
         videoUrl: videoUrl.trim(),
       });
 
       toast({
-        title: t('transcription.success.title'),
-        description: t('transcription.success.description'),
+        title: t('transcription.processing'),
+        description: `Processing: ${createResponse.videoTitle}`,
       });
 
-      // Clear form and refresh data
-      setVideoUrl('');
-      queryClient.invalidateQueries({ queryKey: ['/api/users/transcriptions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-    } catch (error) {
-      console.error('Transcription error:', error);
+      // Step 2: Process the transcription in the background
+      try {
+        const processResponse = await apiRequest('POST', `/api/transcriptions/${createResponse.id}/process`, {});
+        
+        toast({
+          title: t('transcription.success.title'),
+          description: t('transcription.success.description'),
+        });
+
+        // Clear form and refresh data
+        setVideoUrl('');
+        queryClient.invalidateQueries({ queryKey: ['/api/users/transcriptions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+
+      } catch (processError) {
+        console.error('Transcription processing error:', processError);
+        toast({
+          title: t('transcription.error.title'),
+          description: t('transcription.error.description'),
+          variant: 'destructive',
+        });
+      }
+
+    } catch (error: any) {
+      console.error('Transcription creation error:', error);
       toast({
         title: t('transcription.error.title'),
-        description: t('transcription.error.description'),
+        description: error.message || t('transcription.error.description'),
         variant: 'destructive',
       });
     } finally {
@@ -348,7 +370,7 @@ export default function Dashboard() {
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                {transcription.videoUrl}
+                                {transcription.videoTitle || transcription.videoUrl}
                               </p>
                               <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500 dark:text-gray-400">
                                 <span>{transcription.duration}s</span>

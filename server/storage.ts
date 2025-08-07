@@ -6,11 +6,14 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(userId: string, updates: Partial<User>): Promise<User>;
   updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User>;
   updateUserSubscriptionTier(userId: string, tier: string): Promise<User>;
+  incrementUserTranscriptions(userId: string): Promise<User>;
   
   createTranscription(transcription: InsertTranscription): Promise<Transcription>;
   getTranscriptionsByUserId(userId: string): Promise<Transcription[]>;
+  getTranscription(id: string): Promise<Transcription | undefined>;
   updateTranscription(id: string, updates: Partial<Transcription>): Promise<Transcription>;
 }
 
@@ -50,6 +53,10 @@ export class MemStorage implements IStorage {
       transcriptionsUsed: 0,
       createdAt: new Date(),
       isActive: true,
+      isEmailVerified: false,
+      emailVerificationCode: null,
+      emailVerificationExpires: null,
+      updatedAt: new Date(),
     };
     this.users.set(id, user);
     return user;
@@ -71,7 +78,7 @@ export class MemStorage implements IStorage {
     return updatedUser;
   }
 
-  async updateUserSubscriptionTier(userId: string, tier: string): Promise<User> {
+  async updateUser(userId: string, updates: Partial<User>): Promise<User> {
     const user = this.users.get(userId);
     if (!user) {
       throw new Error("User not found");
@@ -79,11 +86,27 @@ export class MemStorage implements IStorage {
     
     const updatedUser = {
       ...user,
-      subscriptionTier: tier,
+      ...updates,
+      updatedAt: new Date(),
     };
     
     this.users.set(userId, updatedUser);
     return updatedUser;
+  }
+
+  async updateUserSubscriptionTier(userId: string, tier: string): Promise<User> {
+    return this.updateUser(userId, { subscriptionTier: tier });
+  }
+
+  async incrementUserTranscriptions(userId: string): Promise<User> {
+    const user = this.users.get(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    return this.updateUser(userId, { 
+      transcriptionsUsed: (user.transcriptionsUsed || 0) + 1 
+    });
   }
 
   async createTranscription(insertTranscription: InsertTranscription): Promise<Transcription> {
@@ -91,12 +114,12 @@ export class MemStorage implements IStorage {
     const transcription: Transcription = {
       ...insertTranscription,
       id,
-      userId: null,
       transcript: null,
       status: "processing",
       duration: null,
       wordCount: null,
       processingTime: null,
+      accuracy: null,
       createdAt: new Date(),
     };
     this.transcriptions.set(id, transcription);
@@ -107,6 +130,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.transcriptions.values()).filter(
       (transcription) => transcription.userId === userId,
     );
+  }
+
+  async getTranscription(id: string): Promise<Transcription | undefined> {
+    return this.transcriptions.get(id);
   }
 
   async updateTranscription(id: string, updates: Partial<Transcription>): Promise<Transcription> {

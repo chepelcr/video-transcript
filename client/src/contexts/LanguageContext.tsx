@@ -256,6 +256,12 @@ const translations = {
     'dashboard.totalTranscriptions': 'Total Transcriptions',
     'dashboard.memberSince': 'Member Since',
     
+    // Transcription Status
+    'transcription.status.processing': 'Processing',
+    'transcription.status.completed': 'Completed',
+    'transcription.status.failed': 'Failed',
+    'transcription.words': 'words',
+    
     // Subscription Page
     'subscription.title': 'Subscribe to VideoScript Pro',
     'subscription.planTitle': 'Pro Plan',
@@ -531,6 +537,12 @@ const translations = {
     'dashboard.dailyLimitReached': 'Límite diario alcanzado',
     'dashboard.totalTranscriptions': 'Transcripciones Totales',
     'dashboard.memberSince': 'Miembro Desde',
+    
+    // Transcription Status Spanish
+    'transcription.status.processing': 'Procesando',
+    'transcription.status.completed': 'Completado',
+    'transcription.status.failed': 'Fallido',
+    'transcription.words': 'palabras',
     
     // Subscription Page
     'subscription.title': 'Suscríbete a VideoScript Pro',

@@ -27,6 +27,7 @@ export const transcriptions = pgTable("transcriptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id),
   videoUrl: text("video_url").notNull(),
+  videoTitle: text("video_title"), // Video title extracted from URL
   transcript: text("transcript"),
   status: text("status").default("processing"), // processing, completed, failed
   duration: numeric("duration", { precision: 10, scale: 2 }), // in seconds with decimals
@@ -60,6 +61,8 @@ export const updateUserProfileSchema = createInsertSchema(users).pick({
 
 export const insertTranscriptionSchema = createInsertSchema(transcriptions).pick({
   videoUrl: true,
+  videoTitle: true,
+  userId: true,
 });
 
 export const insertRefreshTokenSchema = createInsertSchema(refreshTokens).pick({
