@@ -102,9 +102,13 @@ export default function VideoTranscriptionForm({
         description: t('messages.transcribed'),
       });
     } catch (error: any) {
+      const errorMessage = error.message === 'VIDEO_TOO_LONG' 
+        ? t('messages.videoTooLong')
+        : error.message || t('messages.failed');
+      
       toast({
         title: t('messages.error'),
-        description: error.message || t('messages.failed'),
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

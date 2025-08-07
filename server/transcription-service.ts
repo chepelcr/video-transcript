@@ -168,22 +168,25 @@ export class TranscriptionService {
       
       const startTime = Date.now();
       
-      const response = await fetch(`${pythonApiUrl}/transcribe`, {
-        method: 'POST',
+      const response = await fetch(`${pythonApiUrl}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ video_url: videoUrl }),
         // Add timeout to prevent hanging
         signal: AbortSignal.timeout(30000) // 30 second timeout
       });
 
-      if (!response.ok) {
-        throw new Error(`Transcription service returned ${response.status}: ${response.statusText}`);
-      }
-
       const result = await response.json();
       const processingTime = (Date.now() - startTime) / 1000;
+
+      if (!response.ok) {
+        // Handle structured error response
+        if (result.message === '004') {
+          throw new Error('El video tiene una duración muy larga. Por favor, usa un video de máximo 3 minutos.');
+        }
+        throw new Error(result.error || `Transcription service returned ${response.status}: ${response.statusText}`);
+      }
 
       return {
         transcript: result.transcript || '',
@@ -194,6 +197,11 @@ export class TranscriptionService {
       };
     } catch (error) {
       console.error('Transcription service error:', error);
+      
+      // If it's our custom error message, re-throw it
+      if ((error as Error).message === 'El video tiene una duración muy larga. Por favor, usa un video de máximo 3 minutos.') {
+        throw error;
+      }
       
       // Fallback to simulation for development/testing
       return this.simulateTranscription(videoUrl);

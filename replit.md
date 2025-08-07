@@ -29,6 +29,9 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **CORS CONFIGURATION**: Updated server CORS settings to include custom subdomain
 - ✅ **LANGUAGE TOGGLE FIX**: Fixed language switching routing after custom domain migration (August 7, 2025)
 - ✅ **FEATURES SECTION UPDATE**: Updated "Why Choose" section to highlight new transcription history functionality
+- ✅ **AUTHENTICATION BUG FIX**: Fixed critical authentication issue where users weren't properly logged in after email verification (August 7, 2025)
+- ✅ **API RESPONSE PARSING**: Fixed frontend API response handling - now properly parses JSON from Response objects
+- ✅ **TRANSCRIPTION API UPDATE**: Updated transcription service to handle new structured error response format with proper 004 error code handling for long videos (3-minute limit)
 
 # User Preferences
 

@@ -225,6 +225,7 @@ const translations = {
     'messages.emailRequired': 'Please enter your email address',
     'messages.settingUp': 'Setting up...',
     'messages.returnHome': 'Return to Home',
+    'messages.videoTooLong': 'Video is too long. Please use a video of maximum 3 minutes.',
 
     // Transcription History
     'history.title': 'Recent Transcriptions',
@@ -539,6 +540,7 @@ const translations = {
     'messages.emailRequired': 'Por favor ingresa tu dirección de email',
     'messages.settingUp': 'Configurando...',
     'messages.returnHome': 'Volver al Inicio',
+    'messages.videoTooLong': 'El video tiene una duración muy larga. Por favor, usa un video de máximo 3 minutos.',
 
     // Transcription History
     'history.title': 'Transcripciones Recientes',

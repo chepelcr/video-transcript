@@ -9,6 +9,14 @@ export interface TranscriptionResponse {
   accuracy: number;
 }
 
+export interface TranscriptionApiError {
+  timestamp: string;
+  status: string;
+  error: string;
+  message: string;
+  path: string;
+}
+
 // Sample transcriptions for simulation based on video URL patterns
 const SAMPLE_TRANSCRIPTIONS = {
   youtube: [
@@ -63,8 +71,17 @@ export async function transcribeVideo(videoUrl: string): Promise<TranscriptionRe
       console.log('Successfully received transcription from API');
       return result;
     } else {
-      console.log('API returned error:', response.status);
-      throw new Error(`API error: ${response.status}`);
+      const errorData = await response.json() as TranscriptionApiError;
+      console.log('API returned error:', errorData);
+      
+      // Handle specific error codes
+      if (errorData.message === '004') {
+        // The error message will be handled in the UI with proper translation
+        throw new Error('VIDEO_TOO_LONG');
+      }
+      
+      // Handle other errors
+      throw new Error(errorData.error || `API error: ${response.status}`);
     }
   } catch (error) {
     console.log('API call failed:', (error as Error).message);
