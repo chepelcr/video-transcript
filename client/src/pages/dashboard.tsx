@@ -74,7 +74,7 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {t('dashboard.welcomeBack').replace('{{name}}', user?.firstName || user?.username || '')}
+              {t('dashboard.welcomeBack').replace('{{name}}', user?.username || '')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
               {t('dashboard.description')}

@@ -83,11 +83,6 @@ export default function Profile() {
   // Update form when user data loads
   useEffect(() => {
     if (user && !updateProfileMutation.isPending) {
-      console.log('Updating form with user data:', {
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName
-      });
       form.reset({
         username: user.username,
         firstName: user.firstName || '',

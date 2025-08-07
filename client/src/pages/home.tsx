@@ -183,7 +183,7 @@ export default function Home() {
                     className="flex items-center gap-2"
                   >
                     <User className="h-4 w-4" />
-                    {user?.firstName}
+                    {user?.username}
                   </Button>
                   <Button variant="outline" onClick={handleLogout}>
                     Sign Out
@@ -215,7 +215,7 @@ export default function Home() {
                   className="flex items-center gap-1"
                 >
                   <User className="h-4 w-4" />
-                  {user?.firstName}
+                  {user?.username}
                 </Button>
               ) : (
                 <Button size="sm" onClick={() => navigate(`/${language}/login`)}>
