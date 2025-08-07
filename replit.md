@@ -44,6 +44,8 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **TRANSCRIPTION PERSISTENCE**: Updated transcription creation, retrieval, and webhook endpoints to use proper database persistence
 - ✅ **PRE-LOGIN URL PRESERVATION**: Fixed app losing pre-login URL input after authentication by persisting pending video URL in localStorage across page navigation
 - ✅ **DASHBOARD REFRESH ERROR FIX**: Fixed null pointer exception when refreshing dashboard - added null safety for transcript substring operations and disabled buttons for processing transcriptions (August 7, 2025)
+- ✅ **VIDEO TITLE DISPLAY FIX**: Fixed video title display in transcription history - added proper TypeScript typing and improved API response handling (August 7, 2025)
+- ✅ **REFRESH BUTTON TRANSLATIONS**: Added complete Spanish and English translations for refresh button and status indicators in dashboard (August 7, 2025)
 
 # User Preferences
 

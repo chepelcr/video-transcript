@@ -32,6 +32,7 @@ const translations = {
     'common.loading': 'Loading...',
     'common.error': 'Error',
     'common.success': 'Success',
+    'common.refresh': 'Refresh',
     
     // Hero Section
     'hero.title': 'Transform Videos to Text',
@@ -242,6 +243,7 @@ const translations = {
     'history.download': 'Download',
     'history.view': 'View Details',
     'history.createdAt': 'Created',
+    'history.copied': 'Text copied to clipboard!',
 
     // Transcription Form
     'transcription.newTranscription': 'New Transcription',
@@ -300,6 +302,12 @@ const translations = {
     'transcriptions.refreshed': 'History Refreshed',
     'transcriptions.refreshedDesc': 'Transcription history updated successfully',
     
+    // Status translations
+    'status.processing': 'Processing...',
+    'status.completed': 'Completed',
+    'status.failed': 'Failed',
+    'status.pending': 'Pending...',
+    
     // Transcription Queueing
     'transcription.queued.title': 'Transcription Queued',
     'transcription.queued.description': 'Your video "{{title}}" has been queued for processing. You\'ll see the results here soon.',
@@ -356,6 +364,7 @@ const translations = {
     'common.loading': 'Cargando...',
     'common.error': 'Error',
     'common.success': 'Éxito',
+    'common.refresh': 'Actualizar',
     
     // Hero Section
     'hero.title': 'Convierte Videos a Texto',
@@ -566,6 +575,7 @@ const translations = {
     'history.download': 'Descargar',
     'history.view': 'Ver Detalles',
     'history.createdAt': 'Creado',
+    'history.copied': '¡Texto copiado al portapapeles!',
 
     // Transcription Form Spanish
     'transcription.newTranscription': 'Nueva Transcripción',
@@ -623,6 +633,12 @@ const translations = {
     'transcriptions.failed': 'Fallido',
     'transcriptions.refreshed': 'Historial Actualizado',
     'transcriptions.refreshedDesc': 'El historial de transcripciones se ha actualizado exitosamente',
+    
+    // Status translations Spanish
+    'status.processing': 'Procesando...',
+    'status.completed': 'Completado',
+    'status.failed': 'Fallido',
+    'status.pending': 'Pendiente...',
     
     // Transcription Queueing Spanish
     'transcription.queued.title': 'Transcripción en Cola',

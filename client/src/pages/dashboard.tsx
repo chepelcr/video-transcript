@@ -62,7 +62,7 @@ export default function Dashboard() {
     isLoading: transcriptionsLoading,
     isFetching,
     refetch: refetchTranscriptions,
-  } = useQuery({
+  } = useQuery<TranscriptionHistoryResponse>({
     queryKey: ['/api/users/transcriptions'],
     enabled: isAuthenticated && !authLoading,
     retry: (failureCount, error) => {
@@ -113,9 +113,11 @@ export default function Dashboard() {
         videoUrl: videoUrl.trim(),
       });
 
+      const responseData = await createResponse.json();
+
       toast({
         title: t('transcription.queued.title'),
-        description: t('transcription.queued.description').replace('{{title}}', createResponse.videoTitle),
+        description: t('transcription.queued.description').replace('{{title}}', responseData.videoTitle || videoUrl.trim()),
       });
 
       // Clear form and refresh data
@@ -143,7 +145,7 @@ export default function Dashboard() {
     );
   }
 
-  const transcriptions = (transcriptionData as TranscriptionHistoryResponse)?.transcriptions || [];
+  const transcriptions = transcriptionData?.transcriptions || [];
   const dailyUsage = user?.transcriptionsUsed || 0;
   const dailyLimit = user?.isPro ? Infinity : 3;
   const isLimitReached = !user?.isPro && dailyUsage >= dailyLimit;
