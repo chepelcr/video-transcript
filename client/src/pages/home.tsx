@@ -78,7 +78,7 @@ export default function Home() {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Navigation */}
-      <nav className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+      <nav className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -127,13 +127,6 @@ export default function Home() {
               <LanguageToggle />
             </div>
             <div className="md:hidden flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
               {isAuthenticated && (
                 <Button
                   variant="outline"
@@ -160,20 +153,27 @@ export default function Home() {
               )}
               <ThemeToggle />
               <LanguageToggle />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
             </div>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 shadow-lg z-50">
             <div className="px-4 py-2 space-y-2">
               <button 
                 onClick={() => {
                   scrollToSection('features');
                   setIsMobileMenuOpen(false);
                 }} 
-                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium"
+                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
               >
                 {t('nav.features')}
               </button>
@@ -182,7 +182,7 @@ export default function Home() {
                   scrollToSection('pricing');
                   setIsMobileMenuOpen(false);
                 }} 
-                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium"
+                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
               >
                 {t('nav.pricing')}
               </button>
@@ -191,7 +191,7 @@ export default function Home() {
                   scrollToSection('contact');
                   setIsMobileMenuOpen(false);
                 }} 
-                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium"
+                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
               >
                 {t('nav.contact')}
               </button>
@@ -201,7 +201,7 @@ export default function Home() {
                     navigate(`/${language}/login`);
                     setIsMobileMenuOpen(false);
                   }} 
-                  className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium"
+                  className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
                 >
                   Sign In
                 </button>
