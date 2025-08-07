@@ -139,26 +139,27 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
           <div className="text-center">
             <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Sign in to view history
+              {t('auth.loginRequired')}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Create an account to track your transcriptions and access them anytime.
+              {t('auth.loginMessage')}
             </p>
           </div>
         </div>
       ) : isLoading ? (
         <div className="flex items-center justify-center p-6 bg-white dark:bg-gray-900">
           <div className="animate-spin w-6 h-6 border-4 border-primary border-t-transparent rounded-full" />
+          <span className="ml-2 text-gray-600 dark:text-gray-400">{t('history.loading')}</span>
         </div>
       ) : transcriptions.length === 0 ? (
         <div className="flex h-full items-center justify-center p-6 bg-white dark:bg-gray-900">
           <div className="text-center">
             <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              No transcriptions yet
+              {t('history.empty')}
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Your transcription history will appear here after you create your first transcription.
+              {t('history.empty.description')}
             </p>
           </div>
         </div>
@@ -174,7 +175,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                       {getVideoTitle(transcription.videoUrl)}
                     </span>
                     <Badge variant="secondary" className="text-xs">
-                      {Math.round(transcription.accuracy)}% accurate
+                      {Math.round(transcription.accuracy)}% {t('history.accuracy').toLowerCase()}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
@@ -186,7 +187,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                     </div>
                     <div className="flex items-center gap-1">
                       <BarChart3 className="h-3 w-3" />
-                      {transcription.wordCount} words
+                      {transcription.wordCount} {t('history.words').toLowerCase()}
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
@@ -235,10 +236,10 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
           <DialogContent className="max-w-xs sm:max-w-md md:max-w-lg mx-auto h-[85vh] sm:h-[80vh] flex flex-col p-0 bg-white dark:bg-gray-900 animate-in slide-in-from-bottom-8 duration-500 ease-out">
             <DialogHeader className="p-4 border-b">
               <DialogTitle className="text-lg font-semibold">
-                Recent Transcriptions
+                {t('history.title')}
               </DialogTitle>
               <DialogDescription className="sr-only">
-                View and manage your transcription history
+                {t('history.empty.description')}
               </DialogDescription>
             </DialogHeader>
             {transcriptionContent}
@@ -269,7 +270,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
               {/* Header */}
               <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-900">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Recent Transcriptions
+                  {t('history.title')}
                 </h2>
                 <Button variant="ghost" size="sm" onClick={onClose}>
                   <X className="h-4 w-4" />

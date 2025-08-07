@@ -176,6 +176,22 @@ const translations = {
     'messages.emailRequired': 'Please enter your email address',
     'messages.settingUp': 'Setting up...',
     'messages.returnHome': 'Return to Home',
+
+    // Transcription History
+    'history.title': 'Recent Transcriptions',
+    'history.empty': 'No transcriptions yet',
+    'history.empty.description': 'Your transcription history will appear here',
+    'history.loading': 'Loading transcriptions...',
+    'history.error': 'Failed to load transcriptions',
+    'history.duration': 'Duration',
+    'history.words': 'Words',
+    'history.accuracy': 'Accuracy',
+    'history.processing': 'Processing Time',
+    'history.ago': 'ago',
+    'history.copyText': 'Copy Text',
+    'history.download': 'Download',
+    'history.view': 'View Details',
+    'history.createdAt': 'Created',
     
     // Subscription Page
     'subscription.title': 'Subscribe to VideoScript Pro',
@@ -373,6 +389,22 @@ const translations = {
     'messages.emailRequired': 'Por favor ingresa tu dirección de email',
     'messages.settingUp': 'Configurando...',
     'messages.returnHome': 'Volver al Inicio',
+
+    // Transcription History
+    'history.title': 'Transcripciones Recientes',
+    'history.empty': 'No hay transcripciones aún',
+    'history.empty.description': 'Tu historial de transcripciones aparecerá aquí',
+    'history.loading': 'Cargando transcripciones...',
+    'history.error': 'Error al cargar transcripciones',
+    'history.duration': 'Duración',
+    'history.words': 'Palabras',
+    'history.accuracy': 'Precisión',
+    'history.processing': 'Tiempo de Procesamiento',
+    'history.ago': 'hace',
+    'history.copyText': 'Copiar Texto',
+    'history.download': 'Descargar',
+    'history.view': 'Ver Detalles',
+    'history.createdAt': 'Creado',
     
     // Subscription Page
     'subscription.title': 'Suscríbete a VideoScript Pro',
