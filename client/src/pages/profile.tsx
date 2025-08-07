@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useLocation } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, User, Mail, Crown, Calendar } from 'lucide-react';
+import { Loader2, User, Mail, Crown, Calendar, ArrowLeft } from 'lucide-react';
 
 const profileSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters').max(20, 'Username must be less than 20 characters'),
@@ -33,8 +34,9 @@ type ProfileForm = z.infer<typeof profileSchema>;
 export default function Profile() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const queryClient = useQueryClient();
+  const [, navigate] = useLocation();
 
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
@@ -108,6 +110,21 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
+        {/* Header with Back Button */}
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/${language}/dashboard`)}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t('common.back')}
+          </Button>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {t('profile.title')}
+          </h1>
+        </div>
         {/* Profile Overview */}
         <Card>
           <CardHeader>

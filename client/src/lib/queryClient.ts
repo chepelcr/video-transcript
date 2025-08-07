@@ -14,9 +14,30 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<Response> {
   const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+  
+  // Get the access token from localStorage
+  let accessToken = null;
+  try {
+    const authTokens = localStorage.getItem('auth_tokens');
+    if (authTokens) {
+      const tokens = JSON.parse(authTokens);
+      accessToken = tokens.accessToken;
+    }
+  } catch (error) {
+    console.error('Error getting auth tokens:', error);
+  }
+  
+  const headers: Record<string, string> = {};
+  if (data) {
+    headers["Content-Type"] = "application/json";
+  }
+  if (accessToken) {
+    headers["Authorization"] = `Bearer ${accessToken}`;
+  }
+  
   const res = await fetch(fullUrl, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
