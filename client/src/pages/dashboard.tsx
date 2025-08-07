@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+
 import { Icons } from '@/components/ui/icons';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageToggle } from '@/components/LanguageToggle';
@@ -69,33 +70,59 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {t('dashboard.welcomeBack').replace('{{name}}', user?.username || '')}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              {t('dashboard.description')}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <LanguageToggle />
-            <Button variant="outline" onClick={() => navigate(`/${language}/profile`)}>
-              {t('profile.editProfile')}
-            </Button>
-            <Button variant="outline" onClick={() => navigate(`/${language}/`)}>
-              {t('common.backToHome')}
-            </Button>
-            <Button variant="outline" onClick={handleLogout}>
-              {t('common.logout')}
-            </Button>
+      {/* Mobile/Tablet Navigation Bar */}
+      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <h1 className="text-xl md:text-2xl font-bold text-primary">VideoScript</h1>
+            </div>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-3">
+              <ThemeToggle />
+              <LanguageToggle />
+              <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/profile`)}>
+                {t('profile.editProfile')}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/`)}>
+                {t('common.backToHome')}
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                {t('common.logout')}
+              </Button>
+            </div>
+
+            {/* Mobile/Tablet Navigation */}
+            <div className="lg:hidden flex items-center gap-1">
+              <ThemeToggle />
+              <LanguageToggle />
+              <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/profile`)}>
+                <Icons.user className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/`)}>
+                <Icons.home className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                <Icons.logout className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
+      </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="container mx-auto px-4 py-6 md:py-8">
+        {/* Welcome Header */}
+        <div className="mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            {t('dashboard.welcomeBack').replace('{{name}}', user?.username || '')}
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t('dashboard.description')}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Account Overview */}
           <div className="lg:col-span-1">
             <Card>
@@ -153,7 +180,7 @@ export default function Dashboard() {
           </div>
 
           {/* Transcription History */}
-          <div className="lg:col-span-2">
+          <div className="md:col-span-2 lg:col-span-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -187,28 +214,29 @@ export default function Dashboard() {
                     <div className="space-y-4">
                       {transcriptions.map((transcription, index) => (
                         <div key={transcription.id}>
-                          <div className="flex justify-between items-start">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                                 {transcription.videoUrl}
                               </p>
-                              <div className="mt-1 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                              <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500 dark:text-gray-400">
                                 <span>{transcription.duration}s</span>
                                 <span>{transcription.wordCount} {t('history.words')}</span>
                                 <span>{transcription.accuracy}% {t('history.accuracy')}</span>
-                                <span>{new Date(transcription.createdAt).toLocaleDateString()}</span>
+                                <span className="hidden sm:inline">{new Date(transcription.createdAt).toLocaleDateString()}</span>
                               </div>
                               <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                                 {transcription.transcript.substring(0, 150)}...
                               </p>
                             </div>
-                            <div className="ml-4 flex gap-2">
+                            <div className="flex gap-2 sm:ml-4">
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
                                   navigator.clipboard.writeText(transcription.transcript);
                                 }}
+                                className="flex-1 sm:flex-none"
                               >
                                 {t('history.copyText')}
                               </Button>
@@ -224,6 +252,7 @@ export default function Dashboard() {
                                   a.click();
                                   URL.revokeObjectURL(url);
                                 }}
+                                className="flex-1 sm:flex-none"
                               >
                                 {t('history.download')}
                               </Button>
