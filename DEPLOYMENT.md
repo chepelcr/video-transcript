@@ -44,3 +44,44 @@ If the error persists:
 - ✅ Favicon and debug logging added
 
 The routing logic is correct - the issue is that GitHub Pages isn't deployed yet.
+
+## Backend Deployment Instructions
+
+### Current Setup
+- **Frontend**: Deployed on GitHub Pages at `https://jcampos.dev/video-transcript/`
+- **Backend**: Running on Replit at `https://video-scribe-chepelcr.replit.app`
+- **Database**: AWS RDS PostgreSQL at `ls-85945ed6753f404b7b7d74097b833502d2a152ef.co1kq0qg0vtn.us-east-1.rds.amazonaws.com`
+
+### AWS RDS Database Connection
+✅ **Successfully Connected**: Backend now uses AWS RDS PostgreSQL instead of Neon Database
+✅ **SSL Configured**: Proper SSL configuration for AWS RDS connections
+✅ **Schema Applied**: All tables (users, transcriptions, refresh_tokens) are present and functioning
+✅ **Data Verified**: Existing user data (1 user, 1 transcription) preserved
+
+### Environment Variables (Already Configured)
+- `AWS_RDS_DATABASE_URL`: Connection string for AWS RDS PostgreSQL
+- `AWS_RDS_USERNAME`, `AWS_RDS_PASSWORD`, `AWS_RDS_DATABASE_NAME`: Database credentials
+- `VITE_API_BASE_URL`: Points to Replit backend
+- `VITE_STRIPE_PUBLIC_KEY`: Public Stripe key for frontend payments
+- CORS configured for `https://jcampos.dev` domain
+
+### Docker Support for Local Testing
+✅ **Complete Docker Setup**: Multi-stage Dockerfile with development and production configurations
+✅ **Database Integration**: Docker Compose includes PostgreSQL for local development
+✅ **Hot Reloading**: Development environment with live code changes
+✅ **Health Checks**: Container monitoring and automatic restarts
+✅ **Makefile Commands**: Simplified Docker operations (`make dev`, `make prod`, `make stop`)
+
+### Quick Local Testing
+```bash
+# Start local development with Docker
+make dev
+
+# Or manually
+docker-compose -f docker-compose.dev.yml up
+
+# Check health endpoint
+curl http://localhost:5000/health
+```
+
+The hybrid deployment architecture is now enhanced with AWS RDS database integration and complete local development support via Docker.

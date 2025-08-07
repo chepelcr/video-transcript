@@ -16,6 +16,10 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **DATABASE MANAGEMENT**: Automated PostgreSQL setup with initialization scripts
 - ✅ **MAKEFILE COMMANDS**: Simplified Docker operations with make commands for common tasks
 - ✅ **COMPREHENSIVE DOCUMENTATION**: Created README.docker.md with setup and troubleshooting guides
+- ✅ **AWS RDS MIGRATION**: Successfully migrated from Neon Database to AWS RDS PostgreSQL (August 7, 2025)
+- ✅ **DATABASE CREDENTIALS**: Added AWS RDS secrets (DATABASE_URL, USERNAME, PASSWORD, DATABASE_NAME)
+- ✅ **SSL CONFIGURATION**: Proper SSL configuration for production AWS RDS connections
+- ✅ **DATA PRESERVATION**: Existing user and transcription data preserved during migration
 
 # User Preferences
 
