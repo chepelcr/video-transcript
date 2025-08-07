@@ -36,7 +36,7 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [pendingVideoUrl, setPendingVideoUrl] = useState<string>("");
+  const [pendingVideoUrl, setPendingVideoUrl] = useLocalStorage('pendingVideoUrl', "");
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -58,7 +58,9 @@ export default function Home() {
 
   // Auto-transcribe pending video URL after login
   useEffect(() => {
-    if (isAuthenticated && pendingVideoUrl && remainingTranscriptions > 0) {
+    if (isAuthenticated && pendingVideoUrl && pendingVideoUrl.trim() && remainingTranscriptions > 0) {
+      console.log('Auto-transcribing pending URL:', pendingVideoUrl);
+      
       // Auto-submit the pending URL for transcription via new SQS system
       const autoTranscribe = async () => {
         try {
@@ -344,6 +346,7 @@ export default function Home() {
               onUpgradeRequired={() => handleUpgrade('pro')}
               isAuthenticated={isAuthenticated}
               onLoginRequired={(videoUrl) => {
+                console.log('Storing pending video URL for after login:', videoUrl);
                 setPendingVideoUrl(videoUrl);
                 navigate(`/${language}/login`);
               }}

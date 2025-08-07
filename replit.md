@@ -40,6 +40,9 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **HOME PAGE WORKFLOW FIX**: Updated home page transcription form to use new SQS-based API instead of old synchronous endpoint (August 7, 2025)
 - ✅ **USER FLOW CONSISTENCY**: Fixed workflow inconsistency - home page now queues transcriptions via SQS and redirects to dashboard like the rest of the system
 - ✅ **TRANSLATION COMPLETION**: Fixed all remaining hardcoded strings - "Get Started" buttons, navigation elements fully translate across desktop/mobile views
+- ✅ **DATABASE STORAGE MIGRATION**: Completely resolved database storage issue by switching all transcription routes from MemStorage to AuthStorage (database-backed) (August 7, 2025)
+- ✅ **TRANSCRIPTION PERSISTENCE**: Updated transcription creation, retrieval, and webhook endpoints to use proper database persistence
+- ✅ **PRE-LOGIN URL PRESERVATION**: Fixed app losing pre-login URL input after authentication by persisting pending video URL in localStorage across page navigation
 
 # User Preferences
 
