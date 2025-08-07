@@ -48,10 +48,37 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  const { data: transcriptionData, isLoading } = useQuery({
+  // Refresh transcriptions when sidebar opens
+  useEffect(() => {
+    if (isOpen && isAuthenticated) {
+      refetch();
+    }
+  }, [isOpen, isAuthenticated, refetch]);
+
+  const { data: transcriptionData, isLoading, refetch } = useQuery({
     queryKey: ['/api/users/transcriptions'],
     enabled: isAuthenticated,
     retry: false,
+    queryFn: async () => {
+      const tokens = JSON.parse(localStorage.getItem('auth_tokens') || '{}');
+      if (!tokens.accessToken) {
+        throw new Error('No access token available');
+      }
+
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const response = await fetch(`${baseUrl}/api/users/transcriptions`, {
+        headers: {
+          'Authorization': `Bearer ${tokens.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch transcriptions: ${response.status}`);
+      }
+
+      return response.json();
+    },
   });
 
   const transcriptions = (transcriptionData as any)?.transcriptions || [];
