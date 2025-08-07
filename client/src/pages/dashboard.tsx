@@ -1,14 +1,19 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLocation } from 'wouter';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 import { Icons } from '@/components/ui/icons';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -36,6 +41,12 @@ export default function Dashboard() {
   const [, navigate] = useLocation();
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const { t, language } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Transcription form state
+  const [videoUrl, setVideoUrl] = useState('');
+  const [isTranscribing, setIsTranscribing] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -53,6 +64,40 @@ export default function Dashboard() {
   const handleLogout = async () => {
     await logout();
     navigate(`/${language}/`);
+  };
+
+  // Transcription mutation
+  const transcribeMutation = useMutation({
+    mutationFn: async (videoUrl: string) => {
+      return apiRequest('POST', '/api/transcriptions', { videoUrl });
+    },
+    onSuccess: () => {
+      toast({
+        title: t('transcription.success.title'),
+        description: t('transcription.success.description'),
+      });
+      setVideoUrl('');
+      queryClient.invalidateQueries({ queryKey: ['/api/users/transcriptions'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('transcription.error.title'),
+        description: error.message || t('transcription.error.description'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleTranscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!videoUrl.trim()) return;
+    
+    setIsTranscribing(true);
+    try {
+      await transcribeMutation.mutateAsync(videoUrl);
+    } finally {
+      setIsTranscribing(false);
+    }
   };
 
   if (authLoading || !isAuthenticated) {
@@ -121,6 +166,77 @@ export default function Dashboard() {
             {t('dashboard.description')}
           </p>
         </div>
+
+        {/* New Transcription Form */}
+        <Card className="mb-6 md:mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icons.fileText className="h-5 w-5" />
+              {t('transcription.newTranscription')}
+            </CardTitle>
+            <CardDescription>
+              {t('transcription.enterVideoUrl')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLimitReached && !user?.isPro && (
+              <Alert className="mb-4">
+                <AlertDescription>
+                  {t('dashboard.dailyLimitReached')} {t('common.upgradeForUnlimited')}
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            <form onSubmit={handleTranscribe} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="videoUrl">{t('transcription.videoUrl')}</Label>
+                <Input
+                  id="videoUrl"
+                  type="url"
+                  placeholder={t('transcription.videoUrlPlaceholder')}
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  disabled={isTranscribing || isLimitReached}
+                  className="w-full"
+                />
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('dashboard.dailyUsage')}: {dailyUsage} / {user?.isPro ? '∞' : dailyLimit}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    type="submit"
+                    disabled={!videoUrl.trim() || isTranscribing || isLimitReached}
+                    className="flex-1 sm:flex-none"
+                  >
+                    {isTranscribing ? (
+                      <>
+                        <Icons.spinner className="h-4 w-4 animate-spin mr-2" />
+                        {t('transcription.processing')}
+                      </>
+                    ) : (
+                      t('hero.transcribe')
+                    )}
+                  </Button>
+                  
+                  {isLimitReached && !user?.isPro && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => navigate(`/${language}/pricing`)}
+                      className="flex-1 sm:flex-none"
+                    >
+                      {t('common.upgrade')}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 md:grid-rows-1">
           {/* Account Overview */}
