@@ -64,6 +64,7 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **ICON SIZING FIX**: Fixed inconsistent YouTube icon sizes by adding flex-shrink-0 and standardizing icon dimensions across all views (August 7, 2025)
 - ✅ **SIDEBAR CARD REDESIGN**: Restructured sidebar cards to prevent status badge cutoff, moved badges inline with action buttons, and cleaned up layout by removing timestamp clutter (August 7, 2025)
 - ✅ **DASHBOARD HISTORY STYLING**: Applied same clean card design from sidebar to dashboard history with status badges inline with action buttons and removed timestamp clutter (August 7, 2025)
+- ✅ **FREE TIER ONLY**: Disabled upgrade buttons and pro-tier references in dashboard since only offering free tier currently (August 7, 2025)
 
 # User Preferences
 

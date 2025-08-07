@@ -195,8 +195,8 @@ export default function Dashboard() {
 
   const transcriptions = transcriptionData?.transcriptions || [];
   const dailyUsage = user?.transcriptionsUsed || 0;
-  const dailyLimit = user?.isPro ? Infinity : 3;
-  const isLimitReached = !user?.isPro && dailyUsage >= dailyLimit;
+  const dailyLimit = 3;
+  const isLimitReached = dailyUsage >= dailyLimit;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -264,10 +264,10 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isLimitReached && !user?.isPro && (
+            {isLimitReached && (
               <Alert className="mb-4">
                 <AlertDescription>
-                  {t('dashboard.dailyLimitReached')} {t('common.upgradeForUnlimited')}
+                  {t('dashboard.dailyLimitReached')}
                 </AlertDescription>
               </Alert>
             )}
@@ -307,16 +307,7 @@ export default function Dashboard() {
                     )}
                   </Button>
                   
-                  {isLimitReached && !user?.isPro && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => navigate(`/${language}/pricing`)}
-                      className="flex-1 sm:flex-none"
-                    >
-                      {t('common.upgrade')}
-                    </Button>
-                  )}
+
                 </div>
               </div>
             </form>
@@ -337,26 +328,16 @@ export default function Dashboard() {
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.plan')}</p>
                   <div className="flex items-center gap-2">
-                    <Badge variant={user?.isPro ? "default" : "secondary"}>
-                      {user?.isPro ? t('dashboard.pro') : t('dashboard.free')}
+                    <Badge variant="secondary">
+                      {t('dashboard.free')}
                     </Badge>
-                    {!user?.isPro && (
-                      <Button
-                        variant="link"
-                        size="sm"
-                        className="p-0 h-auto"
-                        onClick={() => navigate(`/${language}/subscribe`)}
-                      >
-                        {t('dashboard.upgrade')}
-                      </Button>
-                    )}
                   </div>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.dailyUsage')}</p>
                   <p className="text-lg font-semibold">
-                    {dailyUsage} / {user?.isPro ? '∞' : dailyLimit}
+                    {dailyUsage} / {dailyLimit}
                   </p>
                   {isLimitReached && (
                     <p className="text-sm text-red-600 dark:text-red-400">
