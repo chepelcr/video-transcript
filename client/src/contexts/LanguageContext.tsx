@@ -46,11 +46,11 @@ const translations = {
     'features.title': 'Why Choose VideoScript?',
     'features.subtitle': 'Experience the fastest, most accurate video transcription service powered by advanced AI technology.',
     'features.fast.title': 'Lightning Fast',
-    'features.fast.desc': 'Get your video transcriptions in seconds, not minutes. Our optimized AI processes videos up to 10x faster than competitors.',
+    'features.fast.desc': 'Get your video transcriptions in seconds, not minutes. Our optimized AI processes videos up to 10x faster than competitors with instant access to your complete transcription history.',
     'features.accurate.title': '99% Accuracy',
-    'features.accurate.desc': 'Industry-leading accuracy with support for multiple languages and accents. Perfect transcriptions every time.',
-    'features.secure.title': 'Secure & Private',
-    'features.secure.desc': 'Your data is encrypted and never stored. We process your videos securely and delete them immediately after transcription.',
+    'features.accurate.desc': 'Industry-leading accuracy with support for multiple languages and accents. Perfect transcriptions every time, all saved in your personal history dashboard.',
+    'features.secure.title': 'Complete History',
+    'features.secure.desc': 'Access all your transcriptions anytime with our comprehensive history tracking. Search, organize, and manage your video transcripts with intelligent video title extraction.',
     
     // Pricing
     'pricing.title': 'Simple, Transparent Pricing',
@@ -360,11 +360,11 @@ const translations = {
     'features.title': '¿Por qué elegir VideoScript?',
     'features.subtitle': 'Experimenta el servicio de transcripción de video más rápido y preciso impulsado por tecnología IA avanzada.',
     'features.fast.title': 'Súper Rápido',
-    'features.fast.desc': 'Obtén tus transcripciones de video en segundos, no minutos. Nuestra IA optimizada procesa videos hasta 10 veces más rápido que la competencia.',
+    'features.fast.desc': 'Obtén tus transcripciones de video en segundos, no minutos. Nuestra IA optimizada procesa videos hasta 10 veces más rápido que la competencia con acceso instantáneo a tu historial completo.',
     'features.accurate.title': '99% Precisión',
-    'features.accurate.desc': 'Precisión líder en la industria con soporte para múltiples idiomas y acentos. Transcripciones perfectas cada vez.',
-    'features.secure.title': 'Seguro y Privado',
-    'features.secure.desc': 'Tus datos están encriptados y nunca almacenados. Procesamos tus videos de forma segura y los eliminamos inmediatamente después de la transcripción.',
+    'features.accurate.desc': 'Precisión líder en la industria con soporte para múltiples idiomas y acentos. Transcripciones perfectas cada vez, todas guardadas en tu panel de historial personal.',
+    'features.secure.title': 'Historial Completo',
+    'features.secure.desc': 'Accede a todas tus transcripciones en cualquier momento con nuestro seguimiento integral del historial. Busca, organiza y gestiona tus transcripciones con extracción inteligente de títulos de video.',
     
     // Pricing
     'pricing.title': 'Precios Simples y Transparentes',

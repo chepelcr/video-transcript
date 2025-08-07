@@ -388,7 +388,7 @@ export default function Home() {
               <CardContent className="p-8">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 secondary-icon rounded-lg flex items-center justify-center mr-4">
-                    <Shield className="text-secondary text-xl" />
+                    <History className="text-secondary text-xl" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{t('features.secure.title')}</h3>
                 </div>

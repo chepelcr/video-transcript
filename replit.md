@@ -27,6 +27,8 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **DNS DOCUMENTATION**: Created comprehensive DNS configuration guide for custom domain setup
 - ✅ **GITHUB PAGES ROUTING FIX**: Fixed URL corruption issue on page reload by updating 404.html and routing logic (August 7, 2025)
 - ✅ **CORS CONFIGURATION**: Updated server CORS settings to include custom subdomain
+- ✅ **LANGUAGE TOGGLE FIX**: Fixed language switching routing after custom domain migration (August 7, 2025)
+- ✅ **FEATURES SECTION UPDATE**: Updated "Why Choose" section to highlight new transcription history functionality
 
 # User Preferences
 
