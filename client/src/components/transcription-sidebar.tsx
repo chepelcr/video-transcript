@@ -204,7 +204,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
       {/* Mobile/Tablet Modal - Only render on smaller screens */}
       {!isDesktop && (
         <Dialog open={isOpen} onOpenChange={onClose}>
-          <DialogContent className="max-w-xs sm:max-w-md md:max-w-lg mx-auto h-[85vh] sm:h-[80vh] flex flex-col p-0 bg-white dark:bg-gray-900 animate-in slide-in-from-bottom-4 duration-300">
+          <DialogContent className="max-w-xs sm:max-w-md md:max-w-lg mx-auto h-[85vh] sm:h-[80vh] flex flex-col p-0 bg-white dark:bg-gray-900 animate-in slide-in-from-bottom-8 duration-500 ease-out">
             <DialogHeader className="p-4 border-b">
               <DialogTitle className="text-lg font-semibold">
                 Recent Transcriptions
@@ -220,20 +220,20 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
 
       {/* Desktop Sidebar - Only render on larger screens */}
       {isDesktop && (
-        <div className={`fixed inset-0 z-50 flex transition-opacity duration-300 ${
+        <div className={`fixed inset-0 z-50 flex transition-all duration-500 ease-out ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}>
           {/* Backdrop */}
           <div 
-            className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
+            className={`absolute inset-0 bg-black/50 transition-opacity duration-500 ease-out ${
               isOpen ? 'opacity-100' : 'opacity-0'
             }`} 
             onClick={onClose} 
           />
           
           {/* Sidebar */}
-          <div className={`relative ml-auto w-full max-w-lg xl:max-w-xl bg-white dark:bg-gray-900 shadow-xl border-l border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${
-            isOpen ? 'translate-x-0' : 'translate-x-full'
+          <div className={`relative ml-auto w-full max-w-lg xl:max-w-xl bg-white dark:bg-gray-900 shadow-xl border-l border-gray-200 dark:border-gray-700 transform transition-all duration-500 ease-out ${
+            isOpen ? 'translate-x-0 scale-100' : 'translate-x-full scale-95'
           }`}>
             <div className="flex h-full flex-col">
               {/* Header */}
