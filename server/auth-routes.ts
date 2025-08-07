@@ -20,6 +20,7 @@ import {
   type UserResponse,
   type TranscriptionHistoryResponse
 } from "@shared/auth-schema";
+import { sendVerificationEmail } from "./email";
 
 export function setupAuthRoutes(app: Express) {
   // Register new user
@@ -58,8 +59,14 @@ export function setupAuthRoutes(app: Express) {
         isActive: true,
       });
 
-      // TODO: Send verification email with code
-      console.log(`Verification code for ${user.email}: ${verificationCode}`);
+      // Send verification email
+      const emailSent = await sendVerificationEmail(user.email, verificationCode, validatedData.firstName);
+      
+      if (!emailSent) {
+        console.log(`Failed to send email. Verification code for ${user.email}: ${verificationCode}`);
+      } else {
+        console.log(`Verification email sent to ${user.email}`);
+      }
 
       res.status(201).json({
         message: "User created successfully. Please check your email for verification code.",
