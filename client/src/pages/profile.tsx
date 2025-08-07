@@ -53,13 +53,19 @@ export default function Profile() {
       const response = await apiRequest('PUT', '/api/auth/profile', data);
       return response;
     },
-    onSuccess: () => {
+    onSuccess: async (updatedUser) => {
       toast({
         title: t('profile.update.success.title'),
         description: t('profile.update.success.description'),
       });
+      
       // Invalidate user query to refetch updated data
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      
+      // Wait a bit for the cache to update, then redirect
+      setTimeout(() => {
+        navigate(`/${language}/dashboard`);
+      }, 1500); // Wait 1.5 seconds to show the success message
     },
     onError: (error: any) => {
       toast({
@@ -76,14 +82,19 @@ export default function Profile() {
 
   // Update form when user data loads
   useEffect(() => {
-    if (user) {
+    if (user && !updateProfileMutation.isPending) {
+      console.log('Updating form with user data:', {
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName
+      });
       form.reset({
         username: user.username,
         firstName: user.firstName || '',
         lastName: user.lastName || '',
       });
     }
-  }, [user, form]);
+  }, [user, form, updateProfileMutation.isPending]);
 
   if (isLoading) {
     return (
