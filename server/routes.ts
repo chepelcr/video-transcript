@@ -141,7 +141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user has reached daily limit (3 transcriptions for free users)
-      if (user.subscriptionTier === "free" && (user.dailyTranscriptionsUsed || 0) >= 3) {
+      if (user.subscriptionTier === "free" && (user.transcriptionsUsed || 0) >= 3) {
         return res.status(403).json({ 
           error: "Daily transcription limit reached. Upgrade to Pro for unlimited transcriptions." 
         });
@@ -154,11 +154,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid video URL" });
       }
 
-      // Create transcription record
+      // Create transcription record with initial status
       const transcription = await storage.createTranscription({
         userId,
         videoUrl,
         videoTitle: videoInfo.title,
+        status: "processing",
       });
 
       // Queue transcription for asynchronous processing
@@ -196,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get transcription
-      const transcription = await storage.getTranscription(id);
+      const transcription = await authStorage.getTranscription(id);
       if (!transcription) {
         return res.status(404).json({ error: "Transcription not found" });
       }
@@ -224,7 +225,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
         // Increment user's transcription count
-        await authStorage.incrementUserTranscriptions(userId);
+        await storage.incrementUserTranscriptions(userId);
 
         res.json(updatedTranscription);
 
@@ -294,7 +295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
         // Increment user's transcription count
-        await authStorage.incrementUserTranscriptions(transcription.userId);
+        await storage.incrementUserTranscriptions(transcription.userId);
 
         console.log(`Transcription ${id} completed successfully`);
       } else {
@@ -323,7 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "User not authenticated" });
       }
 
-      const transcriptions = await authStorage.getTranscriptionsByUserId(userId);
+      const transcriptions = await storage.getTranscriptionsByUserId(userId);
       
       res.json({
         transcriptions,

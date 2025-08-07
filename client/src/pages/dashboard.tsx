@@ -322,14 +322,30 @@ export default function Dashboard() {
           {/* Transcription History */}
           <div className="md:col-span-2 lg:col-span-2">
             <Card className="h-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icons.fileText className="h-5 w-5" />
-                  {t('history.title')}
-                </CardTitle>
-                <CardDescription>
-                  {t('history.empty.description')}
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icons.fileText className="h-5 w-5" />
+                    {t('history.title')}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('history.empty.description')}
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => refetchTranscriptions()}
+                    disabled={transcriptionsLoading || isFetching}
+                  >
+                    <Icons.refresh className="h-4 w-4 mr-1" />
+                    {t('common.refresh')}
+                  </Button>
+                  {(transcriptionsLoading || isFetching) && (
+                    <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {transcriptionsLoading ? (
