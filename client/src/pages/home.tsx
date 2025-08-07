@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Play, Gift, Bolt, Target, Shield, Star, Download, Copy, Lock, Check, User, History } from "lucide-react";
+import { Play, Gift, Bolt, Target, Shield, Star, Download, Copy, Lock, Check, User, History, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,6 +32,7 @@ export default function Home() {
   const [currentTranscription, setCurrentTranscription] = useState<Transcription | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const { user, isAuthenticated, logout } = useAuth();
@@ -126,6 +127,13 @@ export default function Home() {
               <LanguageToggle />
             </div>
             <div className="md:hidden flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
               {isAuthenticated && (
                 <Button
                   variant="outline"
@@ -147,7 +155,7 @@ export default function Home() {
                 </Button>
               ) : (
                 <Button size="sm" onClick={() => navigate(`/${language}/register`)}>
-                  {t('nav.getStarted')}
+                  Get Started
                 </Button>
               )}
               <ThemeToggle />
@@ -155,6 +163,52 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+            <div className="px-4 py-2 space-y-2">
+              <button 
+                onClick={() => {
+                  scrollToSection('features');
+                  setIsMobileMenuOpen(false);
+                }} 
+                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium"
+              >
+                {t('nav.features')}
+              </button>
+              <button 
+                onClick={() => {
+                  scrollToSection('pricing');
+                  setIsMobileMenuOpen(false);
+                }} 
+                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium"
+              >
+                {t('nav.pricing')}
+              </button>
+              <button 
+                onClick={() => {
+                  scrollToSection('contact');
+                  setIsMobileMenuOpen(false);
+                }} 
+                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium"
+              >
+                {t('nav.contact')}
+              </button>
+              {!isAuthenticated && (
+                <button 
+                  onClick={() => {
+                    navigate(`/${language}/login`);
+                    setIsMobileMenuOpen(false);
+                  }} 
+                  className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium"
+                >
+                  Sign In
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
