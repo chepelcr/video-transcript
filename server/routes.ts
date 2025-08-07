@@ -7,6 +7,8 @@ import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./payp
 import { transcriptionService } from "./transcription-service";
 import { insertTranscriptionSchema } from "@shared/schema";
 import { authenticateToken } from "./auth";
+import { sqsService } from "./sqs-service";
+import crypto from "crypto";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -158,6 +160,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         videoTitle: videoInfo.title,
       });
 
+      // Queue transcription for asynchronous processing
+      try {
+        await sqsService.queueTranscription(transcription.id, videoUrl, userId);
+        console.log(`Transcription ${transcription.id} queued successfully`);
+      } catch (queueError) {
+        console.error('Failed to queue transcription:', queueError);
+        // Mark as failed if we can't queue it
+        await storage.updateTranscription(transcription.id, {
+          status: "failed",
+        });
+        return res.status(500).json({ error: "Failed to queue transcription for processing" });
+      }
+
       res.json({ 
         id: transcription.id,
         videoTitle: videoInfo.title,
@@ -235,6 +250,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error processing transcription:", error);
       res.status(500).json({ error: "Failed to process transcription" });
+    }
+  });
+
+  // Webhook endpoint to receive processed transcriptions
+  app.post("/api/transcriptions/webhook/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const signature = req.headers['x-webhook-signature'] as string;
+      
+      if (!signature) {
+        console.error('Webhook signature missing');
+        return res.status(401).json({ error: "Webhook signature required" });
+      }
+
+      const payload = JSON.stringify(req.body);
+      
+      // Verify webhook signature
+      if (!sqsService.verifyWebhookSignature(payload, signature)) {
+        console.error('Invalid webhook signature');
+        return res.status(401).json({ error: "Invalid webhook signature" });
+      }
+
+      const { success, transcript, duration, wordCount, processingTime, accuracy, error } = req.body;
+
+      // Get transcription
+      const transcription = await storage.getTranscription(id);
+      if (!transcription) {
+        console.error(`Transcription ${id} not found`);
+        return res.status(404).json({ error: "Transcription not found" });
+      }
+
+      if (success) {
+        // Update transcription with successful results
+        const updatedTranscription = await storage.updateTranscription(id, {
+          transcript: transcript || "",
+          duration: duration?.toString() || "0",
+          wordCount: wordCount || 0,
+          processingTime: processingTime?.toString() || "0",
+          accuracy: accuracy?.toString() || "0",
+          status: "completed",
+        });
+
+        // Increment user's transcription count
+        await storage.incrementUserTranscriptions(transcription.userId);
+
+        console.log(`Transcription ${id} completed successfully`);
+      } else {
+        // Update transcription as failed
+        await storage.updateTranscription(id, {
+          status: "failed",
+        });
+
+        console.log(`Transcription ${id} failed:`, error);
+      }
+
+      res.status(200).json({ message: "Webhook processed successfully" });
+
+    } catch (error) {
+      console.error("Webhook processing error:", error);
+      res.status(500).json({ error: "Failed to process webhook" });
     }
   });
 

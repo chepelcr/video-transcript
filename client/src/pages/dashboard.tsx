@@ -57,10 +57,15 @@ export default function Dashboard() {
     }
   }, [isAuthenticated, authLoading, navigate, language]);
 
-  const { data: transcriptionData, isLoading: transcriptionsLoading } = useQuery({
+  const { data: transcriptionData, isLoading: transcriptionsLoading, refetch: refetchTranscriptions, isFetching } = useQuery({
     queryKey: ['/api/users/transcriptions'],
     enabled: isAuthenticated,
     retry: false,
+    refetchInterval: (data) => {
+      // Auto-refresh every 5 seconds if there are processing transcriptions
+      const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
+      return hasProcessing ? 5000 : false;
+    },
   });
 
   const handleLogout = async () => {
@@ -92,38 +97,20 @@ export default function Dashboard() {
     setIsTranscribing(true);
     
     try {
-      // Step 1: Create transcription record and validate URL
+      // Create transcription record and queue for processing
       const createResponse = await apiRequest('POST', '/api/transcriptions/create', {
         videoUrl: videoUrl.trim(),
       });
 
       toast({
-        title: t('transcription.processing'),
-        description: `Processing: ${createResponse.videoTitle}`,
+        title: t('transcription.queued.title'),
+        description: t('transcription.queued.description').replace('{{title}}', createResponse.videoTitle),
       });
 
-      // Step 2: Process the transcription in the background
-      try {
-        const processResponse = await apiRequest('POST', `/api/transcriptions/${createResponse.id}/process`, {});
-        
-        toast({
-          title: t('transcription.success.title'),
-          description: t('transcription.success.description'),
-        });
-
-        // Clear form and refresh data
-        setVideoUrl('');
-        queryClient.invalidateQueries({ queryKey: ['/api/users/transcriptions'] });
-        queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-
-      } catch (processError) {
-        console.error('Transcription processing error:', processError);
-        toast({
-          title: t('transcription.error.title'),
-          description: t('transcription.error.description'),
-          variant: 'destructive',
-        });
-      }
+      // Clear form and refresh data
+      setVideoUrl('');
+      queryClient.invalidateQueries({ queryKey: ['/api/users/transcriptions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
 
     } catch (error: any) {
       console.error('Transcription creation error:', error);

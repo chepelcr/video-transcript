@@ -294,6 +294,15 @@ const translations = {
     'transcription.status.completed': 'Completed',
     'transcription.status.failed': 'Failed',
     'transcription.words': 'words',
+    'transcriptions.processing': 'Processing',
+    'transcriptions.completed': 'Completed',
+    'transcriptions.failed': 'Failed',
+    'transcriptions.refreshed': 'History Refreshed',
+    'transcriptions.refreshedDesc': 'Transcription history updated successfully',
+    
+    // Transcription Queueing
+    'transcription.queued.title': 'Transcription Queued',
+    'transcription.queued.description': 'Your video "{{title}}" has been queued for processing. You\'ll see the results here soon.',
     
     // Subscription Page
     'subscription.title': 'Subscribe to VideoScript Pro',
@@ -609,6 +618,15 @@ const translations = {
     'transcription.status.completed': 'Completado',
     'transcription.status.failed': 'Fallido',
     'transcription.words': 'palabras',
+    'transcriptions.processing': 'Procesando',
+    'transcriptions.completed': 'Completado',
+    'transcriptions.failed': 'Fallido',
+    'transcriptions.refreshed': 'Historial Actualizado',
+    'transcriptions.refreshedDesc': 'El historial de transcripciones se ha actualizado exitosamente',
+    
+    // Transcription Queueing Spanish
+    'transcription.queued.title': 'Transcripción en Cola',
+    'transcription.queued.description': 'Tu video "{{title}}" ha sido puesto en cola para procesamiento. Verás los resultados aquí pronto.',
     
     // Subscription Page
     'subscription.title': 'Suscríbete a VideoScript Pro',

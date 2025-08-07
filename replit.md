@@ -33,6 +33,10 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **API RESPONSE PARSING**: Fixed frontend API response handling - now properly parses JSON from Response objects
 - ✅ **TRANSCRIPTION API UPDATE**: Updated transcription service to handle new structured error response format with proper 004 error code handling for long videos (3-minute limit)
 - ✅ **SERVER ERROR HANDLING**: Updated server to properly pass through specific error messages from transcription service instead of generic failures
+- ✅ **AWS SQS ASYNCHRONOUS PROCESSING**: Implemented complete asynchronous transcription system using AWS SQS for queuing (August 7, 2025)
+- ✅ **WEBHOOK SECURITY**: Added secure webhook endpoint with TRANSCRIPTION_WEBHOOK_SECRET verification for receiving processed transcriptions
+- ✅ **REAL-TIME STATUS TRACKING**: Enhanced frontend with auto-refresh functionality, status badges, and processing indicators in both sidebar and dashboard
+- ✅ **TRANSCRIPTION STATUS WORKFLOW**: Implemented pending → processing → completed/failed status tracking with bilingual support
 
 # User Preferences
 
@@ -71,8 +75,10 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 - **Neon Database**: Serverless PostgreSQL hosting with connection pooling
 - **Drizzle ORM**: Type-safe database queries with automatic migration generation
 
-### External APIs
+### External APIs & Queue System
 - **Python Transcription Service**: External API endpoint for video transcription processing (configured via VITE_PYTHON_API_URL)
+- **AWS SQS Integration**: Message queue system for asynchronous transcription processing with SqsService class handling queue operations
+- **Webhook Processing**: Secure webhook endpoint (/api/webhook/transcription-result) for receiving completed transcriptions from external service
 
 ### Development Tools
 - **Replit Integration**: Development environment detection and runtime error overlay

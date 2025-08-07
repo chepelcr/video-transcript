@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { X, FileText, Download, Copy, Clock, BarChart3 } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { X, FileText, Download, Copy, Clock, BarChart3, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,7 +15,9 @@ import { formatDistanceToNow } from 'date-fns';
 interface Transcription {
   id: string;
   videoUrl: string;
+  videoTitle?: string;
   transcript: string;
+  status: string;
   duration: number;
   wordCount: number;
   processingTime: number;
@@ -32,6 +34,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const queryClient = useQueryClient();
   
   // Check if we're on a large screen (desktop) - must be declared before early return
   const [isDesktop, setIsDesktop] = useState(false);
@@ -48,10 +51,15 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  const { data: transcriptionData, isLoading, refetch } = useQuery({
+  const { data: transcriptionData, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['/api/users/transcriptions'],
     enabled: isAuthenticated,
     retry: false,
+    refetchInterval: (data) => {
+      // Auto-refresh every 5 seconds if there are processing transcriptions
+      const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
+      return hasProcessing ? 5000 : false;
+    },
     queryFn: async () => {
       const tokens = JSON.parse(localStorage.getItem('auth_tokens') || '{}');
       if (!tokens.accessToken) {
@@ -82,6 +90,35 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
   }, [isOpen, isAuthenticated, refetch]);
 
   const transcriptions = (transcriptionData as any)?.transcriptions || [];
+
+  const handleRefresh = async () => {
+    await refetch();
+    toast({
+      title: t('transcriptions.refreshed'),
+      description: t('transcriptions.refreshedDesc'),
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'processing':
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+          <Clock className="w-3 h-3 mr-1" />
+          {t('transcriptions.processing')}
+        </Badge>;
+      case 'completed':
+        return <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+          <FileText className="w-3 h-3 mr-1" />
+          {t('transcriptions.completed')}
+        </Badge>;
+      case 'failed':
+        return <Badge variant="outline" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+          ❌ {t('transcriptions.failed')}
+        </Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
 
   const handleCopyTranscript = async (transcript: string) => {
     try {
@@ -172,11 +209,16 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                   <CardTitle className="text-sm font-medium flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      {getVideoTitle(transcription.videoUrl)}
+                      {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
                     </span>
-                    <Badge variant="secondary" className="text-xs">
-                      {Math.round(transcription.accuracy)}% {t('history.accuracy').toLowerCase()}
-                    </Badge>
+                    <div className="flex gap-2">
+                      {getStatusBadge(transcription.status)}
+                      {transcription.status === 'completed' && (
+                        <Badge variant="secondary" className="text-xs">
+                          {Math.round(transcription.accuracy)}% accuracy
+                        </Badge>
+                      )}
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -190,31 +232,45 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                       {transcription.wordCount} {t('history.words').toLowerCase()}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
-                    {transcription.transcript}
-                  </p>
+                  {transcription.status === 'completed' && transcription.transcript && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+                      {transcription.transcript}
+                    </p>
+                  )}
+                  {transcription.status === 'processing' && (
+                    <p className="text-sm text-yellow-600 dark:text-yellow-400 italic">
+                      Your transcription is being processed. This may take a few minutes...
+                    </p>
+                  )}
+                  {transcription.status === 'failed' && (
+                    <p className="text-sm text-red-600 dark:text-red-400 italic">
+                      Transcription failed. Please try again with a different video.
+                    </p>
+                  )}
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">
                       {formatDistanceToNow(new Date(transcription.createdAt), { addSuffix: true })}
                     </span>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCopyTranscript(transcription.transcript)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDownloadTranscript(transcription)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Download className="h-3 w-3" />
-                      </Button>
-                    </div>
+                    {transcription.status === 'completed' && (
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCopyTranscript(transcription.transcript)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDownloadTranscript(transcription)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Download className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -272,9 +328,19 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {t('history.title')}
                 </h2>
-                <Button variant="ghost" size="sm" onClick={onClose}>
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleRefresh} 
+                    disabled={isFetching}
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={onClose}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               {/* Content */}
