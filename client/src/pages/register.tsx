@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -76,10 +76,12 @@ export default function Register() {
     }
   };
 
-  if (step === 'verify') {
-    navigate(`/${language}/verify-email?email=${encodeURIComponent(email)}`);
-    return null;
-  }
+  // Handle navigation with useEffect to avoid state update during render
+  useEffect(() => {
+    if (step === 'verify') {
+      navigate(`/${language}/verify-email?email=${encodeURIComponent(email)}`);
+    }
+  }, [step, language, email, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">

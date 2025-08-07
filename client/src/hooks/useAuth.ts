@@ -118,7 +118,7 @@ export function useAuth() {
       }
       
       const result = await response.json() as UserResponse;
-      return result.user;
+      return result;
     },
     retry: false,
   });
