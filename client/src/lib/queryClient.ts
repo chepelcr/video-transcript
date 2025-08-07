@@ -54,7 +54,26 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     const url = queryKey.join("/") as string;
     const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+    
+    // Get the access token from localStorage
+    let accessToken = null;
+    try {
+      const authTokens = localStorage.getItem('auth_tokens');
+      if (authTokens) {
+        const tokens = JSON.parse(authTokens);
+        accessToken = tokens.accessToken;
+      }
+    } catch (error) {
+      console.error('Error getting auth tokens:', error);
+    }
+    
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    
     const res = await fetch(fullUrl, {
+      headers,
       credentials: "include",
     });
 

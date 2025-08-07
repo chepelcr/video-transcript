@@ -57,10 +57,21 @@ export default function Dashboard() {
     }
   }, [isAuthenticated, authLoading, navigate, language]);
 
-  const { data: transcriptionData, isLoading: transcriptionsLoading, refetch: refetchTranscriptions, isFetching } = useQuery({
+  const {
+    data: transcriptionData,
+    isLoading: transcriptionsLoading,
+    isFetching,
+    refetch: refetchTranscriptions,
+  } = useQuery({
     queryKey: ['/api/users/transcriptions'],
-    enabled: isAuthenticated,
-    retry: false,
+    enabled: isAuthenticated && !authLoading,
+    retry: (failureCount, error) => {
+      // Don't retry on authentication errors
+      if (error && error.message && error.message.includes('401')) {
+        return false;
+      }
+      return failureCount < 3;
+    },
     refetchInterval: (data) => {
       // Auto-refresh every 5 seconds if there are processing transcriptions
       const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
