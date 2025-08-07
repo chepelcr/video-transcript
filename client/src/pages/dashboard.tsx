@@ -79,6 +79,9 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="flex gap-3">
+            <Button variant="outline" onClick={() => navigate(`/${language}/profile`)}>
+              {t('profile.editProfile')}
+            </Button>
             <Button variant="outline" onClick={() => navigate(`/${language}/`)}>
               Back to Home
             </Button>
