@@ -38,13 +38,36 @@ function generateSimulatedTranscription(videoUrl: string): string {
 export async function transcribeVideo(videoUrl: string): Promise<TranscriptionResponse> {
   const startTime = Date.now();
   
-  // Skip API call entirely and go directly to simulation
-  console.log('Attempting to contact transcription service...');
+  console.log('Attempting to contact transcription service at:', PYTHON_API_BASE_URL);
   
-  // Simulate API check delay
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  console.log('Transcription service unavailable, using simulation mode');
+  try {
+    // Attempt real API call first with 5 second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
+    const response = await fetch(`${PYTHON_API_BASE_URL}/transcribe`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ videoUrl }),
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Successfully received transcription from API');
+      return result;
+    } else {
+      console.log('API returned error:', response.status);
+      throw new Error(`API error: ${response.status}`);
+    }
+  } catch (error) {
+    console.log('API call failed:', (error as Error).message);
+    console.log('Falling back to simulation mode');
+  }
 
   // Generate simulation with realistic processing time
   console.log('Generating simulated transcription...');
