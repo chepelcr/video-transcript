@@ -18,6 +18,19 @@ const translations = {
     'nav.getStarted': 'Get Started',
     'nav.back': 'Back to Home',
     
+    // Common
+    'common.back': 'Back',
+    'common.backToHome': 'Back to Home',
+    'common.logout': 'Sign Out',
+    'common.cancel': 'Cancel',
+    'common.continue': 'Continue',
+    'common.save': 'Save',
+    'common.delete': 'Delete',
+    'common.edit': 'Edit',
+    'common.loading': 'Loading...',
+    'common.error': 'Error',
+    'common.success': 'Success',
+    
     // Hero Section
     'hero.title': 'Transform Videos to Text',
     'hero.subtitle': 'in Seconds',
@@ -267,6 +280,19 @@ const translations = {
     'nav.contact': 'Contacto',
     'nav.getStarted': 'Comenzar',
     'nav.back': 'Volver al Inicio',
+    
+    // Common
+    'common.back': 'Atrás',
+    'common.backToHome': 'Volver al Inicio',
+    'common.logout': 'Cerrar Sesión',
+    'common.cancel': 'Cancelar',
+    'common.continue': 'Continuar',
+    'common.save': 'Guardar',
+    'common.delete': 'Eliminar',
+    'common.edit': 'Editar',
+    'common.loading': 'Cargando...',
+    'common.error': 'Error',
+    'common.success': 'Éxito',
     
     // Hero Section
     'hero.title': 'Convierte Videos a Texto',
