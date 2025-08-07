@@ -1,4 +1,17 @@
-import { Loader2, User, FileText, Menu, Home, LogOut } from "lucide-react";
+import { 
+  Loader2, 
+  User, 
+  FileText, 
+  Menu, 
+  Home, 
+  LogOut, 
+  RefreshCw, 
+  History,
+  ChevronDown,
+  Copy,
+  Download,
+  ExternalLink
+} from "lucide-react";
 
 export const Icons = {
   spinner: Loader2,
@@ -7,4 +20,10 @@ export const Icons = {
   menu: Menu,
   home: Home,
   logout: LogOut,
+  refresh: RefreshCw,
+  history: History,
+  chevronDown: ChevronDown,
+  copy: Copy,
+  download: Download,
+  externalLink: ExternalLink,
 };
