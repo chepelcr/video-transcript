@@ -20,17 +20,25 @@ interface AuthTokens {
 const getStoredTokens = (): AuthTokens | null => {
   try {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+    console.log('Getting stored tokens:', stored ? 'Found' : 'Not found');
     return stored ? JSON.parse(stored) : null;
-  } catch {
+  } catch (error) {
+    console.error('Error getting stored tokens:', error);
     return null;
   }
 };
 
 const setStoredTokens = (tokens: AuthTokens | null): void => {
-  if (tokens) {
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(tokens));
-  } else {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+  try {
+    if (tokens) {
+      console.log('Storing tokens:', { hasAccess: !!tokens.accessToken, hasRefresh: !!tokens.refreshToken });
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(tokens));
+    } else {
+      console.log('Clearing tokens');
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+  } catch (error) {
+    console.error('Error storing tokens:', error);
   }
 };
 
@@ -160,20 +168,31 @@ export function useAuth() {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (data: LoginRequest) => {
+      console.log('Attempting login...');
       const response = await apiRequest('POST', '/api/auth/login', data);
       const authData = response as unknown as AuthResponse;
       
+      console.log('Login response received:', { hasUser: !!authData.user, hasTokens: !!(authData.accessToken && authData.refreshToken) });
+      
       // Store tokens
-      setStoredTokens({
+      const tokens = {
         accessToken: authData.accessToken,
         refreshToken: authData.refreshToken,
-      });
+      };
+      
+      setStoredTokens(tokens);
+      console.log('Tokens stored successfully');
       
       return authData;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Login mutation success, refetching user data...');
       // Force refetch user data immediately after successful login
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
       queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
+    },
+    onError: (error) => {
+      console.error('Login mutation error:', error);
     },
   });
 
