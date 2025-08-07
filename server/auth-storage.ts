@@ -81,6 +81,54 @@ export class AuthStorage {
     return user || null;
   }
 
+  // Set password reset token
+  async setPasswordResetToken(email: string, token: string, expiresAt: Date): Promise<User | null> {
+    const [user] = await db
+      .update(users)
+      .set({
+        passwordResetToken: token,
+        passwordResetExpires: expiresAt,
+        updatedAt: new Date()
+      })
+      .where(eq(users.email, email))
+      .returning();
+    return user || null;
+  }
+
+  // Get user by password reset token
+  async getUserByResetToken(token: string): Promise<User | null> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(
+        and(
+          eq(users.passwordResetToken, token),
+          gt(users.passwordResetExpires, new Date())
+        )
+      );
+    return user || null;
+  }
+
+  // Reset password using token
+  async resetPassword(token: string, newPasswordHash: string): Promise<User | null> {
+    const [user] = await db
+      .update(users)
+      .set({
+        password: newPasswordHash,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+        updatedAt: new Date()
+      })
+      .where(
+        and(
+          eq(users.passwordResetToken, token),
+          gt(users.passwordResetExpires, new Date())
+        )
+      )
+      .returning();
+    return user || null;
+  }
+
   // Increment transcriptions used
   async incrementTranscriptionsUsed(userId: string): Promise<void> {
     await db

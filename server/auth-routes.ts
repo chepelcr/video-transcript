@@ -7,6 +7,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
   generateVerificationCode,
+  generatePasswordResetToken,
   authenticateToken,
   cleanUserObject
 } from "./auth";
@@ -15,12 +16,14 @@ import {
   verifyEmailRequestSchema,
   loginRequestSchema,
   refreshTokenRequestSchema,
+  forgotPasswordRequestSchema,
+  resetPasswordRequestSchema,
   createTranscriptionRequestSchema,
   type AuthResponse,
   type UserResponse,
   type TranscriptionHistoryResponse
 } from "@shared/auth-schema";
-import { sendVerificationEmail } from "./email";
+import { sendVerificationEmail, sendPasswordResetEmail } from "./email";
 
 export function setupAuthRoutes(app: Express) {
   // Register new user
@@ -251,6 +254,86 @@ export function setupAuthRoutes(app: Express) {
       console.error("Logout error:", error);
       res.status(400).json({ 
         error: error.message || "Logout failed" 
+      });
+    }
+  });
+
+  // Forgot password
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const validatedData = forgotPasswordRequestSchema.parse(req.body);
+      
+      // Check if user exists
+      const user = await authStorage.getUserByEmail(validatedData.email);
+      if (!user) {
+        // For security, we don't reveal if the email exists or not
+        return res.json({
+          message: "If an account with that email exists, a password reset link has been sent."
+        });
+      }
+
+      // Generate password reset token
+      const resetToken = generatePasswordResetToken();
+      const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      // Save reset token to database
+      await authStorage.setPasswordResetToken(validatedData.email, resetToken, resetExpires);
+
+      // Send password reset email
+      const emailSent = await sendPasswordResetEmail(
+        validatedData.email, 
+        resetToken, 
+        user.firstName || 'User'
+      );
+      
+      if (!emailSent) {
+        console.log(`Failed to send password reset email. Reset token for ${user.email}: ${resetToken}`);
+      } else {
+        console.log(`Password reset email sent to ${user.email}`);
+      }
+
+      res.json({
+        message: "If an account with that email exists, a password reset link has been sent."
+      });
+    } catch (error: any) {
+      console.error("Forgot password error:", error);
+      res.status(400).json({ 
+        error: error.message || "Failed to process password reset request" 
+      });
+    }
+  });
+
+  // Reset password
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const validatedData = resetPasswordRequestSchema.parse(req.body);
+      
+      // Verify reset token
+      const user = await authStorage.getUserByResetToken(validatedData.token);
+      if (!user) {
+        return res.status(400).json({
+          error: "Invalid or expired reset token"
+        });
+      }
+
+      // Hash new password
+      const hashedPassword = await hashPassword(validatedData.newPassword);
+
+      // Update password and clear reset token
+      const updatedUser = await authStorage.resetPassword(validatedData.token, hashedPassword);
+      if (!updatedUser) {
+        return res.status(400).json({
+          error: "Failed to reset password"
+        });
+      }
+
+      res.json({
+        message: "Password reset successfully. You can now log in with your new password."
+      });
+    } catch (error: any) {
+      console.error("Reset password error:", error);
+      res.status(400).json({ 
+        error: error.message || "Failed to reset password" 
       });
     }
   });

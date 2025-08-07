@@ -52,6 +52,11 @@ export function generateVerificationCode(): string {
   return crypto.randomInt(100000, 999999).toString();
 }
 
+// Generate secure password reset token
+export function generatePasswordResetToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
 // Authentication middleware
 export async function authenticateToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;

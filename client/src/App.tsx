@@ -14,6 +14,8 @@ import VerifyEmail from "@/pages/verify-email";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Profile from "@/pages/profile";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import { DebugInfo } from "@/components/DebugInfo";
 import React, { useEffect, useState } from "react";
 
@@ -122,6 +124,8 @@ function RouterWithLanguage() {
       <Route path="/register" component={Register} />
       <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/login" component={Login} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/profile" component={Profile} />
       <Route component={NotFound} />

@@ -130,17 +130,28 @@ export default function Login() {
             </form>
           </Form>
 
-          <div className="mt-4 text-center text-sm">
-            <span className="text-muted-foreground">
-              {t('auth.login.noAccount')}{' '}
-            </span>
-            <Button
-              variant="link"
-              className="p-0 h-auto font-medium"
-              onClick={() => navigate(`/${language}/register`)}
-            >
-              {t('auth.login.signUp')}
-            </Button>
+          <div className="mt-4 text-center text-sm space-y-2">
+            <div>
+              <Button
+                variant="link"
+                className="p-0 h-auto font-medium"
+                onClick={() => navigate(`/${language}/forgot-password`)}
+              >
+                {t('auth.login.forgotPassword')}?
+              </Button>
+            </div>
+            <div>
+              <span className="text-muted-foreground">
+                {t('auth.login.noAccount')}{' '}
+              </span>
+              <Button
+                variant="link"
+                className="p-0 h-auto font-medium"
+                onClick={() => navigate(`/${language}/register`)}
+              >
+                {t('auth.login.signUp')}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

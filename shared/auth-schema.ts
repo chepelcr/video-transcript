@@ -30,6 +30,9 @@ export const users = pgTable("users", {
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationCode: varchar("email_verification_code", { length: 6 }),
   emailVerificationExpires: timestamp("email_verification_expires"),
+  // Password reset fields
+  passwordResetToken: varchar("password_reset_token", { length: 64 }),
+  passwordResetExpires: timestamp("password_reset_expires"),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("users_email_idx").on(table.email),
@@ -101,6 +104,15 @@ export const refreshTokenRequestSchema = z.object({
   refreshToken: z.string(),
 });
 
+export const forgotPasswordRequestSchema = z.object({
+  email: z.string().email("Valid email is required"),
+});
+
+export const resetPasswordRequestSchema = z.object({
+  token: z.string().min(1, "Reset token is required"),
+  newPassword: z.string().min(8, "Password must be at least 8 characters"),
+});
+
 export const createTranscriptionRequestSchema = z.object({
   videoUrl: z.string().url(),
   transcript: z.string(),
@@ -122,6 +134,8 @@ export type RegisterRequest = z.infer<typeof registerRequestSchema>;
 export type VerifyEmailRequest = z.infer<typeof verifyEmailRequestSchema>;
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
 export type RefreshTokenRequest = z.infer<typeof refreshTokenRequestSchema>;
+export type ForgotPasswordRequest = z.infer<typeof forgotPasswordRequestSchema>;
+export type ResetPasswordRequest = z.infer<typeof resetPasswordRequestSchema>;
 export type CreateTranscriptionRequest = z.infer<typeof createTranscriptionRequestSchema>;
 
 // API Response types
