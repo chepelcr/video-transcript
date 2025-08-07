@@ -226,15 +226,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                         {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
                       </CardTitle>
                     </div>
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex gap-1 flex-wrap">
-                        {getStatusBadge(transcription.status)}
-                        {transcription.status === 'completed' && transcription.accuracy && (
-                          <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                            {Math.round(transcription.accuracy)}%
-                          </Badge>
-                        )}
-                      </div>
+                    <div className="flex items-center justify-end">
                       <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                         {formatDistanceToNow(new Date(transcription.createdAt), { addSuffix: true })}
                       </span>
@@ -271,7 +263,15 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                       Transcription failed. Please try again with a different video.
                     </p>
                   )}
-                  <div className="flex items-center justify-end">
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-1 flex-wrap">
+                      {getStatusBadge(transcription.status)}
+                      {transcription.status === 'completed' && transcription.accuracy && (
+                        <Badge variant="secondary" className="text-xs whitespace-nowrap">
+                          {Math.round(transcription.accuracy)}%
+                        </Badge>
+                      )}
+                    </div>
                     <div className="flex gap-1">
                       <Button
                         variant="ghost"
