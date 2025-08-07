@@ -343,9 +343,9 @@ export default function Home() {
                 ) : (
                   <Button 
                     className="w-full mt-auto" 
-                    onClick={() => navigate(`/${language}/register`)}
+                    onClick={() => navigate(`/${language}/login`)}
                   >
-                    Create Account
+                    Sign In
                   </Button>
                 )}
               </CardContent>
