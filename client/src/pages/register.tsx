@@ -21,6 +21,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Home, Loader2 } from 'lucide-react';
 
 const registerSchema = z.object({
+  username: z.string().min(3, 'Username must be at least 3 characters').max(20, 'Username must be less than 20 characters'),
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
@@ -44,6 +45,7 @@ export default function Register() {
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      username: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -55,6 +57,7 @@ export default function Register() {
   const onSubmit = async (values: RegisterForm) => {
     try {
       await register({
+        username: values.username,
         email: values.email,
         password: values.password,
         firstName: values.firstName,
@@ -108,6 +111,20 @@ export default function Register() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('auth.register.username')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('auth.register.usernamePlaceholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}

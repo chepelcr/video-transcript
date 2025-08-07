@@ -8,6 +8,8 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionTier: text("subscription_tier").default("free"), // free, pro, enterprise
@@ -46,6 +48,14 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
   password: true,
+  firstName: true,
+  lastName: true,
+});
+
+export const updateUserProfileSchema = createInsertSchema(users).pick({
+  username: true,
+  firstName: true,
+  lastName: true,
 });
 
 export const insertTranscriptionSchema = createInsertSchema(transcriptions).pick({
@@ -59,6 +69,7 @@ export const insertRefreshTokenSchema = createInsertSchema(refreshTokens).pick({
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertTranscription = z.infer<typeof insertTranscriptionSchema>;
 export type Transcription = typeof transcriptions.$inferSelect;

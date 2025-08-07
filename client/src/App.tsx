@@ -13,6 +13,7 @@ import Register from "@/pages/register";
 import VerifyEmail from "@/pages/verify-email";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
+import Profile from "@/pages/profile";
 import { DebugInfo } from "@/components/DebugInfo";
 import React, { useEffect, useState } from "react";
 
@@ -122,6 +123,7 @@ function RouterWithLanguage() {
       <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/profile" component={Profile} />
       <Route component={NotFound} />
     </Switch>
   );

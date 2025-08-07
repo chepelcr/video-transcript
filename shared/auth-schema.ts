@@ -18,6 +18,8 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionTier: text("subscription_tier").default("free"),
@@ -78,6 +80,7 @@ export const selectRefreshTokenSchema = createSelectSchema(refreshTokens);
 
 // API Request/Response types
 export const registerRequestSchema = z.object({
+  username: z.string().min(3).max(20),
   email: z.string().email(),
   password: z.string().min(8),
   firstName: z.string().min(1),

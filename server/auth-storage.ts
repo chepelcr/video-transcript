@@ -32,6 +32,15 @@ export class AuthStorage {
     return user || null;
   }
 
+  // Get user by username
+  async getUserByUsername(username: string): Promise<User | null> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
+    return user || null;
+  }
+
   // Get user by ID
   async getUserById(id: string): Promise<User | null> {
     const [user] = await db

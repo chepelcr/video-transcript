@@ -43,14 +43,13 @@ export function setupAuthRoutes(app: Express) {
       const verificationCode = generateVerificationCode();
       const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-      // Create username from first and last name
-      const username = `${validatedData.firstName}${validatedData.lastName}`.toLowerCase().replace(/\s+/g, '');
-      
       // Create user
       const user = await authStorage.createUser({
         email: validatedData.email,
         password: hashedPassword,
-        username: username,
+        username: validatedData.username,
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
         emailVerificationCode: verificationCode,
         emailVerificationExpires: verificationExpires,
         isEmailVerified: false,
@@ -60,7 +59,7 @@ export function setupAuthRoutes(app: Express) {
       });
 
       // Send verification email
-      const emailSent = await sendVerificationEmail(user.email, verificationCode, validatedData.firstName);
+      const emailSent = await sendVerificationEmail(user.email, verificationCode, validatedData.firstName || 'User');
       
       if (!emailSent) {
         console.log(`Failed to send email. Verification code for ${user.email}: ${verificationCode}`);
@@ -386,6 +385,44 @@ export function setupAuthRoutes(app: Express) {
       res.status(400).json({ 
         error: error.message || "Failed to get transcription" 
       });
+    }
+  });
+
+  // Update user profile
+  app.put("/api/auth/profile", authenticateToken, async (req, res) => {
+    try {
+      const userId = (req as any).userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { username, firstName, lastName } = req.body;
+
+      // Validate input
+      if (!username || !firstName || !lastName) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+
+      // Check if username is already taken by another user
+      const existingUser = await authStorage.getUserByUsername(username);
+      if (existingUser && existingUser.id !== userId) {
+        return res.status(400).json({ error: "Username is already taken" });
+      }
+
+      const updatedUser = await authStorage.updateUser(userId, {
+        username,
+        firstName,
+        lastName,
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json(cleanUserObject(updatedUser));
+    } catch (error: any) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ error: "Failed to update profile" });
     }
   });
 }

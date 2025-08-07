@@ -77,6 +77,8 @@ const translations = {
     // Authentication
     'auth.register.title': 'Create Account',
     'auth.register.description': 'Get started with VideoScript today',
+    'auth.register.username': 'Username',
+    'auth.register.usernamePlaceholder': 'Choose a unique username',
     'auth.register.firstName': 'First Name',
     'auth.register.firstNamePlaceholder': 'Enter your first name',
     'auth.register.lastName': 'Last Name',
@@ -192,6 +194,27 @@ const translations = {
     'history.download': 'Download',
     'history.view': 'View Details',
     'history.createdAt': 'Created',
+
+    // Profile translations
+    'profile.title': 'Profile',
+    'profile.description': 'Manage your account information and preferences.',
+    'profile.verified': 'Verified',
+    'profile.plan': 'Plan',
+    'profile.memberSince': 'Member since',
+    'profile.transcriptionsUsed': 'transcriptions used',
+    'profile.edit.title': 'Edit Profile',
+    'profile.edit.description': 'Update your profile information. Note: Email cannot be changed.',
+    'profile.edit.username': 'Username',
+    'profile.edit.usernamePlaceholder': 'Enter your username',
+    'profile.edit.firstName': 'First Name',
+    'profile.edit.firstNamePlaceholder': 'Enter your first name',
+    'profile.edit.lastName': 'Last Name',
+    'profile.edit.lastNamePlaceholder': 'Enter your last name',
+    'profile.edit.emailNote': 'Email cannot be changed',
+    'profile.edit.submit': 'Update Profile',
+    'profile.update.success.title': 'Profile Updated',
+    'profile.update.success.description': 'Your profile has been updated successfully.',
+    'profile.update.error': 'Failed to update profile',
     
     // Subscription Page
     'subscription.title': 'Subscribe to VideoScript Pro',
@@ -296,6 +319,8 @@ const translations = {
     // Authentication
     'auth.register.title': 'Crear Cuenta',
     'auth.register.description': 'Comienza con VideoScript hoy',
+    'auth.register.username': 'Nombre de Usuario',
+    'auth.register.usernamePlaceholder': 'Elige un nombre de usuario único',
     'auth.register.firstName': 'Nombre',
     'auth.register.firstNamePlaceholder': 'Ingresa tu nombre',
     'auth.register.lastName': 'Apellido',
@@ -405,6 +430,27 @@ const translations = {
     'history.download': 'Descargar',
     'history.view': 'Ver Detalles',
     'history.createdAt': 'Creado',
+
+    // Profile translations Spanish
+    'profile.title': 'Perfil',
+    'profile.description': 'Gestiona la información de tu cuenta y preferencias.',
+    'profile.verified': 'Verificado',
+    'profile.plan': 'Plan',
+    'profile.memberSince': 'Miembro desde',
+    'profile.transcriptionsUsed': 'transcripciones utilizadas',
+    'profile.edit.title': 'Editar Perfil',
+    'profile.edit.description': 'Actualiza la información de tu perfil. Nota: El email no se puede cambiar.',
+    'profile.edit.username': 'Nombre de Usuario',
+    'profile.edit.usernamePlaceholder': 'Ingresa tu nombre de usuario',
+    'profile.edit.firstName': 'Nombre',
+    'profile.edit.firstNamePlaceholder': 'Ingresa tu nombre',
+    'profile.edit.lastName': 'Apellido',
+    'profile.edit.lastNamePlaceholder': 'Ingresa tu apellido',
+    'profile.edit.emailNote': 'El email no se puede cambiar',
+    'profile.edit.submit': 'Actualizar Perfil',
+    'profile.update.success.title': 'Perfil Actualizado',
+    'profile.update.success.description': 'Tu perfil ha sido actualizado exitosamente.',
+    'profile.update.error': 'Error al actualizar perfil',
     
     // Subscription Page
     'subscription.title': 'Suscríbete a VideoScript Pro',
