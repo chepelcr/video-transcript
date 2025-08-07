@@ -25,6 +25,8 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **EMAIL TEMPLATE UPDATE**: Updated password reset emails to use custom domain URLs
 - ✅ **BILINGUAL FORGOT PASSWORD**: Complete Spanish and English translation support for password reset flow
 - ✅ **DNS DOCUMENTATION**: Created comprehensive DNS configuration guide for custom domain setup
+- ✅ **GITHUB PAGES ROUTING FIX**: Fixed URL corruption issue on page reload by updating 404.html and routing logic (August 7, 2025)
+- ✅ **CORS CONFIGURATION**: Updated server CORS settings to include custom subdomain
 
 # User Preferences
 

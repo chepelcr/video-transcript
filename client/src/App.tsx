@@ -31,6 +31,18 @@ function RouterWithLanguage() {
     try {
       console.log('Router effect triggered:', { location, language, windowPath: window.location.pathname });
       
+      // Handle GitHub Pages 404.html query string redirect
+      const urlParams = new URLSearchParams(window.location.search);
+      const githubPagePath = urlParams.get('/');
+      if (githubPagePath) {
+        // Clean up the GitHub Pages redirect
+        const cleanPath = githubPagePath.replace(/~and~/g, '&');
+        console.log('GitHub Pages redirect detected, cleaning path:', githubPagePath, '->', cleanPath);
+        window.history.replaceState({}, '', cleanPath || '/');
+        setLocation(cleanPath || '/');
+        return;
+      }
+      
       // Extract the route part for language detection
       let routePart = location;
       
@@ -59,12 +71,8 @@ function RouterWithLanguage() {
   }, [location, language, setLanguage, setLocation, isInitialized]);
 
   const stripLanguagePrefix = (path: string) => {
-    // First remove base path if present, then remove language prefix
-    let cleanPath = path;
-    if (cleanPath.startsWith('/video-transcript')) {
-      cleanPath = cleanPath.replace('/video-transcript', '') || '/';
-    }
-    return cleanPath.replace(/^\/(en|es)/, '') || '/';
+    // Remove language prefix for routing
+    return path.replace(/^\/(en|es)/, '') || '/';
   };
 
   // Get current path without base path and language prefix for routing

@@ -11,9 +11,9 @@
       // string into just a query string, and then redirects the browser
       // to the new url with only a query string and hash fragment
       
-      // For Project Pages site (subdirectory deployment)
-      // Set pathSegmentsToKeep to 1 to preserve /video-transcript
-      var pathSegmentsToKeep = 1;
+      // For custom domain deployment (no subdirectory)
+      // Set pathSegmentsToKeep to 0 for root domain
+      var pathSegmentsToKeep = 0;
 
       var l = window.location;
       l.replace(

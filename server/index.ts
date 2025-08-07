@@ -13,7 +13,8 @@ app.use((req, res, next) => {
     'http://localhost:5174',
     'http://127.0.0.1:5173',
     'http://127.0.0.1:5174',
-    'https://jcampos.dev', // Your actual domain
+    'https://jcampos.dev', // Main domain
+    'https://video-transcript.jcampos.dev', // Custom subdomain
     'https://a84950eb-2031-40c4-8a39-1789c99c8ca2-00-2c46rofc44noa.spock.replit.dev', // Replit frontend
     process.env.FRONTEND_URL,
     process.env.REPL_SLUG && `https://${process.env.REPL_SLUG}--${process.env.REPL_OWNER}.replit.app`

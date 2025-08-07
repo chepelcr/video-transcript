@@ -64,8 +64,11 @@ jobs:
         echo ""
         echo "Custom domain deployment configured:"
         echo "✓ CNAME file: $(cat dist/gh-pages/CNAME)"
-        echo "✓ 404.html routing configured"
+        echo "✓ 404.html routing configured for custom domain"
         echo "✓ Debug logging enabled"
+        echo ""
+        echo "=== 404.html Configuration Check ==="
+        head -20 dist/gh-pages/404.html | grep pathSegmentsToKeep
       env:
         VITE_STRIPE_PUBLIC_KEY: ${{ secrets.VITE_STRIPE_PUBLIC_KEY }}
         VITE_PYTHON_API_URL: ${{ secrets.VITE_PYTHON_API_URL }}
