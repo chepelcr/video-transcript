@@ -16,6 +16,8 @@ const translations = {
     'nav.pricing': 'Pricing',
     'nav.contact': 'Contact',
     'nav.getStarted': 'Get Started',
+    'nav.history': 'History',
+    'nav.profile': 'Profile',
     'nav.back': 'Back to Home',
     
     // Common
@@ -348,6 +350,8 @@ const translations = {
     'nav.pricing': 'Precios',
     'nav.contact': 'Contacto',
     'nav.getStarted': 'Comenzar',
+    'nav.history': 'Historial',
+    'nav.profile': 'Perfil',
     'nav.back': 'Volver al Inicio',
     
     // Common
