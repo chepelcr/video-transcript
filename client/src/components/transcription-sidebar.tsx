@@ -197,7 +197,8 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
     </div>
   );
 
-  if (!isOpen) return null;
+  // Always render the container to ensure smooth animations
+  // if (!isOpen) return null;
 
   return (
     <>
@@ -218,10 +219,10 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
         </Dialog>
       )}
 
-      {/* Desktop Sidebar - Only render on larger screens */}
+      {/* Desktop Sidebar - Always render container for smooth animations */}
       {isDesktop && (
         <div className={`fixed inset-0 z-50 flex transition-all duration-500 ease-out ${
-          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          isOpen ? 'opacity-100 pointer-events-auto visible' : 'opacity-0 pointer-events-none invisible'
         }`}>
           {/* Backdrop */}
           <div 
@@ -232,8 +233,10 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
           />
           
           {/* Sidebar */}
-          <div className={`relative ml-auto w-full max-w-lg xl:max-w-xl bg-white dark:bg-gray-900 shadow-xl border-l border-gray-200 dark:border-gray-700 transform transition-all duration-500 ease-out ${
-            isOpen ? 'translate-x-0 scale-100' : 'translate-x-full scale-95'
+          <div className={`relative ml-auto w-full max-w-lg xl:max-w-xl bg-white dark:bg-gray-900 shadow-2xl border-l border-gray-200 dark:border-gray-700 transform transition-all duration-500 ease-out ${
+            isOpen 
+              ? 'translate-x-0 scale-100 opacity-100' 
+              : 'translate-x-full scale-95 opacity-50'
           }`}>
             <div className="flex h-full flex-col">
               {/* Header */}
