@@ -32,6 +32,21 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const { t } = useLanguage();
+  
+  // Check if we're on a large screen (desktop) - must be declared before early return
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  // Use effect to determine screen size - must be declared before early return
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsDesktop(window.innerWidth >= 1024); // lg breakpoint
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const { data: transcriptionData, isLoading } = useQuery({
     queryKey: ['/api/users/transcriptions'],
@@ -183,21 +198,6 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
   );
 
   if (!isOpen) return null;
-
-  // Check if we're on a large screen (desktop)
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  // Use effect to determine screen size
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsDesktop(window.innerWidth >= 1024); // lg breakpoint
-    };
-    
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
 
   return (
     <>
