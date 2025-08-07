@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Play, Gift, Bolt, Target, Shield, Star, Download, Copy, Lock, Check, User } from "lucide-react";
+import { Play, Gift, Bolt, Target, Shield, Star, Download, Copy, Lock, Check, User, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import VideoTranscriptionForm from "@/components/video-transcription-form";
 import TranscriptionResults from "@/components/transcription-results";
 import PaymentModal from "@/components/payment-modal";
+import TranscriptionSidebar from "@/components/transcription-sidebar";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -30,6 +31,7 @@ export default function Home() {
   const [transcriptionsUsed, setTranscriptionsUsed] = useLocalStorage('transcriptionsUsed', 0);
   const [currentTranscription, setCurrentTranscription] = useState<Transcription | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const { user, isAuthenticated, logout } = useAuth();
@@ -91,6 +93,14 @@ export default function Home() {
               <button onClick={() => scrollToSection('contact')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
                 {t('nav.contact')}
               </button>
+              <Button
+                variant="outline"
+                onClick={() => setIsSidebarOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <History className="h-4 w-4" />
+                History
+              </Button>
               {isAuthenticated ? (
                 <>
                   <Button
@@ -119,6 +129,13 @@ export default function Home() {
               <LanguageToggle />
             </div>
             <div className="md:hidden flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsSidebarOpen(true)}
+              >
+                <History className="h-4 w-4" />
+              </Button>
               {isAuthenticated ? (
                 <Button
                   variant="outline"
@@ -266,53 +283,62 @@ export default function Home() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 mt-auto" disabled>
-                  {t('pricing.free.button')}
-                </Button>
+                {isAuthenticated ? (
+                  <Button className="w-full bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 mt-auto" disabled>
+                    {t('pricing.free.button')}
+                  </Button>
+                ) : (
+                  <Button 
+                    className="w-full mt-auto" 
+                    onClick={() => navigate(`/${language}/register`)}
+                  >
+                    Create Account
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
-            {/* Pro Tier */}
-            <Card className="pricing-card border-2 border-primary relative bg-white dark:bg-gray-800 flex flex-col">
+            {/* Pro Tier - Coming Soon */}
+            <Card className="pricing-card border-2 border-gray-300 dark:border-gray-600 relative bg-white dark:bg-gray-800 flex flex-col opacity-75">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-primary text-white">{t('pricing.pro.popular')}</Badge>
+                <Badge className="bg-gray-500 text-white">Coming Soon</Badge>
               </div>
               <CardContent className="p-8 flex-grow flex flex-col">
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('pricing.pro.title')}</h3>
-                  <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">$15</div>
+                  <div className="text-4xl font-bold text-gray-500 dark:text-gray-400 mb-2">$15</div>
                   <p className="text-gray-600 dark:text-gray-300">{t('pricing.pro.subtitle')}</p>
                 </div>
                 <div className="flex-grow">
                   <ul className="space-y-4 mb-8">
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
+                    <li className="flex items-center opacity-50">
+                      <Lock className="text-gray-400 mr-3 h-5 w-5" />
                       <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.unlimited')}</span>
                     </li>
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
+                    <li className="flex items-center opacity-50">
+                      <Lock className="text-gray-400 mr-3 h-5 w-5" />
                       <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.duration')}</span>
                     </li>
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
+                    <li className="flex items-center opacity-50">
+                      <Lock className="text-gray-400 mr-3 h-5 w-5" />
                       <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.accuracy')}</span>
                     </li>
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
+                    <li className="flex items-center opacity-50">
+                      <Lock className="text-gray-400 mr-3 h-5 w-5" />
                       <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.formats')}</span>
                     </li>
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
+                    <li className="flex items-center opacity-50">
+                      <Lock className="text-gray-400 mr-3 h-5 w-5" />
                       <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.priority')}</span>
                     </li>
-                    <li className="flex items-center">
-                      <Check className="text-accent mr-3 h-5 w-5" />
+                    <li className="flex items-center opacity-50">
+                      <Lock className="text-gray-400 mr-3 h-5 w-5" />
                       <span className="text-gray-700 dark:text-gray-300">{t('pricing.pro.support')}</span>
                     </li>
                   </ul>
                 </div>
-                <Button onClick={() => handleUpgrade('pro')} className="w-full bg-primary text-white hover:bg-indigo-600 mt-auto">
-                  {t('pricing.pro.button')}
+                <Button className="w-full bg-gray-400 hover:bg-gray-400 text-gray-600 cursor-not-allowed mt-auto" disabled>
+                  Coming Soon
                 </Button>
               </CardContent>
             </Card>
@@ -476,6 +502,11 @@ export default function Home() {
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
         planType={selectedPlan}
+      />
+
+      <TranscriptionSidebar 
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
     </div>
   );
