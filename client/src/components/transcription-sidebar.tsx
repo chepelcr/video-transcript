@@ -56,7 +56,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
     queryKey: ['/api/users/transcriptions'],
     enabled: isAuthenticated,
     retry: false,
-    refetchInterval: (data) => {
+    refetchInterval: (data: any) => {
       // Auto-refresh every 5 seconds if there are processing transcriptions
       const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
       return hasProcessing ? 5000 : false;
@@ -90,7 +90,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
     }
   }, [isOpen, isAuthenticated, refetch]);
 
-  const transcriptions = (transcriptionData as any)?.transcriptions || [];
+  const transcriptions = transcriptionData?.transcriptions || [];
 
   const handleRefresh = async () => {
     await refetch();
@@ -102,22 +102,16 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'processing':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-          <Clock className="w-3 h-3 mr-1" />
-          {t('transcriptions.processing')}
-        </Badge>;
       case 'completed':
-        return <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-          <FileText className="w-3 h-3 mr-1" />
-          {t('transcriptions.completed')}
-        </Badge>;
+        return <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white text-xs">{t('status.completed')}</Badge>;
+      case 'processing':
+        return <Badge variant="default" className="bg-orange-500 hover:bg-orange-600 text-white text-xs">{t('status.processing')}</Badge>;
       case 'failed':
-        return <Badge variant="outline" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-          ❌ {t('transcriptions.failed')}
-        </Badge>;
+        return <Badge variant="destructive" className="text-xs">{t('status.failed')}</Badge>;
+      case 'pending':
+        return <Badge variant="secondary" className="bg-gray-500 hover:bg-gray-600 text-white text-xs">{t('status.pending')}</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="secondary" className="text-xs">{status}</Badge>;
     }
   };
 
@@ -248,7 +242,7 @@ export default function TranscriptionSidebar({ isOpen, onClose }: TranscriptionS
                     </div>
                     <div className="flex items-center gap-1">
                       <BarChart3 className="h-3 w-3" />
-                      {transcription.wordCount} {t('history.words').toLowerCase()}
+                      {transcription.wordCount} {t('history.words')}
                     </div>
                   </div>
                   {transcription.status === 'completed' && transcription.transcript && (

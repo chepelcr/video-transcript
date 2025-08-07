@@ -105,7 +105,7 @@ export default function Dashboard() {
       }
       return failureCount < 3;
     },
-    refetchInterval: (data) => {
+    refetchInterval: (data: any) => {
       // Auto-refresh every 5 seconds if there are processing transcriptions
       const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
       return hasProcessing ? 5000 : false;
@@ -167,6 +167,21 @@ export default function Dashboard() {
       });
     } finally {
       setIsTranscribing(false);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white text-xs">{t('status.completed')}</Badge>;
+      case 'processing':
+        return <Badge variant="default" className="bg-orange-500 hover:bg-orange-600 text-white text-xs">{t('status.processing')}</Badge>;
+      case 'failed':
+        return <Badge variant="destructive" className="text-xs">{t('status.failed')}</Badge>;
+      case 'pending':
+        return <Badge variant="secondary" className="bg-gray-500 hover:bg-gray-600 text-white text-xs">{t('status.pending')}</Badge>;
+      default:
+        return <Badge variant="secondary" className="text-xs">{status}</Badge>;
     }
   };
 
@@ -418,11 +433,14 @@ export default function Dashboard() {
                         <div key={transcription.id}>
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                {getVideoProviderIcon(transcription.videoUrl)}
-                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                  {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
-                                </p>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  {getVideoProviderIcon(transcription.videoUrl)}
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                    {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
+                                  </p>
+                                </div>
+                                {getStatusBadge(transcription.status)}
                               </div>
                               <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500 dark:text-gray-400">
                                 {transcription.status === 'completed' && (

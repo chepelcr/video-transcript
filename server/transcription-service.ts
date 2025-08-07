@@ -2,6 +2,7 @@ interface VideoInfo {
   title: string;
   isValid: boolean;
   platform?: 'youtube' | 'vimeo' | 'other';
+  duration?: number; // Duration in seconds
 }
 
 export class TranscriptionService {
@@ -15,13 +16,23 @@ export class TranscriptionService {
       
       // Check if it's a supported video platform
       if (this.isYouTubeUrl(urlObj)) {
-        const title = await this.extractYouTubeTitle(url);
-        return { title, isValid: true, platform: 'youtube' };
+        const videoData = await this.extractYouTubeData(url);
+        return { 
+          title: videoData.title, 
+          isValid: videoData.duration ? videoData.duration <= 300 : true, // 5 minutes = 300 seconds
+          platform: 'youtube',
+          duration: videoData.duration
+        };
       }
       
       if (this.isVimeoUrl(urlObj)) {
-        const title = await this.extractVimeoTitle(url);
-        return { title, isValid: true, platform: 'vimeo' };
+        const videoData = await this.extractVimeoData(url);
+        return { 
+          title: videoData.title, 
+          isValid: videoData.duration ? videoData.duration <= 300 : true,
+          platform: 'vimeo',
+          duration: videoData.duration
+        };
       }
       
       // For other URLs, try to extract from meta tags
@@ -42,12 +53,12 @@ export class TranscriptionService {
     return url.hostname.includes('vimeo.com');
   }
 
-  private async extractYouTubeTitle(url: string): Promise<string> {
+  private async extractYouTubeData(url: string): Promise<{title: string, duration?: number}> {
     try {
       // Extract video ID from YouTube URL
       const videoId = this.extractYouTubeVideoId(url);
       if (!videoId) {
-        return 'YouTube Video';
+        return { title: 'YouTube Video' };
       }
 
       // Try to get title from oEmbed API (no API key required)
@@ -56,13 +67,32 @@ export class TranscriptionService {
       const response = await fetch(oembedUrl);
       if (response.ok) {
         const data = await response.json();
-        return data.title || 'YouTube Video';
+        
+        // Try to extract duration from the HTML page (basic scraping)
+        let duration: number | undefined;
+        try {
+          const pageResponse = await fetch(`https://www.youtube.com/watch?v=${videoId}`);
+          const html = await pageResponse.text();
+          
+          // Look for duration in JSON-LD schema or meta tags
+          const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
+          if (durationMatch) {
+            duration = parseInt(durationMatch[1]);
+          }
+        } catch (durationError) {
+          console.log('Could not extract duration, proceeding without validation');
+        }
+        
+        return { 
+          title: data.title || 'YouTube Video',
+          duration
+        };
       }
       
-      return 'YouTube Video';
+      return { title: 'YouTube Video' };
     } catch (error) {
-      console.error('Error extracting YouTube title:', error);
-      return 'YouTube Video';
+      console.error('Error extracting YouTube data:', error);
+      return { title: 'YouTube Video' };
     }
   }
 
@@ -72,27 +102,30 @@ export class TranscriptionService {
     return match ? match[1] : null;
   }
 
-  private async extractVimeoTitle(url: string): Promise<string> {
+  private async extractVimeoData(url: string): Promise<{title: string, duration?: number}> {
     try {
       // Extract video ID from Vimeo URL
       const videoId = this.extractVimeoVideoId(url);
       if (!videoId) {
-        return 'Vimeo Video';
+        return { title: 'Vimeo Video' };
       }
 
-      // Try to get title from oEmbed API
+      // Try to get data from oEmbed API
       const oembedUrl = `https://vimeo.com/api/oembed.json?url=https://vimeo.com/${videoId}`;
       
       const response = await fetch(oembedUrl);
       if (response.ok) {
         const data = await response.json();
-        return data.title || 'Vimeo Video';
+        return { 
+          title: data.title || 'Vimeo Video',
+          duration: data.duration // Vimeo oEmbed includes duration in seconds
+        };
       }
       
-      return 'Vimeo Video';
+      return { title: 'Vimeo Video' };
     } catch (error) {
-      console.error('Error extracting Vimeo title:', error);
-      return 'Vimeo Video';
+      console.error('Error extracting Vimeo data:', error);
+      return { title: 'Vimeo Video' };
     }
   }
 

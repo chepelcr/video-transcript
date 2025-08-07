@@ -54,6 +54,11 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **DATABASE SCHEMA COMPLETION**: Added missing `videoTitle` and `status` columns to transcriptions table with proper TypeScript types
 - ✅ **SQL INSERTION FIXED**: Resolved SQL syntax errors in createTranscription method that were causing database insertion failures
 - ✅ **END-TO-END VALIDATION**: Complete transcription flow from URL validation to database storage is now fully functional
+- ✅ **COPY/DOWNLOAD BUTTONS FIXED**: Fixed visibility and functionality of copy/download buttons in both sidebar and dashboard views (August 7, 2025)
+- ✅ **STATUS BADGE CONSISTENCY**: Unified status badge styling across sidebar and dashboard with consistent colors and hover effects
+- ✅ **VIDEO DURATION VALIDATION**: Added 5-minute duration limit validation for YouTube and Vimeo videos before transcription processing
+- ✅ **TRANSLATION FIXES**: Fixed "words" text localization and removed unwanted .toLowerCase() calls in transcription displays
+- ✅ **UI IMPROVEMENTS**: Added video provider icons (YouTube red, Vimeo blue, generic) next to video titles across all transcription views
 
 # User Preferences
 

@@ -150,6 +150,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const videoInfo = await transcriptionService.validateAndExtractVideoInfo(videoUrl);
       
       if (!videoInfo.isValid) {
+        if (videoInfo.duration && videoInfo.duration > 300) {
+          return res.status(400).json({ 
+            error: "Video is too long. Please use videos that are 5 minutes or shorter.",
+            code: "VIDEO_TOO_LONG",
+            duration: Math.round(videoInfo.duration / 60 * 10) / 10 // Convert to minutes with 1 decimal
+          });
+        }
         return res.status(400).json({ error: "Invalid video URL" });
       }
 
