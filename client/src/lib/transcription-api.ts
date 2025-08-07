@@ -38,14 +38,17 @@ function generateSimulatedTranscription(videoUrl: string): string {
 export async function transcribeVideo(videoUrl: string): Promise<TranscriptionResponse> {
   const startTime = Date.now();
   
-  console.log('Attempting to contact transcription service at:', `${PYTHON_API_BASE_URL}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`);
+  console.log('Video URL received:', videoUrl);
+  console.log('Python API base URL:', PYTHON_API_BASE_URL);
+  const fullApiUrl = `${PYTHON_API_BASE_URL}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`;
+  console.log('Full API URL being called:', fullApiUrl);
   
   try {
     // Attempt real API call first with 10 minute timeout for long processing
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10 * 60 * 1000); // 10 minutes
     
-    const response = await fetch(`${PYTHON_API_BASE_URL}/video-listener/listen-video?videoUrl=${encodeURIComponent(videoUrl)}`, {
+    const response = await fetch(fullApiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
