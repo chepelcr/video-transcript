@@ -72,6 +72,8 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **STATUS CHANGE DETECTION**: Intelligent system that tracks previous transcription states and triggers notifications only when statuses actually change
 - ✅ **CACHE-BUSTING IMPLEMENTATION**: Added cache control headers to prevent 304 responses and ensure real-time data updates (August 8, 2025)
 - ✅ **MANUAL TRANSCRIPTION UPDATE ENDPOINT**: Added PATCH endpoint for testing transcription status changes and validating notification system
+- ✅ **AGGRESSIVE CLIENT-SIDE CACHE BUSTING**: Implemented random queryKey generation to force unique API calls and eliminate 304 cached responses (August 8, 2025)
+- ✅ **REAL-TIME DATA POLLING CONFIRMED**: Dashboard now successfully fetches fresh data every 10 seconds with 200 responses instead of cached 304s
 
 # User Preferences
 
