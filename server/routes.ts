@@ -530,6 +530,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Complete transcription flow simulation endpoint
+  app.post("/api/test/complete-flow", authenticateToken, async (req, res) => {
+    try {
+      console.log("🚀 COMPLETE FLOW TEST: Starting end-to-end transcription simulation");
+      
+      const userId = (req as any).userId;
+      const { videoUrl } = req.body;
+      const testVideoUrl = videoUrl || "https://www.youtube.com/watch?v=jNQXAC9IVRw";
+
+      // Step 1: Extract video title (simulate oEmbed API call)
+      let videoTitle = "Complete Flow Test Video";
+      try {
+        if (testVideoUrl.includes("youtube.com")) {
+          console.log("🎥 Extracting YouTube video title...");
+          const videoId = testVideoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
+          if (videoId) {
+            // Simulate oEmbed API call for real title extraction
+            const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+            try {
+              const response = await fetch(oembedUrl);
+              if (response.ok) {
+                const data = await response.json();
+                videoTitle = data.title || videoTitle;
+                console.log(`✅ Extracted video title: "${videoTitle}"`);
+              }
+            } catch (error) {
+              console.log("⚠️ Using fallback title");
+            }
+          }
+        }
+      } catch (error) {
+        console.log("⚠️ Video title extraction failed, using fallback");
+      }
+
+      // Step 2: Create transcription in 'pending' state (before SQS submission)
+      const newTranscription = await authStorage.createTranscription({
+        userId,
+        videoUrl: testVideoUrl,
+        videoTitle,
+        status: "pending"
+      });
+
+      console.log(`✅ Step 1: Created pending transcription: ${newTranscription.id.substring(0, 8)}... - ${videoTitle}`);
+
+      // Step 3: Simulate SQS submission and move to 'processing'
+      setTimeout(async () => {
+        try {
+          console.log(`🔄 Step 2: Simulating SQS submission...`);
+          await authStorage.updateTranscription(newTranscription.id, { status: "processing" });
+          console.log(`✅ Status updated to 'processing' - transcription sent to queue`);
+
+          // Step 4: Simulate webhook completion after processing delay
+          setTimeout(async () => {
+            try {
+              console.log(`🎙️ Step 3: Simulating transcription processing complete...`);
+              
+              const completeTranscript = `Welcome to the complete transcription flow test! This is a comprehensive transcript that demonstrates the full functionality of our video transcription service.
+
+This longer transcript allows you to test both the download and copy features from the dashboard. You can click the download button to save this transcript as a text file to your device, making it easy to share or edit in other applications.
+
+The copy button will copy this entire transcript to your clipboard, allowing you to paste it anywhere you need. This is perfect for quick sharing in emails, documents, or other applications.
+
+Our transcription service provides accurate, timestamped transcriptions with excellent quality and fast processing times. The dashboard shows all your transcription history with easy-to-use controls for managing your content.
+
+Thank you for testing our complete transcription flow!`;
+
+              const completionUpdates = {
+                status: "completed" as const,
+                transcript: completeTranscript,
+                duration: 85,
+                wordCount: 156,
+                accuracy: 97.8,
+                processingTime: 18.5
+              };
+
+              console.log(`🔄 Step 4: Webhook simulation - completing transcription...`);
+              const completedTranscription = await authStorage.updateTranscription(newTranscription.id, completionUpdates);
+              
+              console.log(`🎉 TRANSCRIPTION COMPLETE!`);
+              console.log(`📋 Transcript preview: "${completeTranscript.substring(0, 50)}..."`);
+              console.log(`📊 Duration: ${completionUpdates.duration}s | Words: ${completionUpdates.wordCount} | Accuracy: ${completionUpdates.accuracy}%`);
+              console.log(`📢 Dashboard will detect completion in next polling cycle`);
+              console.log(`🔔 Notification ready: "${videoTitle}" transcription completed`);
+              console.log(`💾 Download & Copy buttons now active in dashboard`);
+              
+            } catch (error) {
+              console.error("❌ Error in webhook completion:", error);
+            }
+          }, 5000); // 5 second processing delay
+          
+        } catch (error) {
+          console.error("❌ Error in SQS simulation:", error);
+        }
+      }, 1000); // 1 second delay for SQS submission
+
+      res.json({
+        success: true,
+        transcription: {
+          id: newTranscription.id,
+          videoTitle,
+          videoUrl: testVideoUrl,
+          flowSteps: [
+            "1. Video title extracted",
+            "2. Transcription created (pending)",
+            "3. SQS submission (processing) - 1s delay",
+            "4. Webhook completion (completed) - 5s delay"
+          ]
+        },
+        message: "🚀 Complete transcription flow started! Check dashboard in 6-10 seconds for completed transcription with download/copy buttons."
+      });
+
+    } catch (error) {
+      console.error("❌ Error in complete flow test:", error);
+      res.status(500).json({ message: "Failed to start complete flow test" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
