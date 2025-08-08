@@ -22,8 +22,8 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { Icons } from "@/components/ui/icons";
-// import { ThemeToggle } from '@/components/ThemeToggle';
-// import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { SiYoutube, SiVimeo } from "react-icons/si";
 
 interface Transcription {
@@ -349,8 +349,8 @@ export default function Dashboard() {
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-3">
-              {/* <ThemeToggle />
-              <LanguageToggle /> */}
+              <ThemeToggle />
+              <LanguageToggle />
               <Button
                 variant="outline"
                 size="sm"
@@ -372,8 +372,8 @@ export default function Dashboard() {
 
             {/* Mobile/Tablet Navigation */}
             <div className="lg:hidden flex items-center gap-1">
-              {/* <ThemeToggle />
-              <LanguageToggle /> */}
+              <ThemeToggle />
+              <LanguageToggle />
               <Button
                 variant="outline"
                 size="sm"
@@ -636,7 +636,7 @@ export default function Dashboard() {
                             <div className="flex gap-1 flex-wrap">
                               {getStatusBadge(
                                 transcription.status,
-                                transcription.transcript
+                                transcription.transcript,
                               )}
                               {transcription.status === "completed" &&
                                 transcription.accuracy && (
