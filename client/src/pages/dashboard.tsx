@@ -47,6 +47,9 @@ export default function Dashboard() {
   const { t, language } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [previousTranscriptions, setPreviousTranscriptions] = useState<Transcription[]>([]);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [isTranscribing, setIsTranscribing] = useState(false);
 
   // Calculate limit status early
   const dailyUsage = user?.transcriptionsUsed || 0;
@@ -83,10 +86,6 @@ export default function Dashboard() {
       return <Icons.fileText className="h-4 w-4 text-gray-500 flex-shrink-0" />;
     }
   };
-  
-  // Transcription form state
-  const [videoUrl, setVideoUrl] = useState('');
-  const [isTranscribing, setIsTranscribing] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -112,10 +111,49 @@ export default function Dashboard() {
     },
     refetchInterval: (data: any) => {
       // Auto-refresh every 5 seconds if there are processing transcriptions
-      const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing');
-      return hasProcessing ? 5000 : false;
+      const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing' || t.status === 'pending');
+      return hasProcessing ? 5000 : 10000; // Poll every 10 seconds for demonstration
     },
   });
+
+  // Monitor for status changes and show notifications
+  useEffect(() => {
+    if (!transcriptionData?.transcriptions) return;
+
+    const currentTranscriptions = transcriptionData.transcriptions;
+    
+    // If we have previous transcriptions, check for status changes
+    if (previousTranscriptions.length > 0) {
+      currentTranscriptions.forEach(current => {
+        const previous = previousTranscriptions.find(p => p.id === current.id);
+        
+        if (previous && previous.status !== current.status) {
+          // Status changed - show notification
+          if (current.status === 'completed') {
+            toast({
+              title: t('notifications.completed.title'),
+              description: t('notifications.completed.description').replace('{{title}}', current.videoTitle || getVideoTitle(current.videoUrl)),
+              variant: 'default',
+            });
+          } else if (current.status === 'failed') {
+            toast({
+              title: t('notifications.failed.title'),
+              description: t('notifications.failed.description').replace('{{title}}', current.videoTitle || getVideoTitle(current.videoUrl)),
+              variant: 'destructive',
+            });
+          } else if (current.status === 'processing') {
+            toast({
+              title: t('notifications.processing.title'),
+              description: t('notifications.processing.description').replace('{{title}}', current.videoTitle || getVideoTitle(current.videoUrl)),
+            });
+          }
+        }
+      });
+    }
+    
+    // Update previous transcriptions for next comparison
+    setPreviousTranscriptions(currentTranscriptions);
+  }, [transcriptionData?.transcriptions, previousTranscriptions, toast, t, getVideoTitle]);
 
   const handleLogout = async () => {
     await logout();

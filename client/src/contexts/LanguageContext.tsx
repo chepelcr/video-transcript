@@ -314,6 +314,14 @@ const translations = {
     'transcription.queued.title': 'Transcription Queued',
     'transcription.queued.description': 'Your video "{{title}}" has been queued for processing. You\'ll see the results here soon.',
     
+    // Notifications
+    'notifications.completed.title': 'Transcription Completed!',
+    'notifications.completed.description': 'Your video "{{title}}" has been successfully transcribed and is ready to view.',
+    'notifications.failed.title': 'Transcription Failed',
+    'notifications.failed.description': 'We couldn\'t process your video "{{title}}". Please try again.',
+    'notifications.processing.title': 'Processing Started',
+    'notifications.processing.description': 'Your video "{{title}}" is now being transcribed.',
+    
     // Subscription Page
     'subscription.title': 'Subscribe to VideoScript Pro',
     'subscription.planTitle': 'Pro Plan',
@@ -647,6 +655,14 @@ const translations = {
     // Transcription Queueing Spanish
     'transcription.queued.title': 'Transcripción en Cola',
     'transcription.queued.description': 'Tu video "{{title}}" ha sido puesto en cola para procesamiento. Verás los resultados aquí pronto.',
+    
+    // Notifications Spanish
+    'notifications.completed.title': '¡Transcripción Completada!',
+    'notifications.completed.description': 'Tu video "{{title}}" ha sido transcrito exitosamente y está listo para ver.',
+    'notifications.failed.title': 'Transcripción Falló',
+    'notifications.failed.description': 'No pudimos procesar tu video "{{title}}". Por favor, inténtalo de nuevo.',
+    'notifications.processing.title': 'Procesamiento Iniciado',
+    'notifications.processing.description': 'Tu video "{{title}}" está siendo transcrito ahora.',
     
     // Subscription Page
     'subscription.title': 'Suscríbete a VideoScript Pro',
