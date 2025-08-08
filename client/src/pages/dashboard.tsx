@@ -100,7 +100,7 @@ export default function Dashboard() {
     isFetching,
     refetch: refetchTranscriptions,
   } = useQuery<TranscriptionHistoryResponse>({
-    queryKey: ['/api/users/transcriptions', Math.random()], // Force unique queries
+    queryKey: ['/api/users/transcriptions'], // Use normal queryKey structure
     enabled: isAuthenticated && !authLoading,
     retry: (failureCount, error) => {
       // Don't retry on authentication errors
@@ -118,6 +118,8 @@ export default function Dashboard() {
     gcTime: 0, // Don't cache
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+    networkMode: 'always', // Always fetch from network
+    refetchOnReconnect: true,
   });
 
   // Monitor for status changes and show notifications
