@@ -128,6 +128,8 @@ export default function Dashboard() {
         const previous = previousTranscriptions.find(p => p.id === current.id);
         
         if (previous && previous.status !== current.status) {
+          console.log(`Status change detected: ${current.id} changed from ${previous.status} to ${current.status}`);
+          
           // Status changed - show notification
           if (current.status === 'completed') {
             toast({
