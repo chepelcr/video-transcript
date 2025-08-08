@@ -65,6 +65,11 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **SIDEBAR CARD REDESIGN**: Restructured sidebar cards to prevent status badge cutoff, moved badges inline with action buttons, and cleaned up layout by removing timestamp clutter (August 7, 2025)
 - ✅ **DASHBOARD HISTORY STYLING**: Applied same clean card design from sidebar to dashboard history with status badges inline with action buttons and removed timestamp clutter (August 7, 2025)
 - ✅ **FREE TIER ONLY**: Disabled upgrade buttons and pro-tier references in dashboard since only offering free tier currently (August 7, 2025)
+- ✅ **AUTOMATIC DASHBOARD UPDATES**: Implemented intelligent polling system with 5-second intervals during processing and 10-second intervals for general monitoring (August 8, 2025)
+- ✅ **REAL-TIME NOTIFICATION SYSTEM**: Complete bilingual toast notification system that detects status changes and shows user-friendly alerts with video titles
+- ✅ **SMART POLLING BEHAVIOR**: Dashboard automatically accelerates refresh rate when transcriptions are processing and prevents duplicate notifications
+- ✅ **NOTIFICATION TRANSLATIONS**: Added comprehensive Spanish and English translations for all transcription status change notifications in LanguageContext
+- ✅ **STATUS CHANGE DETECTION**: Intelligent system that tracks previous transcription states and triggers notifications only when statuses actually change
 
 # User Preferences
 
