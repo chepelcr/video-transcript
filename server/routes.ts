@@ -399,30 +399,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   // Test endpoint to trigger notification system (temporary for testing)
-  // Test endpoint to create a processing transcription for testing notifications
-  app.post('/api/test/create-processing', async (req, res) => {
+  // Create a processing transcription and then complete it to test notifications
+  app.post('/api/test/trigger-notification', async (req, res) => {
     try {
-      console.log('🧪 Creating a processing transcription for notification testing...');
+      console.log('🎯 NOTIFICATION TEST: Creating processing transcription then completing it...');
       
-      const transcription = await authStorage.createTranscription({
+      // First, create a processing transcription
+      const newTranscription = await authStorage.createTranscription({
         userId: '755c862b-c14a-41d2-994b-ac62cf1a2cb2',
         videoUrl: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
-        videoTitle: 'Me at the zoo',
+        videoTitle: 'Me at the zoo - Test Notification',
         status: 'processing',
         duration: 19,
       } as any);
       
-      console.log(`✅ Created processing transcription: ${transcription.id} - Me at the zoo`);
+      console.log(`✅ Created processing transcription: ${newTranscription.id.substring(0,8)}... - ${newTranscription.videoTitle}`);
+      
+      // Wait a moment to ensure it's in the database
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Now complete it to trigger status change
+      const updates = {
+        status: 'completed',
+        transcript: 'All right, so here we are in front of the elephants, and the cool thing about these guys is that they have really, really, really long trunks, and that\'s, that\'s cool. And that\'s pretty much all there is to say.',
+        duration: 19,
+        wordCount: 52,
+        accuracy: 98.2,
+        processingTime: 8.7
+      };
+      
+      const updatedTranscription = await authStorage.updateTranscription(newTranscription.id, updates);
+      
+      console.log(`🎉 STATUS CHANGE TRIGGERED! processing → completed`);
+      console.log(`📢 Dashboard should detect this change in next 10-second poll`);
+      console.log(`🔔 Expected notification: "¡Transcripción Completada! Me at the zoo - Test Notification"`);
       
       res.json({ 
         success: true,
-        transcription,
-        message: 'Processing transcription created - ready for completion test!'
+        transcription: {
+          id: newTranscription.id,
+          videoTitle: newTranscription.videoTitle,
+          statusChange: 'processing → completed'
+        },
+        message: `✅ Fresh status change created! Dashboard will detect in next polling cycle.`
       });
       
     } catch (error) {
-      console.error('Error creating test transcription:', error);
-      res.status(500).json({ error: 'Failed to create test transcription' });
+      console.error('Error in notification test:', error);
+      res.status(500).json({ error: 'Notification test failed' });
     }
   });
 
