@@ -123,7 +123,15 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const url = queryKey.join("/") as string;
-    const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+    let finalUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+    
+    // Add cache-busting for transcriptions endpoint
+    if (finalUrl.includes('/api/users/transcriptions')) {
+      const separator = finalUrl.includes('?') ? '&' : '?';
+      finalUrl = `${finalUrl}${separator}_t=${Date.now()}&_r=${Math.random()}`;
+    }
+    
+    const fullUrl = finalUrl;
     
     // Get the access token from localStorage
     let accessToken = null;

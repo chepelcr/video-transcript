@@ -341,10 +341,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const result = await authStorage.getUserTranscriptions(userId, 50, 0);
       
-      // Prevent caching to ensure real-time updates
-      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      // AGGRESSIVE cache prevention - bypass ALL caching mechanisms
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, private');
       res.set('Pragma', 'no-cache');
       res.set('Expires', '0');
+      res.set('ETag', Math.random().toString());
+      res.set('Last-Modified', new Date().toUTCString());
+      res.set('Vary', '*');
+      
+      // Remove any conditional request headers that cause 304
+      res.removeHeader('If-None-Match');
+      res.removeHeader('If-Modified-Since');
       
       res.json({
         transcriptions: result.transcriptions,
@@ -392,6 +399,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   // Test endpoint to trigger notification system (temporary for testing)
+  // Debug endpoint to check database state
+  app.get('/api/debug/transcriptions/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const result = await authStorage.getUserTranscriptions(userId, 50, 0);
+      
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      
+      res.json({
+        message: 'Raw database transcriptions',
+        timestamp: new Date().toISOString(),
+        transcriptions: result.transcriptions.map(t => ({
+          id: t.id,
+          videoTitle: (t as any).videoTitle,
+          status: (t as any).status,
+          transcript: (t as any).transcript ? (t as any).transcript.substring(0, 100) + '...' : null,
+          createdAt: t.createdAt
+        }))
+      });
+    } catch (error) {
+      console.error('Debug endpoint error:', error);
+      res.status(500).json({ error: 'Debug failed' });
+    }
+  });
+
   app.post('/api/test/complete-el-trapo', async (req, res) => {
     try {
       console.log('🧪 Testing notification system by completing El Trapo transcription...');
