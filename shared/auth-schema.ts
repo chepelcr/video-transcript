@@ -41,13 +41,15 @@ export const users = pgTable("users", {
 // Transcriptions table to track user transcription history
 export const transcriptions = pgTable("transcriptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id).notNull(),
+  userId: varchar("user_id").references(() => users.id),
   videoUrl: text("video_url").notNull(),
-  transcript: text("transcript").notNull(),
-  duration: integer("duration").notNull(), // in seconds
-  wordCount: integer("word_count").notNull(),
-  processingTime: integer("processing_time").notNull(), // in seconds
-  accuracy: integer("accuracy").notNull(), // percentage
+  videoTitle: text("video_title"), // Video title extracted from URL
+  transcript: text("transcript"),
+  status: text("status").default("pending"), // pending, processing, completed, failed
+  duration: integer("duration"), // in seconds
+  wordCount: integer("word_count"),
+  processingTime: integer("processing_time"), // in seconds  
+  accuracy: integer("accuracy"), // percentage
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("transcriptions_user_id_idx").on(table.userId),

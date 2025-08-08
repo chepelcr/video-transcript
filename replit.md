@@ -1,83 +1,6 @@
 # Overview
 
-This is a video transcription service application built with a full-stack TypeScript architecture, now optimized for GitHub Pages deployment. The app allows users to submit video URLs for transcription with a freemium pricing model - users get 3 free transcriptions before requiring a paid subscription. The system integrates with both Stripe and PayPal for payment processing and features a modern React frontend with shadcn/ui components.
-
-## Recent Changes (August 2025)
-- ✅ **TRANSCRIPTION ARCHITECTURE RESTRUCTURED**: Moved all transcription logic from frontend to backend for security
-- ✅ **TWO-STEP TRANSCRIPTION PROCESS**: Implemented validate URL first, then process transcription workflow
-- ✅ **VIDEO TITLE EXTRACTION**: Added intelligent title extraction for YouTube, Vimeo, and generic URLs
-- ✅ **DASHBOARD ENHANCEMENT**: Updated to display video titles instead of raw URLs in transcription history
-- ✅ **STATUS INDICATORS**: Added transcription status badges (processing, completed, failed) in history view
-- ✅ **AUTHENTICATION MIDDLEWARE**: Fixed authentication middleware and API endpoints across the application
-- ✅ **DOCKER CONTAINERIZATION**: Complete Docker setup with development and production configurations
-- ✅ **LOCAL TESTING ENVIRONMENT**: Multi-stage Dockerfile with PostgreSQL database integration
-- ✅ **HEALTH CHECK ENDPOINTS**: Added /health endpoint for Docker container monitoring
-- ✅ **DEVELOPMENT WORKFLOW**: Hot reloading support with volume mounting for live code changes
-- ✅ **DATABASE MANAGEMENT**: Automated PostgreSQL setup with initialization scripts
-- ✅ **MAKEFILE COMMANDS**: Simplified Docker operations with make commands for common tasks
-- ✅ **COMPREHENSIVE DOCUMENTATION**: Created README.docker.md with setup and troubleshooting guides
-- ✅ **AWS RDS MIGRATION**: Successfully migrated from Neon Database to AWS RDS PostgreSQL (August 7, 2025)
-- ✅ **DATABASE CREDENTIALS**: Added AWS RDS secrets (DATABASE_URL, USERNAME, PASSWORD, DATABASE_NAME)
-- ✅ **SSL CONFIGURATION**: Proper SSL configuration for production AWS RDS connections
-- ✅ **DATA PRESERVATION**: Existing user and transcription data preserved during migration
-- ✅ **CUSTOM DOMAIN CONFIGURATION**: Configured GitHub Pages for custom subdomain `video-transcript.jcampos.dev` (August 7, 2025)
-- ✅ **BASE PATH CLEANUP**: Removed `/video-transcript` subfolder from all routes and configurations
-- ✅ **EMAIL TEMPLATE UPDATE**: Updated password reset emails to use custom domain URLs
-- ✅ **BILINGUAL FORGOT PASSWORD**: Complete Spanish and English translation support for password reset flow
-- ✅ **DNS DOCUMENTATION**: Created comprehensive DNS configuration guide for custom domain setup
-- ✅ **GITHUB PAGES ROUTING FIX**: Fixed URL corruption issue on page reload by updating 404.html and routing logic (August 7, 2025)
-- ✅ **CORS CONFIGURATION**: Updated server CORS settings to include custom subdomain
-- ✅ **LANGUAGE TOGGLE FIX**: Fixed language switching routing after custom domain migration (August 7, 2025)
-- ✅ **FEATURES SECTION UPDATE**: Updated "Why Choose" section to highlight new transcription history functionality
-- ✅ **AUTHENTICATION BUG FIX**: Fixed critical authentication issue where users weren't properly logged in after email verification (August 7, 2025)
-- ✅ **API RESPONSE PARSING**: Fixed frontend API response handling - now properly parses JSON from Response objects
-- ✅ **TRANSCRIPTION API UPDATE**: Updated transcription service to handle new structured error response format with proper 004 error code handling for long videos (3-minute limit)
-- ✅ **SERVER ERROR HANDLING**: Updated server to properly pass through specific error messages from transcription service instead of generic failures
-- ✅ **AWS SQS ASYNCHRONOUS PROCESSING**: Implemented complete asynchronous transcription system using AWS SQS for queuing (August 7, 2025)
-- ✅ **WEBHOOK SECURITY**: Added secure webhook endpoint with TRANSCRIPTION_WEBHOOK_SECRET verification for receiving processed transcriptions
-- ✅ **REAL-TIME STATUS TRACKING**: Enhanced frontend with auto-refresh functionality, status badges, and processing indicators in both sidebar and dashboard
-- ✅ **TRANSCRIPTION STATUS WORKFLOW**: Implemented pending → processing → completed/failed status tracking with bilingual support
-- ✅ **HOME PAGE WORKFLOW FIX**: Updated home page transcription form to use new SQS-based API instead of old synchronous endpoint (August 7, 2025)
-- ✅ **USER FLOW CONSISTENCY**: Fixed workflow inconsistency - home page now queues transcriptions via SQS and redirects to dashboard like the rest of the system
-- ✅ **TRANSLATION COMPLETION**: Fixed all remaining hardcoded strings - "Get Started" buttons, navigation elements fully translate across desktop/mobile views
-- ✅ **DATABASE STORAGE MIGRATION**: Completely resolved database storage issue by switching all transcription routes from MemStorage to AuthStorage (database-backed) (August 7, 2025)
-- ✅ **TRANSCRIPTION PERSISTENCE**: Updated transcription creation, retrieval, and webhook endpoints to use proper database persistence
-- ✅ **PRE-LOGIN URL PRESERVATION**: Fixed app losing pre-login URL input after authentication by persisting pending video URL in localStorage across page navigation
-- ✅ **DASHBOARD REFRESH ERROR FIX**: Fixed null pointer exception when refreshing dashboard - added null safety for transcript substring operations and disabled buttons for processing transcriptions (August 7, 2025)
-- ✅ **VIDEO TITLE DISPLAY FIX**: Fixed video title display in transcription history - added proper TypeScript typing and improved API response handling (August 7, 2025)
-- ✅ **REFRESH BUTTON TRANSLATIONS**: Added complete Spanish and English translations for refresh button and status indicators in dashboard (August 7, 2025)
-- ✅ **TOKEN EXPIRATION FIX**: Implemented automatic access token refresh when 401/403 errors occur - seamless session continuation without user intervention (August 7, 2025)
-- ✅ **UI FIELD VISIBILITY**: Fixed dashboard to hide inappropriate fields (duration, words, accuracy) for pending/processing transcriptions
-- ✅ **TYPE SAFETY IMPROVEMENTS**: Resolved all TypeScript LSP diagnostics with proper schema alignment and type casting
-- ✅ **COMPLETE TRANSCRIPTION FLOW RESTORED**: Fixed critical 500 errors in transcription creation flow (August 7, 2025)
-- ✅ **VIDEO TITLE EXTRACTION WORKING**: Successfully extracts real YouTube video titles using oEmbed API (e.g., "Rick Astley - Never Gonna Give You Up (Official Video)")
-- ✅ **DATABASE SCHEMA COMPLETION**: Added missing `videoTitle` and `status` columns to transcriptions table with proper TypeScript types
-- ✅ **SQL INSERTION FIXED**: Resolved SQL syntax errors in createTranscription method that were causing database insertion failures
-- ✅ **END-TO-END VALIDATION**: Complete transcription flow from URL validation to database storage is now fully functional
-- ✅ **COPY/DOWNLOAD BUTTONS FIXED**: Fixed visibility and functionality of copy/download buttons in both sidebar and dashboard views (August 7, 2025)
-- ✅ **STATUS BADGE CONSISTENCY**: Unified status badge styling across sidebar and dashboard with consistent colors and hover effects
-- ✅ **VIDEO DURATION VALIDATION**: Added 5-minute duration limit validation for YouTube and Vimeo videos before transcription processing
-- ✅ **TRANSLATION FIXES**: Fixed "words" text localization and removed unwanted .toLowerCase() calls in transcription displays
-- ✅ **UI IMPROVEMENTS**: Added video provider icons (YouTube red, Vimeo blue, generic) next to video titles across all transcription views
-- ✅ **DURATION DISPLAY FEATURE**: Added video duration display in sidebar history with estimated durations for demonstration (August 7, 2025)
-- ✅ **TYPESCRIPT FIXES**: Resolved all LSP diagnostics and type safety issues across transcription components
-- ✅ **ICON SIZING FIX**: Fixed inconsistent YouTube icon sizes by adding flex-shrink-0 and standardizing icon dimensions across all views (August 7, 2025)
-- ✅ **SIDEBAR CARD REDESIGN**: Restructured sidebar cards to prevent status badge cutoff, moved badges inline with action buttons, and cleaned up layout by removing timestamp clutter (August 7, 2025)
-- ✅ **DASHBOARD HISTORY STYLING**: Applied same clean card design from sidebar to dashboard history with status badges inline with action buttons and removed timestamp clutter (August 7, 2025)
-- ✅ **FREE TIER ONLY**: Disabled upgrade buttons and pro-tier references in dashboard since only offering free tier currently (August 7, 2025)
-- ✅ **AUTOMATIC DASHBOARD UPDATES**: Implemented intelligent polling system with 5-second intervals during processing and 10-second intervals for general monitoring (August 8, 2025)
-- ✅ **REAL-TIME NOTIFICATION SYSTEM**: Complete bilingual toast notification system that detects status changes and shows user-friendly alerts with video titles
-- ✅ **SMART POLLING BEHAVIOR**: Dashboard automatically accelerates refresh rate when transcriptions are processing and prevents duplicate notifications
-- ✅ **NOTIFICATION TRANSLATIONS**: Added comprehensive Spanish and English translations for all transcription status change notifications in LanguageContext
-- ✅ **STATUS CHANGE DETECTION**: Intelligent system that tracks previous transcription states and triggers notifications only when statuses actually change
-- ✅ **CACHE-BUSTING IMPLEMENTATION**: Added cache control headers to prevent 304 responses and ensure real-time data updates (August 8, 2025)
-- ✅ **MANUAL TRANSCRIPTION UPDATE ENDPOINT**: Added PATCH endpoint for testing transcription status changes and validating notification system
-- ✅ **AGGRESSIVE CLIENT-SIDE CACHE BUSTING**: Implemented random queryKey generation to force unique API calls and eliminate 304 cached responses (August 8, 2025)
-- ✅ **REAL-TIME DATA POLLING CONFIRMED**: Dashboard now successfully fetches fresh data every 10 seconds with 200 responses instead of cached 304s
-- ✅ **DASHBOARD LOADING STATE FIXED**: Resolved URL path corruption issue where random numbers were incorrectly appended to API endpoints (August 8, 2025)
-- ✅ **NOTIFICATION SYSTEM FULLY OPERATIONAL**: Real-time status monitoring with 10-second polling intervals, bilingual toast notifications ready for status changes
-- ✅ **CACHE-BUSTING BREAKTHROUGH**: Resolved persistent 304 cached response issue by implementing aggressive cache-busting with timestamp parameters in queryClient (August 8, 2025)
-- ✅ **REAL-TIME DATA UPDATES**: Dashboard now receives fresh 200 responses instead of cached 304s, enabling proper status change detection for notifications
+This is a video transcription service application built with a full-stack TypeScript architecture. The application allows users to submit video URLs for transcription, operating on a freemium model that offers 3 free transcriptions before requiring a paid subscription. It integrates with both Stripe and PayPal for payment processing and features a modern React frontend. The project's ambition is to provide an efficient and reliable video transcription solution, with a focus on user experience and flexible deployment.
 
 # User Preferences
 
@@ -87,42 +10,51 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 # System Architecture
 
 ## Frontend Architecture
-- **React with TypeScript**: Single-page application using Vite as the build tool
-- **UI Framework**: shadcn/ui components built on Radix UI primitives with Tailwind CSS for styling
-- **Routing**: Wouter for client-side routing with pages for home, checkout, and subscription
-- **State Management**: TanStack Query for server state management and local storage hooks for client state
-- **Forms**: React Hook Form with Zod validation schemas
-- **Payment Integration**: Stripe Elements for subscription payments and custom PayPal button component
+- **Technology Stack**: React with TypeScript, using Vite as the build tool.
+- **UI/UX**: Utilizes `shadcn/ui` components built on Radix UI primitives, styled with Tailwind CSS.
+- **Routing**: Client-side routing handled by Wouter for pages such as home, checkout, and subscription.
+- **State Management**: TanStack Query for server state management and local storage hooks for client state.
+- **Forms**: React Hook Form with Zod validation schemas.
+- **Payment UI**: Integrates Stripe Elements and a custom PayPal button component.
 
 ## Backend Architecture
-- **Express.js Server**: RESTful API with TypeScript, featuring request logging middleware and error handling
-- **Development Setup**: Vite dev server integration for hot module replacement in development
-- **Payment Processing**: Dual payment provider support with Stripe for subscriptions and PayPal for one-time payments
-- **Session Management**: Express sessions with PostgreSQL session store using connect-pg-simple
+- **Server**: Express.js with TypeScript, incorporating request logging middleware and robust error handling.
+- **Development Workflow**: Vite dev server integration for hot module replacement.
+- **Payment Processing**: Supports both Stripe for subscriptions and PayPal for one-time payments.
+- **Session Management**: Express sessions with PostgreSQL session store (`connect-pg-simple`).
+- **Transcription Logic**: All transcription logic is moved to the backend for enhanced security.
+- **Asynchronous Processing**: Implements an asynchronous transcription system using AWS SQS for queuing, with a secure webhook for receiving processed transcriptions.
+- **Video Title Extraction**: Intelligent title extraction for YouTube, Vimeo, and generic URLs.
+- **Dockerization**: Comprehensive Docker setup for both development and production environments, including PostgreSQL integration and health check endpoints.
 
 ## Data Layer
-- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
-- **Schema Design**: Users table with subscription tracking and transcriptions table for storing processing results
-- **Storage Interface**: Abstracted storage layer with in-memory implementation for development and database implementation for production
-- **Database Provider**: Neon Database serverless PostgreSQL
+- **Database**: PostgreSQL, with Drizzle ORM for type-safe operations.
+- **Schema Design**: Includes `Users` table for subscription tracking and `Transcriptions` table for storing processing results, including video title and status.
+- **Storage Interface**: Abstracted storage layer, with a database implementation for production.
+- **Database Provider**: AWS RDS PostgreSQL.
 
-## External Dependencies
+## System Design Choices
+- **Two-Step Transcription**: A workflow that first validates the URL, then processes the transcription.
+- **Authentication**: Robust authentication middleware and API endpoints with seamless session continuation via automatic access token refresh.
+- **Real-Time Updates**: Intelligent polling system with variable intervals (5-10 seconds) for real-time dashboard updates, coupled with a bilingual toast notification system for status changes. Aggressive client-side cache busting ensures fresh data.
+- **Multi-language Support**: Comprehensive bilingual support for UI elements, password reset flow, and notifications.
+- **Freemium Model Enforcement**: Usage tracking to enforce the 3-free-transcription limit.
+- **Deployment**: Optimized for GitHub Pages with custom domain configuration.
+
+# External Dependencies
 
 ### Payment Providers
-- **Stripe**: Subscription management, payment intents, and customer billing
-- **PayPal**: Alternative payment option using PayPal Server SDK with sandbox/production environment switching
+- **Stripe**: For subscription management, payment intents, and customer billing.
+- **PayPal**: For alternative one-time payment options, utilizing the PayPal Server SDK.
 
 ### Database & Infrastructure
-- **Neon Database**: Serverless PostgreSQL hosting with connection pooling
-- **Drizzle ORM**: Type-safe database queries with automatic migration generation
+- **AWS RDS PostgreSQL**: For managed PostgreSQL database hosting.
+- **Drizzle ORM**: For type-safe database queries.
 
 ### External APIs & Queue System
-- **Python Transcription Service**: External API endpoint for video transcription processing (configured via VITE_PYTHON_API_URL)
-- **AWS SQS Integration**: Message queue system for asynchronous transcription processing with SqsService class handling queue operations
-- **Webhook Processing**: Secure webhook endpoint (/api/webhook/transcription-result) for receiving completed transcriptions from external service
+- **Python Transcription Service**: An external API endpoint responsible for video transcription processing.
+- **AWS SQS**: Utilized for asynchronous message queuing to manage transcription requests.
+- **oEmbed API**: Used for extracting real YouTube video titles.
 
 ### Development Tools
-- **Replit Integration**: Development environment detection and runtime error overlay
-- **Vite Plugins**: React support, runtime error modal, and cartographer for Replit environment
-
-The architecture follows a separation of concerns with shared TypeScript schemas between frontend and backend, enabling type safety across the full stack. The payment system supports both subscription and one-time payment models, with usage tracking to enforce the freemium limitations.
+- **Replit Integration**: For development environment detection and runtime error display.
