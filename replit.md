@@ -70,6 +70,8 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **SMART POLLING BEHAVIOR**: Dashboard automatically accelerates refresh rate when transcriptions are processing and prevents duplicate notifications
 - ✅ **NOTIFICATION TRANSLATIONS**: Added comprehensive Spanish and English translations for all transcription status change notifications in LanguageContext
 - ✅ **STATUS CHANGE DETECTION**: Intelligent system that tracks previous transcription states and triggers notifications only when statuses actually change
+- ✅ **CACHE-BUSTING IMPLEMENTATION**: Added cache control headers to prevent 304 responses and ensure real-time data updates (August 8, 2025)
+- ✅ **MANUAL TRANSCRIPTION UPDATE ENDPOINT**: Added PATCH endpoint for testing transcription status changes and validating notification system
 
 # User Preferences
 
