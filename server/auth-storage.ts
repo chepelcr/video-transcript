@@ -217,29 +217,85 @@ export class AuthStorage {
   // Update transcription  
   async updateTranscription(id: string, updates: Partial<Transcription>): Promise<Transcription | null> {
     try {
-      console.log('Updating transcription with:', { id, updates });
+      console.log('🔄 Updating transcription:', { id: id.substring(0,8) + '...', updates });
       
-      // Simple direct SQL update for status
-      if (updates.status && Object.keys(updates).length === 1) {
-        const result = await db.execute(sql`
-          UPDATE transcriptions 
-          SET status = ${updates.status}
-          WHERE id = ${id} 
-          RETURNING *
-        `);
-        console.log('SQL update result:', result);
-        return result.rows[0] as Transcription || null;
+      // Convert frontend field names to database column names using exact schema field names
+      const dbUpdates: any = {};
+      
+      if (updates.status !== undefined) {
+        dbUpdates.status = updates.status;
+      }
+      if (updates.transcript !== undefined) {
+        dbUpdates.transcript = updates.transcript;
+      }
+      if (updates.duration !== undefined) {
+        dbUpdates.duration = updates.duration;
+      }
+      if (updates.wordCount !== undefined) {
+        dbUpdates.wordCount = updates.wordCount; // Maps to word_count in schema
+      }
+      if (updates.accuracy !== undefined) {
+        dbUpdates.accuracy = updates.accuracy;
+      }
+      if (updates.processingTime !== undefined) {
+        dbUpdates.processingTime = updates.processingTime; // Maps to processing_time in schema
       }
       
-      // For multiple fields, use Drizzle ORM
-      const [transcription] = await db
-        .update(transcriptions)
-        .set(updates)
-        .where(eq(transcriptions.id, id))
-        .returning();
-      return transcription || null;
+      if (Object.keys(dbUpdates).length === 0) {
+        console.log('❌ No valid update fields provided');
+        return null;
+      }
+      
+      console.log('🔄 Using Drizzle ORM update with:', dbUpdates);
+      console.log('🔄 Updating transcription ID:', id);
+      
+      try {
+        // Execute the update without .returning() to avoid Drizzle issues
+        await db
+          .update(transcriptions)
+          .set(dbUpdates)
+          .where(eq(transcriptions.id, id));
+        
+        console.log('✅ Drizzle update executed successfully');
+        
+        // Fetch the updated record separately using raw SQL with proper field mapping
+        const result = await db.execute(sql`
+          SELECT id, user_id as "userId", video_url as "videoUrl", video_title as "videoTitle", 
+                 transcript, status, duration, word_count as "wordCount", 
+                 processing_time as "processingTime", accuracy, created_at as "createdAt"
+          FROM transcriptions 
+          WHERE id = ${id}
+        `);
+        
+        const updatedTranscription = result.rows[0] as Transcription;
+        
+        if (updatedTranscription) {
+          console.log(`✅ Transcription ${id.substring(0,8)}... updated successfully to status: ${updatedTranscription.status}`);
+          console.log('✅ Updated data keys:', Object.keys(updatedTranscription));
+          console.log('✅ Status field debug:', {
+            statusValue: updatedTranscription.status,
+            statusType: typeof updatedTranscription.status,
+            hasStatusKey: 'status' in updatedTranscription,
+            allFieldsDebug: updatedTranscription
+          });
+          
+          // Force the status if it's still undefined
+          if (!updatedTranscription.status && dbUpdates.status) {
+            console.log('🔧 Forcing status from dbUpdates since fetch returned undefined');
+            updatedTranscription.status = dbUpdates.status;
+          }
+          
+          return updatedTranscription;
+        } else {
+          console.log(`❌ No transcription found with ID: ${id}`);
+          return null;
+        }
+      } catch (drizzleError) {
+        console.error('❌ Drizzle update error:', drizzleError);
+        throw drizzleError;
+      }
     } catch (error) {
-      console.error('Update transcription error:', error);
+      console.error('❌ Update transcription error:', error);
       throw error;
     }
   }
