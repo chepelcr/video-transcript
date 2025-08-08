@@ -31,7 +31,6 @@ Go to your repository Settings > Secrets and variables > Actions, and add:
 
 ```
 VITE_STRIPE_PUBLIC_KEY=pk_test_...
-VITE_PYTHON_API_URL=https://your-python-api.com
 VITE_API_BASE_URL=https://your-replit-app.replit.app
 ```
 

@@ -32,7 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   // Setup authentication routes
-  setupAuthRoutes(app);
+   setupAuthRoutes(app);
   // PayPal routes
   app.get("/api/paypal/setup", async (req, res) => {
     await loadPaypalDefault(req, res);
@@ -349,12 +349,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: "completed",
         } as any);
 
-        console.log(`Updated transcription result:`, updatedTranscription);
+          console.log(`Updated transcription result:`, updatedTranscription);
 
-        // Increment user's transcription count
-        await authStorage.incrementUserTranscriptions(transcription.userId);
+          // Increment user's transcription count
+          await authStorage.incrementUserTranscriptions(transcription.userId);
 
-        console.log(`Transcription ${id} completed successfully`);
+          console.log(`Transcription ${id} completed successfully`);
       } else {
         // Update transcription as failed
         await authStorage.updateTranscription(id, {
@@ -498,85 +498,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Debug endpoint error:", error);
       res.status(500).json({ error: "Debug failed" });
-    }
-  });
-
-  app.post("/api/test/complete-me-at-zoo", async (req, res) => {
-    try {
-      console.log(
-        "🧪 Testing notification system by completing Me at the zoo transcription...",
-      );
-
-      // Find the Me at the zoo transcription by video title
-      const result = await authStorage.getUserTranscriptions(
-        "755c862b-c14a-41d2-994b-ac62cf1a2cb2",
-      );
-      const meAtZooTranscription = result.transcriptions.find(
-        (t) =>
-          t.videoTitle?.toLowerCase().includes("zoo") ||
-          t.videoTitle?.toLowerCase().includes("me at") ||
-          (t.status === "processing" &&
-            t.id !== "04525290-f901-4b67-b816-4c8864c13c5b"), // Skip El Trapo
-      );
-
-      if (!meAtZooTranscription) {
-        return res.json({
-          error:
-            "Me at the zoo transcription not found or no processing transcriptions available",
-        });
-      }
-
-      console.log(
-        `Found transcription: ${meAtZooTranscription.id} - ${(meAtZooTranscription as any).videoTitle}`,
-      );
-
-      // Update it to completed status with English content
-      const updates = {
-        status: "completed",
-        transcript:
-          "Hello! This is the completed transcription of \"Me at the zoo\". All right, so here we are in front of the elephants, and the cool thing about these guys is that they have really, really, really long trunks, and that's, that's cool. And that's pretty much all there is to say.",
-        duration: 19,
-        wordCount: 52,
-        accuracy: 98.2,
-        processingTime: 8.7,
-      };
-
-      const updatedTranscription = await authStorage.updateTranscription(
-        meAtZooTranscription.id,
-        updates,
-      );
-
-      console.log(
-        `✅ Transcription updated to completed! ID: ${meAtZooTranscription.id}`,
-      );
-      console.log("📢 Dashboard should show notification within 10 seconds...");
-
-      // Force cache refresh by logging the updated transcription data
-      console.log(
-        "Updated transcription data:",
-        JSON.stringify(
-          {
-            id: updatedTranscription?.id,
-            videoTitle: (updatedTranscription as any)?.videoTitle,
-            status: (updatedTranscription as any)?.status,
-            transcript:
-              (updatedTranscription as any)?.transcript?.substring(0, 100) +
-              "...",
-          },
-          null,
-          2,
-        ),
-      );
-
-      res.json({
-        success: true,
-        transcription: updatedTranscription,
-        message:
-          "Me at the zoo transcription completed - check dashboard for notification!",
-      });
-    } catch (error) {
-      console.error("Error in test endpoint:", error);
-      res.status(500).json({ error: "Test failed" });
     }
   });
 

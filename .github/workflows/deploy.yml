@@ -71,7 +71,6 @@ jobs:
         head -20 dist/gh-pages/404.html | grep pathSegmentsToKeep
       env:
         VITE_STRIPE_PUBLIC_KEY: ${{ secrets.VITE_STRIPE_PUBLIC_KEY }}
-        VITE_PYTHON_API_URL: ${{ secrets.VITE_PYTHON_API_URL }}
         VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
         NODE_ENV: production
         

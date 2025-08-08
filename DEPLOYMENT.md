@@ -1,4 +1,4 @@
-# GitHub Pages Deployment Guide - Custom Domain
+s# GitHub Pages Deployment Guide - Custom Domain
 
 ## Overview
 The application is configured for deployment to a custom subdomain: `https://video-transcript.jcampos.dev`
