@@ -76,6 +76,8 @@ This is a video transcription service application built with a full-stack TypeSc
 - ✅ **REAL-TIME DATA POLLING CONFIRMED**: Dashboard now successfully fetches fresh data every 10 seconds with 200 responses instead of cached 304s
 - ✅ **DASHBOARD LOADING STATE FIXED**: Resolved URL path corruption issue where random numbers were incorrectly appended to API endpoints (August 8, 2025)
 - ✅ **NOTIFICATION SYSTEM FULLY OPERATIONAL**: Real-time status monitoring with 10-second polling intervals, bilingual toast notifications ready for status changes
+- ✅ **CACHE-BUSTING BREAKTHROUGH**: Resolved persistent 304 cached response issue by implementing aggressive cache-busting with timestamp parameters in queryClient (August 8, 2025)
+- ✅ **REAL-TIME DATA UPDATES**: Dashboard now receives fresh 200 responses instead of cached 304s, enabling proper status change detection for notifications
 
 # User Preferences
 
