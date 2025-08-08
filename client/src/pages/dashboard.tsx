@@ -1,25 +1,30 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useLocation } from 'wouter';
-import { useEffect, useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useLocation } from "wouter";
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-import { Icons } from '@/components/ui/icons';
+import { Icons } from "@/components/ui/icons";
 // import { ThemeToggle } from '@/components/ThemeToggle';
 // import { LanguageToggle } from '@/components/LanguageToggle';
-import { SiYoutube, SiVimeo } from 'react-icons/si';
-
+import { SiYoutube, SiVimeo } from "react-icons/si";
 
 interface Transcription {
   id: string;
@@ -47,8 +52,10 @@ export default function Dashboard() {
   const { t, language } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [previousTranscriptions, setPreviousTranscriptions] = useState<Transcription[]>([]);
-  const [videoUrl, setVideoUrl] = useState('');
+  const [previousTranscriptions, setPreviousTranscriptions] = useState<
+    Transcription[]
+  >([]);
+  const [videoUrl, setVideoUrl] = useState("");
   const [isTranscribing, setIsTranscribing] = useState(false);
 
   // Calculate limit status early
@@ -60,25 +67,31 @@ export default function Dashboard() {
   const getVideoTitle = (url: string) => {
     try {
       const urlObj = new URL(url);
-      if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
-        return 'YouTube Video';
+      if (
+        urlObj.hostname.includes("youtube.com") ||
+        urlObj.hostname.includes("youtu.be")
+      ) {
+        return "YouTube Video";
       }
-      if (urlObj.hostname.includes('vimeo.com')) {
-        return 'Vimeo Video';
+      if (urlObj.hostname.includes("vimeo.com")) {
+        return "Vimeo Video";
       }
       return urlObj.hostname;
     } catch {
-      return 'Video';
+      return "Video";
     }
   };
 
   const getVideoProviderIcon = (url: string) => {
     try {
       const urlObj = new URL(url);
-      if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+      if (
+        urlObj.hostname.includes("youtube.com") ||
+        urlObj.hostname.includes("youtu.be")
+      ) {
         return <SiYoutube className="h-4 w-4 text-red-600 flex-shrink-0" />;
       }
-      if (urlObj.hostname.includes('vimeo.com')) {
+      if (urlObj.hostname.includes("vimeo.com")) {
         return <SiVimeo className="h-4 w-4 text-blue-500 flex-shrink-0" />;
       }
       return <Icons.fileText className="h-4 w-4 text-gray-500 flex-shrink-0" />;
@@ -100,81 +113,103 @@ export default function Dashboard() {
     isFetching,
     refetch: refetchTranscriptions,
   } = useQuery<TranscriptionHistoryResponse>({
-    queryKey: ['/api/users/transcriptions'], // Use normal queryKey structure
+    queryKey: ["/api/users/transcriptions"], // Use normal queryKey structure
     enabled: isAuthenticated && !authLoading,
     retry: (failureCount, error) => {
       // Don't retry on authentication errors
-      if (error && error.message && error.message.includes('401')) {
+      if (error && error.message && error.message.includes("401")) {
         return false;
       }
       return failureCount < 3;
     },
     refetchInterval: (data: any) => {
       // Auto-refresh every 5 seconds if there are processing transcriptions
-      const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing' || t.status === 'pending');
+      const hasProcessing = data?.transcriptions?.some(
+        (t: Transcription) =>
+          t.status === "processing" || t.status === "pending",
+      );
       return hasProcessing ? 5000 : 10000; // Poll every 10 seconds for demonstration
     },
     staleTime: 0, // Always consider data stale
     gcTime: 0, // Don't cache
     refetchOnMount: true,
     refetchOnWindowFocus: true,
-    networkMode: 'always', // Always fetch from network
+    networkMode: "always", // Always fetch from network
     refetchOnReconnect: true,
   });
 
   // Monitor for status changes and show notifications
   useEffect(() => {
-    console.log('Notification effect triggered:', {
+    console.log("Notification effect triggered:", {
       hasData: !!transcriptionData?.transcriptions,
       currentCount: transcriptionData?.transcriptions?.length || 0,
-      previousCount: previousTranscriptions.length
+      previousCount: previousTranscriptions.length,
     });
 
     if (!transcriptionData?.transcriptions) return;
 
     const currentTranscriptions = transcriptionData.transcriptions;
-    
+
     // If we have previous transcriptions, check for status changes
     if (previousTranscriptions.length > 0) {
-      console.log('Checking for status changes...');
-      currentTranscriptions.forEach(current => {
-        const previous = previousTranscriptions.find(p => p.id === current.id);
-        
+      console.log("Checking for status changes...");
+      currentTranscriptions.forEach((current) => {
+        const previous = previousTranscriptions.find(
+          (p) => p.id === current.id,
+        );
+
         if (previous && previous.status !== current.status) {
-          console.log(`🔔 STATUS CHANGE DETECTED: ${current.id.substring(0,8)}... changed from ${previous.status} to ${current.status}`);
-          console.log('Video title:', current.videoTitle);
-          
+          console.log(
+            `🔔 STATUS CHANGE DETECTED: ${current.id.substring(0, 8)}... changed from ${previous.status} to ${current.status}`,
+          );
+          console.log("Video title:", current.videoTitle);
+
           // Status changed - show notification
-          if (current.status === 'completed') {
-            console.log('Showing completion notification...');
+          if (current.status === "completed") {
+            console.log("Showing completion notification...");
             toast({
-              title: t('notifications.completed.title'),
-              description: t('notifications.completed.description').replace('{{title}}', current.videoTitle || getVideoTitle(current.videoUrl)),
-              variant: 'default',
+              title: t("notifications.completed.title"),
+              description: t("notifications.completed.description").replace(
+                "{{title}}",
+                current.videoTitle || getVideoTitle(current.videoUrl),
+              ),
+              variant: "default",
             });
-          } else if (current.status === 'failed') {
-            console.log('Showing failure notification...');
+          } else if (current.status === "failed") {
+            console.log("Showing failure notification...");
             toast({
-              title: t('notifications.failed.title'),
-              description: t('notifications.failed.description').replace('{{title}}', current.videoTitle || getVideoTitle(current.videoUrl)),
-              variant: 'destructive',
+              title: t("notifications.failed.title"),
+              description: t("notifications.failed.description").replace(
+                "{{title}}",
+                current.videoTitle || getVideoTitle(current.videoUrl),
+              ),
+              variant: "destructive",
             });
-          } else if (current.status === 'processing') {
-            console.log('Showing processing notification...');
+          } else if (current.status === "processing") {
+            console.log("Showing processing notification...");
             toast({
-              title: t('notifications.processing.title'),
-              description: t('notifications.processing.description').replace('{{title}}', current.videoTitle || getVideoTitle(current.videoUrl)),
+              title: t("notifications.processing.title"),
+              description: t("notifications.processing.description").replace(
+                "{{title}}",
+                current.videoTitle || getVideoTitle(current.videoUrl),
+              ),
             });
           }
         }
       });
     } else {
-      console.log('No previous transcriptions to compare against');
+      console.log("No previous transcriptions to compare against");
     }
-    
+
     // Update previous transcriptions for next comparison
     setPreviousTranscriptions(currentTranscriptions);
-  }, [transcriptionData?.transcriptions, previousTranscriptions, toast, t, getVideoTitle]);
+  }, [
+    transcriptionData?.transcriptions,
+    previousTranscriptions,
+    toast,
+    t,
+    getVideoTitle,
+  ]);
 
   const handleLogout = async () => {
     await logout();
@@ -183,76 +218,117 @@ export default function Dashboard() {
 
   const handleTranscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!videoUrl.trim()) {
       toast({
-        title: t('messages.error'),
-        description: t('messages.enterUrl'),
-        variant: 'destructive',
+        title: t("messages.error"),
+        description: t("messages.enterUrl"),
+        variant: "destructive",
       });
       return;
     }
 
     if (isLimitReached && !user?.isPro) {
       toast({
-        title: t('messages.error'),
-        description: t('messages.limitReached'),
-        variant: 'destructive',
+        title: t("messages.error"),
+        description: t("messages.limitReached"),
+        variant: "destructive",
       });
       return;
     }
 
     setIsTranscribing(true);
-    
+
     try {
       // Create transcription record and queue for processing
-      const createResponse = await apiRequest('POST', '/api/transcriptions/create', {
-        videoUrl: videoUrl.trim(),
-      });
+      const createResponse = await apiRequest(
+        "POST",
+        "/api/transcriptions/create",
+        {
+          videoUrl: videoUrl.trim(),
+        },
+      );
 
       const responseData = await createResponse.json();
 
       toast({
-        title: t('transcription.queued.title'),
-        description: t('transcription.queued.description').replace('{{title}}', responseData.videoTitle || videoUrl.trim()),
+        title: t("transcription.queued.title"),
+        description: t("transcription.queued.description").replace(
+          "{{title}}",
+          responseData.videoTitle || videoUrl.trim(),
+        ),
       });
 
       // Clear form and refresh data
-      setVideoUrl('');
-      queryClient.invalidateQueries({ queryKey: ['/api/users/transcriptions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-
+      setVideoUrl("");
+      queryClient.invalidateQueries({
+        queryKey: ["/api/users/transcriptions"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
     } catch (error: any) {
-      console.error('Transcription creation error:', error);
+      console.error("Transcription creation error:", error);
       toast({
-        title: t('transcription.error.title'),
-        description: error.message || t('transcription.error.description'),
-        variant: 'destructive',
+        title: t("transcription.error.title"),
+        description: error.message || t("transcription.error.description"),
+        variant: "destructive",
       });
     } finally {
       setIsTranscribing(false);
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, transcript: string) => {
+    status = transcript ? "completed" : status;
     switch (status) {
-      case 'completed':
-        return <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white text-xs">{t('status.completed')}</Badge>;
-      case 'processing':
-        return <Badge variant="default" className="bg-orange-500 hover:bg-orange-600 text-white text-xs">{t('status.processing')}</Badge>;
-      case 'failed':
-        return <Badge variant="destructive" className="text-xs">{t('status.failed')}</Badge>;
-      case 'pending':
-        return <Badge variant="secondary" className="bg-gray-500 hover:bg-gray-600 text-white text-xs">{t('status.pending')}</Badge>;
+      case "completed":
+        return (
+          <Badge
+            variant="default"
+            className="bg-green-600 hover:bg-green-700 text-white text-xs"
+          >
+            {t("status.completed")}
+          </Badge>
+        );
+      case "processing":
+        return (
+          <Badge
+            variant="default"
+            className="bg-orange-500 hover:bg-orange-600 text-white text-xs"
+          >
+            {t("status.processing")}
+          </Badge>
+        );
+      case "failed":
+        return (
+          <Badge variant="destructive" className="text-xs">
+            {t("status.failed")}
+          </Badge>
+        );
+      case "pending":
+        return (
+          <Badge
+            variant="secondary"
+            className="bg-gray-500 hover:bg-gray-600 text-white text-xs"
+          >
+            {t("status.pending")}
+          </Badge>
+        );
       default:
-        return <Badge variant="secondary" className="text-xs">{status}</Badge>;
+        return (
+          <Badge variant="secondary" className="text-xs">
+            {status}
+          </Badge>
+        );
     }
   };
 
   if (authLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" aria-label="Loading"/>
+        <div
+          className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"
+          aria-label="Loading"
+        />
       </div>
     );
   }
@@ -266,21 +342,31 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <h1 className="text-xl md:text-2xl font-bold text-primary">VideoScript</h1>
+              <h1 className="text-xl md:text-2xl font-bold text-primary">
+                VideoScript
+              </h1>
             </div>
-            
+
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-3">
               {/* <ThemeToggle />
               <LanguageToggle /> */}
-              <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/profile`)}>
-                {t('profile.editProfile')}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/${language}/profile`)}
+              >
+                {t("profile.editProfile")}
               </Button>
-              <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/`)}>
-                {t('common.backToHome')}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/${language}/`)}
+              >
+                {t("common.backToHome")}
               </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
-                {t('common.logout')}
+                {t("common.logout")}
               </Button>
             </div>
 
@@ -288,10 +374,18 @@ export default function Dashboard() {
             <div className="lg:hidden flex items-center gap-1">
               {/* <ThemeToggle />
               <LanguageToggle /> */}
-              <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/profile`)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/${language}/profile`)}
+              >
                 <Icons.user className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => navigate(`/${language}/`)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/${language}/`)}
+              >
                 <Icons.home className="h-4 w-4" />
               </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -306,10 +400,13 @@ export default function Dashboard() {
         {/* Welcome Header */}
         <div className="mb-6 md:mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {t('dashboard.welcomeBack').replace('{{name}}', user?.username || '')}
+            {t("dashboard.welcomeBack").replace(
+              "{{name}}",
+              user?.username || "",
+            )}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            {t('dashboard.description')}
+            {t("dashboard.description")}
           </p>
         </div>
 
@@ -318,57 +415,58 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Icons.fileText className="h-5 w-5" />
-              {t('transcription.newTranscription')}
+              {t("transcription.newTranscription")}
             </CardTitle>
             <CardDescription>
-              {t('transcription.enterVideoUrl')}
+              {t("transcription.enterVideoUrl")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {isLimitReached && (
               <Alert className="mb-4">
                 <AlertDescription>
-                  {t('dashboard.dailyLimitReached')}
+                  {t("dashboard.dailyLimitReached")}
                 </AlertDescription>
               </Alert>
             )}
-            
+
             <form onSubmit={handleTranscribe} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="videoUrl">{t('transcription.videoUrl')}</Label>
+                <Label htmlFor="videoUrl">{t("transcription.videoUrl")}</Label>
                 <Input
                   id="videoUrl"
                   type="url"
-                  placeholder={t('transcription.videoUrlPlaceholder')}
+                  placeholder={t("transcription.videoUrlPlaceholder")}
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
                   disabled={isTranscribing || isLimitReached}
                   className="w-full"
                 />
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('dashboard.dailyUsage')}: {dailyUsage} / {user?.isPro ? '∞' : dailyLimit}
+                  {t("dashboard.dailyUsage")}: {dailyUsage} /{" "}
+                  {user?.isPro ? "∞" : dailyLimit}
                 </div>
-                
+
                 <div className="flex gap-2">
                   <Button
                     type="submit"
-                    disabled={!videoUrl.trim() || isTranscribing || isLimitReached}
+                    disabled={
+                      !videoUrl.trim() || isTranscribing || isLimitReached
+                    }
                     className="flex-1 sm:flex-none"
                   >
                     {isTranscribing ? (
                       <>
                         <Icons.spinner className="h-4 w-4 animate-spin mr-2" />
-                        {t('transcription.processing')}
+                        {t("transcription.processing")}
                       </>
                     ) : (
-                      t('hero.transcribe')
+                      t("hero.transcribe")
                     )}
                   </Button>
-                  
-
                 </div>
               </div>
             </form>
@@ -382,40 +480,50 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Icons.user className="h-5 w-5" />
-                  {t('dashboard.accountOverview')}
+                  {t("dashboard.accountOverview")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.plan')}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {t("dashboard.plan")}
+                  </p>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      {t('dashboard.free')}
-                    </Badge>
+                    <Badge variant="secondary">{t("dashboard.free")}</Badge>
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.dailyUsage')}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {t("dashboard.dailyUsage")}
+                  </p>
                   <p className="text-lg font-semibold">
                     {dailyUsage} / {dailyLimit}
                   </p>
                   {isLimitReached && (
                     <p className="text-sm text-red-600 dark:text-red-400">
-                      {t('dashboard.dailyLimitReached')}
+                      {t("dashboard.dailyLimitReached")}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.totalTranscriptions')}</p>
-                  <p className="text-lg font-semibold">{transcriptions.length}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {t("dashboard.totalTranscriptions")}
+                  </p>
+                  <p className="text-lg font-semibold">
+                    {transcriptions.length}
+                  </p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.memberSince')}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {t("dashboard.memberSince")}
+                  </p>
                   <p className="text-sm">
-                    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                    {user?.createdAt
+                      ? new Date(user.createdAt).toLocaleDateString()
+                      : "N/A"}
                   </p>
                 </div>
               </CardContent>
@@ -429,21 +537,21 @@ export default function Dashboard() {
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     <Icons.fileText className="h-5 w-5" />
-                    {t('history.title')}
+                    {t("history.title")}
                   </CardTitle>
                   <CardDescription>
-                    {t('history.empty.description')}
+                    {t("history.empty.description")}
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => refetchTranscriptions()}
                     disabled={transcriptionsLoading || isFetching}
                   >
                     <Icons.refresh className="h-4 w-4 mr-1" />
-                    {t('common.refresh')}
+                    {t("common.refresh")}
                   </Button>
                   {(transcriptionsLoading || isFetching) && (
                     <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />
@@ -459,25 +567,29 @@ export default function Dashboard() {
                   <div className="text-center py-8">
                     <Icons.fileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600 dark:text-gray-400">
-                      {t('history.empty')}
+                      {t("history.empty")}
                     </p>
                     <Button
                       className="mt-4"
                       onClick={() => navigate(`/${language}/`)}
                     >
-                      {t('hero.transcribe')}
+                      {t("hero.transcribe")}
                     </Button>
                   </div>
                 ) : (
                   <ScrollArea className="h-96">
                     <div className="space-y-3">
                       {transcriptions.map((transcription, index) => (
-                        <div key={transcription.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+                        <div
+                          key={transcription.id}
+                          className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800"
+                        >
                           {/* Video Title Row */}
                           <div className="flex items-center gap-2 min-w-0 mb-3">
                             {getVideoProviderIcon(transcription.videoUrl)}
                             <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate flex-1 min-w-0">
-                              {transcription.videoTitle || getVideoTitle(transcription.videoUrl)}
+                              {transcription.videoTitle ||
+                                getVideoTitle(transcription.videoUrl)}
                             </h4>
                           </div>
 
@@ -489,40 +601,52 @@ export default function Dashboard() {
                                 {transcription.duration}s
                               </div>
                             )}
-                            {transcription.status === 'completed' && transcription.wordCount && (
-                              <div className="flex items-center gap-1">
-                                <Icons.barChart className="h-3 w-3" />
-                                {transcription.wordCount} {t('history.words')}
-                              </div>
-                            )}
+                            {transcription.status === "completed" &&
+                              transcription.wordCount && (
+                                <div className="flex items-center gap-1">
+                                  <Icons.barChart className="h-3 w-3" />
+                                  {transcription.wordCount} {t("history.words")}
+                                </div>
+                              )}
                           </div>
 
                           {/* Transcript Preview or Status */}
-                          {transcription.status === 'completed' && transcription.transcript && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
-                              {transcription.transcript}
-                            </p>
-                          )}
-                          {transcription.status === 'processing' && (
-                            <p className="text-sm text-yellow-600 dark:text-yellow-400 italic mb-3">
-                              Your transcription is being processed. This may take a few minutes...
-                            </p>
-                          )}
-                          {transcription.status === 'failed' && (
+                          {transcription.transcript ||
+                            (transcription.status === "completed" && (
+                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
+                                {transcription.transcript}
+                              </p>
+                            ))}
+                          {!transcription.transcript &&
+                            transcription.status === "processing" && (
+                              <p className="text-sm text-yellow-600 dark:text-yellow-400 italic mb-3">
+                                Your transcription is being processed. This may
+                                take a few minutes...
+                              </p>
+                            )}
+                          {transcription.status === "failed" && (
                             <p className="text-sm text-red-600 dark:text-red-400 italic mb-3">
-                              Transcription failed. Please try again with a different video.
+                              Transcription failed. Please try again with a
+                              different video.
                             </p>
                           )}
 
                           {/* Status Badge and Action Buttons Row */}
                           <div className="flex items-center justify-between">
                             <div className="flex gap-1 flex-wrap">
-                              {getStatusBadge(transcription.status)}
-                              {transcription.status === 'completed' && transcription.accuracy && (
-                                <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                                  {Math.round(transcription.accuracy)}%
-                                </Badge>
+                              {getStatusBadge(
+                                transcription.status,
+                                transcription.transcript
                               )}
+                              {transcription.status === "completed" &&
+                                transcription.accuracy && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs whitespace-nowrap"
+                                  >
+                                    {Math.round(transcription.accuracy)}%
+                                  </Badge>
+                                )}
                             </div>
                             <div className="flex gap-1">
                               <Button
@@ -530,16 +654,22 @@ export default function Dashboard() {
                                 size="sm"
                                 onClick={() => {
                                   if (transcription.transcript) {
-                                    navigator.clipboard.writeText(transcription.transcript);
+                                    navigator.clipboard.writeText(
+                                      transcription.transcript,
+                                    );
                                     toast({
-                                      title: t('messages.success'),
-                                      description: t('history.copied'),
+                                      title: t("messages.success"),
+                                      description: t("history.copied"),
                                     });
                                   }
                                 }}
-                                disabled={transcription.status !== 'completed' || !transcription.transcript}
+                                disabled={!transcription.transcript}
                                 className="h-8 w-8 p-0"
-                                title={transcription.status === 'completed' ? "Copy transcript" : "Transcript not ready"}
+                                title={
+                                  transcription.status === "completed"
+                                    ? "Copy transcript"
+                                    : "Transcript not ready"
+                                }
                               >
                                 <Icons.copy className="h-3 w-3" />
                               </Button>
@@ -548,18 +678,25 @@ export default function Dashboard() {
                                 size="sm"
                                 onClick={() => {
                                   if (transcription.transcript) {
-                                    const blob = new Blob([transcription.transcript], { type: 'text/plain' });
+                                    const blob = new Blob(
+                                      [transcription.transcript],
+                                      { type: "text/plain" },
+                                    );
                                     const url = URL.createObjectURL(blob);
-                                    const a = document.createElement('a');
+                                    const a = document.createElement("a");
                                     a.href = url;
                                     a.download = `transcription-${transcription.videoTitle || transcription.id}.txt`;
                                     a.click();
                                     URL.revokeObjectURL(url);
                                   }
                                 }}
-                                disabled={transcription.status !== 'completed' || !transcription.transcript}
+                                disabled={!transcription.transcript}
                                 className="h-8 w-8 p-0"
-                                title={transcription.status === 'completed' ? "Download transcript" : "Transcript not ready"}
+                                title={
+                                  transcription.status === "completed"
+                                    ? "Download transcript"
+                                    : "Transcript not ready"
+                                }
                               >
                                 <Icons.download className="h-3 w-3" />
                               </Button>
