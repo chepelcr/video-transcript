@@ -391,6 +391,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
+  // Test endpoint to trigger notification system (temporary for testing)
+  app.post('/api/test/complete-el-trapo', async (req, res) => {
+    try {
+      console.log('🧪 Testing notification system by completing El Trapo transcription...');
+      
+      // Find the El Trapo transcription by video title
+      const result = await authStorage.getUserTranscriptions('755c862b-c14a-41d2-994b-ac62cf1a2cb2');
+      const elTrapoTranscription = result.transcriptions.find(t => 
+        t.videoTitle?.includes('Trapo') || 
+        t.videoTitle?.includes('pan') ||
+        t.status === 'processing'
+      );
+      
+      if (!elTrapoTranscription) {
+        return res.json({ error: 'El Trapo transcription not found' });
+      }
+      
+      console.log(`Found transcription: ${elTrapoTranscription.id} - ${elTrapoTranscription.videoTitle}`);
+      
+      // Update it to completed status with Spanish content
+      const updates = {
+        status: 'completed',
+        transcript: '¡Hola! Esta es la transcripción completada de "El Trapo y el pan". La transcripción ha sido procesada exitosamente y ahora está lista para su visualización. El sistema de notificaciones debería mostrar una alerta en tiempo real.',
+        duration: 180,
+        wordCount: 42,
+        accuracy: 96.8,
+        processingTime: 25.3
+      };
+      
+      const updatedTranscription = await authStorage.updateTranscription(elTrapoTranscription.id, updates);
+      
+      console.log(`✅ Transcription updated to completed! ID: ${elTrapoTranscription.id}`);
+      console.log('📢 Dashboard should show notification within 10 seconds...');
+      
+      // Force cache refresh by logging the updated transcription data
+      console.log('Updated transcription data:', JSON.stringify({
+        id: updatedTranscription.id,
+        videoTitle: updatedTranscription.videoTitle,
+        status: updatedTranscription.status,
+        transcript: updatedTranscription.transcript?.substring(0, 100) + '...'
+      }, null, 2));
+      
+      res.json({ 
+        success: true, 
+        transcription: updatedTranscription,
+        message: 'El Trapo transcription completed - check dashboard for notification!'
+      });
+      
+    } catch (error) {
+      console.error('Error in test endpoint:', error);
+      res.status(500).json({ error: 'Test failed' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
