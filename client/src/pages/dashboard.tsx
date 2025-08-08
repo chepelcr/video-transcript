@@ -114,36 +114,49 @@ export default function Dashboard() {
       const hasProcessing = data?.transcriptions?.some((t: Transcription) => t.status === 'processing' || t.status === 'pending');
       return hasProcessing ? 5000 : 10000; // Poll every 10 seconds for demonstration
     },
+    staleTime: 0, // Always consider data stale
+    gcTime: 0, // Don't cache
   });
 
   // Monitor for status changes and show notifications
   useEffect(() => {
+    console.log('Notification effect triggered:', {
+      hasData: !!transcriptionData?.transcriptions,
+      currentCount: transcriptionData?.transcriptions?.length || 0,
+      previousCount: previousTranscriptions.length
+    });
+
     if (!transcriptionData?.transcriptions) return;
 
     const currentTranscriptions = transcriptionData.transcriptions;
     
     // If we have previous transcriptions, check for status changes
     if (previousTranscriptions.length > 0) {
+      console.log('Checking for status changes...');
       currentTranscriptions.forEach(current => {
         const previous = previousTranscriptions.find(p => p.id === current.id);
         
         if (previous && previous.status !== current.status) {
-          console.log(`Status change detected: ${current.id} changed from ${previous.status} to ${current.status}`);
+          console.log(`🔔 STATUS CHANGE DETECTED: ${current.id.substring(0,8)}... changed from ${previous.status} to ${current.status}`);
+          console.log('Video title:', current.videoTitle);
           
           // Status changed - show notification
           if (current.status === 'completed') {
+            console.log('Showing completion notification...');
             toast({
               title: t('notifications.completed.title'),
               description: t('notifications.completed.description').replace('{{title}}', current.videoTitle || getVideoTitle(current.videoUrl)),
               variant: 'default',
             });
           } else if (current.status === 'failed') {
+            console.log('Showing failure notification...');
             toast({
               title: t('notifications.failed.title'),
               description: t('notifications.failed.description').replace('{{title}}', current.videoTitle || getVideoTitle(current.videoUrl)),
               variant: 'destructive',
             });
           } else if (current.status === 'processing') {
+            console.log('Showing processing notification...');
             toast({
               title: t('notifications.processing.title'),
               description: t('notifications.processing.description').replace('{{title}}', current.videoTitle || getVideoTitle(current.videoUrl)),
@@ -151,6 +164,8 @@ export default function Dashboard() {
           }
         }
       });
+    } else {
+      console.log('No previous transcriptions to compare against');
     }
     
     // Update previous transcriptions for next comparison
