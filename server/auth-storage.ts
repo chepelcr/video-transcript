@@ -214,9 +214,24 @@ export class AuthStorage {
     return transcription || null;
   }
 
-  // Update transcription
+  // Update transcription  
   async updateTranscription(id: string, updates: Partial<Transcription>): Promise<Transcription | null> {
     try {
+      console.log('Updating transcription with:', { id, updates });
+      
+      // Simple direct SQL update for status
+      if (updates.status && Object.keys(updates).length === 1) {
+        const result = await db.execute(sql`
+          UPDATE transcriptions 
+          SET status = ${updates.status}
+          WHERE id = ${id} 
+          RETURNING *
+        `);
+        console.log('SQL update result:', result);
+        return result.rows[0] as Transcription || null;
+      }
+      
+      // For multiple fields, use Drizzle ORM
       const [transcription] = await db
         .update(transcriptions)
         .set(updates)

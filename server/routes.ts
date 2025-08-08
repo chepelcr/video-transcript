@@ -302,6 +302,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (success) {
         // Update transcription with successful results
+        console.log(`Updating transcription ${id} with status: completed`);
         const updatedTranscription = await authStorage.updateTranscription(id, {
           transcript: transcript || "",
           duration: duration || 0,
@@ -310,6 +311,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           accuracy: accuracy || 0,
           status: "completed",
         } as any);
+
+        console.log(`Updated transcription result:`, updatedTranscription);
 
         // Increment user's transcription count
         await authStorage.incrementUserTranscriptions(transcription.userId);
