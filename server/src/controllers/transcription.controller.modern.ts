@@ -5,15 +5,13 @@ import {
   updateTranscriptionSchema,
   TranscriptionStatus 
 } from '../models/transcription.model';
-import { AuthRequest } from '../types/auth.types';
-import { IAuthMiddleware } from '../middlewares/auth.middleware';
 import { apiGatewayMiddleware } from '../middlewares/api-gateway.middleware';
 
 export interface ITranscriptionController {
-  createTranscription(req: AuthRequest, res: Response): Promise<void>;
-  getTranscriptionById(req: AuthRequest, res: Response): Promise<void>;
-  getUserTranscriptions(req: AuthRequest, res: Response): Promise<void>;
-  updateTranscription(req: AuthRequest, res: Response): Promise<void>;
+  createTranscription(req: Request, res: Response): Promise<void>;
+  getTranscriptionById(req: Request, res: Response): Promise<void>;
+  getUserTranscriptions(req: Request, res: Response): Promise<void>;
+  updateTranscription(req: Request, res: Response): Promise<void>;
   getPublicTranscription(req: Request, res: Response): Promise<void>;
   handleWebhook(req: Request, res: Response): Promise<void>;
   getRouter(): Router;
@@ -23,8 +21,7 @@ export class TranscriptionController implements ITranscriptionController {
   private router: Router;
 
   constructor(
-    private transcriptionService: ITranscriptionService,
-    private authMiddleware: IAuthMiddleware
+    private transcriptionService: ITranscriptionService
   ) {
     this.router = Router();
     this.setupRoutes();
@@ -86,7 +83,6 @@ export class TranscriptionController implements ITranscriptionController {
     this.router.post(
       '/users/:userId/transcriptions',
       apiGatewayMiddleware,
-      this.authMiddleware.authenticate.bind(this.authMiddleware),
       this.createTranscription.bind(this)
     );
 
@@ -149,7 +145,6 @@ export class TranscriptionController implements ITranscriptionController {
     this.router.get(
       '/users/:userId/transcriptions',
       apiGatewayMiddleware,
-      this.authMiddleware.authenticate.bind(this.authMiddleware),
       this.getUserTranscriptions.bind(this)
     );
 
@@ -194,7 +189,6 @@ export class TranscriptionController implements ITranscriptionController {
     this.router.get(
       '/users/:userId/transcriptions/:id',
       apiGatewayMiddleware,
-      this.authMiddleware.authenticate.bind(this.authMiddleware),
       this.getTranscriptionById.bind(this)
     );
 
@@ -264,7 +258,6 @@ export class TranscriptionController implements ITranscriptionController {
     this.router.patch(
       '/users/:userId/transcriptions/:id',
       apiGatewayMiddleware,
-      this.authMiddleware.authenticate.bind(this.authMiddleware),
       this.updateTranscription.bind(this)
     );
 
@@ -389,14 +382,15 @@ export class TranscriptionController implements ITranscriptionController {
     );
   }
 
-  async createTranscription(req: AuthRequest, res: Response): Promise<void> {
+  async createTranscription(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.params.userId;
-      const authenticatedUserId = req.userId;
       
-      // Verify user can only create transcriptions for themselves
-      if (userId !== authenticatedUserId) {
-        res.status(403).json({ error: 'You can only create transcriptions for your own account' });
+      // AWS API Gateway handles authorization - user ID comes from validated context
+      console.log(`📝 Creating transcription for user: ${userId?.substring(0, 8)}... (AWS API Gateway authorized)`);
+      
+      if (!userId) {
+        res.status(400).json({ error: 'User ID is required' });
         return;
       }
 
@@ -445,20 +439,15 @@ export class TranscriptionController implements ITranscriptionController {
     }
   }
 
-  async getTranscriptionById(req: AuthRequest, res: Response): Promise<void> {
+  async getTranscriptionById(req: Request, res: Response): Promise<void> {
     try {
       const { userId, id } = req.params;
-      const authenticatedUserId = req.userId;
 
-      // Verify user can only access their own transcriptions
-      if (userId !== authenticatedUserId) {
-        res.status(403).json({ error: 'You can only access your own transcriptions' });
-        return;
-      }
+      // AWS API Gateway handles authorization
 
       console.log(`📝 Getting transcription ${id?.substring(0, 8)}... for user: ${userId?.substring(0, 8)}...`);
       
-      const transcription = await this.transcriptionService.getTranscriptionById(id!, userId!);
+      const transcription = await this.transcriptionService.getTranscription(id!);
       
       if (!transcription) {
         res.status(404).json({ error: 'Transcription not found' });
@@ -472,36 +461,24 @@ export class TranscriptionController implements ITranscriptionController {
     }
   }
 
-  async getUserTranscriptions(req: AuthRequest, res: Response): Promise<void> {
+  async getUserTranscriptions(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.params.userId;
-      const authenticatedUserId = req.userId;
 
-      // Verify user can only access their own transcriptions
-      if (userId !== authenticatedUserId) {
-        res.status(403).json({ error: 'You can only access your own transcriptions' });
-        return;
-      }
+      // AWS API Gateway handles authorization
 
       console.log(`📝 Get user transcriptions: ${userId?.substring(0, 8)}...`);
 
       const limit = parseInt(req.query.limit as string) || 50;
       const offset = parseInt(req.query.offset as string) || 0;
 
-      const result = await this.transcriptionService.getUserTranscriptions(userId!, {
-        limit: Math.min(limit, 100), // Cap at 100
-        offset: Math.max(offset, 0) // Ensure non-negative
-      });
-
-      const total = await this.transcriptionService.getUserTranscriptionCount(userId!);
+      const result = await this.transcriptionService.getUserTranscriptions(userId!, Math.min(limit, 100), Math.max(offset, 0));
       
-      console.log(`✅ Retrieved ${result.length} transcriptions for user: ${userId?.substring(0, 8)}...`);
+      console.log(`✅ Retrieved ${result.transcriptions.length} transcriptions for user: ${userId?.substring(0, 8)}...`);
       
       res.json({
-        transcriptions: result,
-        total,
-        limit,
-        offset
+        transcriptions: result.transcriptions,
+        total: result.total
       });
       
     } catch (error: any) {
@@ -510,23 +487,18 @@ export class TranscriptionController implements ITranscriptionController {
     }
   }
 
-  async updateTranscription(req: AuthRequest, res: Response): Promise<void> {
+  async updateTranscription(req: Request, res: Response): Promise<void> {
     try {
       const { userId, id } = req.params;
-      const authenticatedUserId = req.userId;
 
-      // Verify user can only update their own transcriptions
-      if (userId !== authenticatedUserId) {
-        res.status(403).json({ error: 'You can only update your own transcriptions' });
-        return;
-      }
+      // AWS API Gateway handles authorization
 
       console.log(`📝 Updating transcription ${id?.substring(0, 8)}... for user: ${userId?.substring(0, 8)}...`);
 
       // Validate input
       const validatedInput = updateTranscriptionSchema.parse(req.body);
 
-      const transcription = await this.transcriptionService.updateTranscription(id!, userId!, validatedInput);
+      const transcription = await this.transcriptionService.updateTranscription(id!, validatedInput);
       
       if (!transcription) {
         res.status(404).json({ error: 'Transcription not found' });
@@ -553,7 +525,7 @@ export class TranscriptionController implements ITranscriptionController {
 
       console.log(`🌍 Getting public transcription: ${id?.substring(0, 8)}...`);
       
-      const transcription = await this.transcriptionService.getPublicTranscription(id!);
+      const transcription = await this.transcriptionService.getTranscription(id!);
       
       if (!transcription) {
         res.status(404).json({ error: 'Transcription not found or not available for public access' });
@@ -588,7 +560,7 @@ export class TranscriptionController implements ITranscriptionController {
       // Validate input
       const validatedInput = updateTranscriptionSchema.parse(req.body);
 
-      const result = await this.transcriptionService.processWebhookUpdate(id!, validatedInput);
+      const result = await this.transcriptionService.processWebhookResult(id!, validatedInput);
       
       if (!result) {
         res.status(404).json({ error: 'Transcription not found' });

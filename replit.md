@@ -3,6 +3,13 @@
 This is a video transcription service application built with a full-stack TypeScript architecture. The application allows users to submit video URLs for transcription, operating on a freemium model that offers 3 free transcriptions before requiring a paid subscription. It integrates with both Stripe and PayPal for payment processing and features a modern React frontend. The project's ambition is to provide an efficient and reliable video transcription solution, with a focus on user experience and flexible deployment.
 
 ## Recent Changes (August 2025)
+**Complete Controller-Only Architecture Migration (January 2025)** - Final modernization completed:
+- ✅ **Modern Controller Pattern**: All 5 controllers migrated to self-contained architecture with embedded routing
+- ✅ **JWT/API Key Validation Removed**: All internal authentication removed - AWS API Gateway handles authorization
+- ✅ **Routes Folder Deleted**: Complete consolidation into controller-only pattern
+- ✅ **Service Method Alignment**: Fixed all service method calls to match actual implementations
+- ✅ **AWS API Gateway Ready**: Full compatibility with external authorization via x-user-id headers
+
 **Automatic OpenAPI Documentation System** - Implemented library-based API documentation:
 - ✅ **Library Integration**: Uses swagger-jsdoc and swagger-ui-express for automatic OpenAPI generation
 - ✅ **JSDoc-Based Documentation**: Route documentation via JSDoc comments, no manual endpoint management
@@ -49,9 +56,9 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 
 # System Architecture
 
-**Architecture Cleanup (August 2025)**: Removed all legacy server files (auth.ts, auth-routes.ts, auth-storage.ts, migration.ts, paypal.ts, sqs-service.ts, storage.ts, transcription-service.ts, routes.ts) - functionality fully migrated to new enterprise-level layered architecture in server/src/.
+**Complete Architecture Migration (January 2025)**: All functionality migrated to modern controller-only architecture. Removed legacy routes folder entirely and eliminated all JWT/API key validation in favor of AWS API Gateway authorization.
 
-**Controller-Only Architecture (August 2025)**: Eliminated redundant routes/controllers separation by implementing modern controller-based architecture where controllers contain both business logic and route definitions with JSDoc documentation.
+**Self-Contained Controllers (January 2025)**: Five controllers now handle both routing and business logic with embedded route definitions and JSDoc documentation for automatic OpenAPI generation.
 
 ## Frontend Architecture
 - **Technology Stack**: React with TypeScript, using Vite as the build tool.
@@ -71,7 +78,8 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
   - `server/src/controllers/` - HTTP request/response handling, routing, and JSDoc documentation
   - `server/src/middlewares/` - Authentication, CORS, and request processing
   - `server/src/types/` - TypeScript type definitions
-- **Complete Controller Architecture**: AuthController, TranscriptionController, PaymentController, UserController, and HealthController
+- **Modern Controller Architecture**: AuthController, TranscriptionController, PaymentController, UserController, and HealthController (all with embedded routing)
+- **AWS API Gateway Compatible**: No internal JWT validation - relies on external AWS API Gateway authorization via x-user-id headers
 - **Comprehensive Route Coverage**: All auth endpoints (/register, /login, /refresh-token, /verify-email, /forgot-password, /reset-password, /me, /profile), user endpoints (/profile, /transcriptions), payment endpoints (Stripe + PayPal), transcription endpoints, and health monitoring endpoints
 - **Health Monitoring System**: Production-ready health checks (/health, /readiness, /liveness, /ping) with service dependency monitoring
 - **API Documentation System**: FastAPI-style Swagger documentation with auto-generated OpenAPI 3.0 spec (/docs for UI, /api-docs for JSON)

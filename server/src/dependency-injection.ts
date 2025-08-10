@@ -16,6 +16,10 @@ import { HealthController } from './controllers/health.controller';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 // Modern controllers include routing
 import { TranscriptionController as ModernTranscriptionController } from './controllers/transcription.controller.modern';
+import { AuthController as ModernAuthController } from './controllers/auth.controller.modern';
+import { UserController as ModernUserController } from './controllers/user.controller.modern';
+import { PaymentController as ModernPaymentController } from './controllers/payment.controller.modern';
+import { HealthController as ModernHealthController } from './controllers/health.controller.modern';
 
 // Create repositories
 export const transcriptionRepository = new TranscriptionRepository();
@@ -43,18 +47,11 @@ export const healthController = new HealthController();
 // Create middlewares
 export const authMiddleware = new AuthMiddleware(authService);
 
-// Modern controller with embedded routes
-export const modernTranscriptionController = new ModernTranscriptionController(transcriptionService, authMiddleware);
+// Modern controllers with embedded routes (AWS API Gateway compatible)
+export const modernTranscriptionController = new ModernTranscriptionController(transcriptionService);
+export const modernAuthController = new ModernAuthController(authService, userRepository);
+export const modernUserController = new ModernUserController(userRepository, transcriptionRepository);
+export const modernPaymentController = new ModernPaymentController(userRepository);
+export const modernHealthController = new ModernHealthController();
 
-// Legacy route exports (for backwards compatibility - will be removed)
-import { TranscriptionRoutes } from './routes/transcription.routes';
-import { AuthRoutes } from './routes/auth.routes';
-import { PaymentRoutes } from './routes/payment.routes';
-import { UserRoutes } from './routes/user.routes';
-import { HealthRoutes } from './routes/health.routes';
-
-export const authRoutes = new AuthRoutes(authController, authMiddleware);
-export const transcriptionRoutes = new TranscriptionRoutes(transcriptionController, authMiddleware);
-export const paymentRoutes = new PaymentRoutes(paymentController, authMiddleware);
-export const userRoutes = new UserRoutes(userController, authMiddleware);
-export const healthRoutes = new HealthRoutes(healthController);
+// Legacy routes removed - all functionality migrated to modern controllers
