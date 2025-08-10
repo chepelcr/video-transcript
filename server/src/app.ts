@@ -44,7 +44,8 @@ export async function createApp(): Promise<Express> {
     await connectDatabase();
     console.log('✅ Database connection successful');
   } catch (error) {
-    console.warn('⚠️ Database connection failed, continuing without database:', error.message);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.warn('⚠️ Database connection failed, continuing without database:', errorMessage);
     // Continue without database for demo purposes
   }
 
