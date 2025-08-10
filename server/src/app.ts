@@ -39,8 +39,14 @@ export async function createApp(): Promise<Express> {
     next();
   });
 
-  // Connect to database
-  await connectDatabase();
+  // Connect to database (optional - fallback if not available)
+  try {
+    await connectDatabase();
+    console.log('✅ Database connection successful');
+  } catch (error) {
+    console.warn('⚠️ Database connection failed, continuing without database:', error.message);
+    // Continue without database for demo purposes
+  }
 
   // API Documentation endpoints (must be before frontend fallback)
   const swaggerConfig = new SwaggerConfig();

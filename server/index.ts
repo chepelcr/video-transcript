@@ -86,15 +86,25 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    // For now, let's use the working legacy routes instead of the new architecture
-    // until we can debug the database connection issue
-    console.log('🚀 Starting server with legacy routes (working configuration)...');
+    // Try enterprise architecture first, fall back to legacy if database issues
+    console.log('🚀 Starting hybrid server...');
     
-    // Import and use the working legacy routes
-    const { registerRoutes } = await import('./routes');
-    const server = await registerRoutes(app);
+    try {
+      // Create the new enterprise app and mount it
+      const enterpriseApp = await createApp();
+      app.use('/', enterpriseApp);
+      console.log('✅ Using enterprise architecture with full database support');
+    } catch (error) {
+      console.warn('⚠️ Enterprise architecture failed, falling back to legacy routes:', error.message);
+      
+      // Fallback to legacy routes for demonstration
+      const { registerRoutes } = await import('./routes');
+      const fallbackServer = await registerRoutes(app);
+      console.log('✅ Using legacy routes for demonstration');
+    }
     
-    // Server is created by registerRoutes above
+    // Create HTTP server
+    const server = await import('http').then(http => http.createServer(app));
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;

@@ -4,21 +4,27 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/auth-schema";
 
 // Construct database URL from AWS RDS secrets or use provided URL
-let databaseUrl = process.env.DATABASE_URL || process.env.AWS_RDS_DATABASE_URL;
+let databaseUrl = process.env.DATABASE_URL;
 
+// If no complete DATABASE_URL, construct it from AWS RDS components
 if (!databaseUrl && process.env.AWS_RDS_USERNAME && process.env.AWS_RDS_PASSWORD) {
-  // Build URL from AWS RDS components - use exact same logic as working old server
-  const host = process.env.PGHOST || 'ls-85945ed6753f404b7b7d74097b833502d2a152ef.co1kq0qg0vtn.us-east-1.rds.amazonaws.com';
-  const port = process.env.PGPORT || '5432';
-  const database = process.env.AWS_RDS_DATABASE_NAME || process.env.PGDATABASE || 'video-transcript';
+  // Build URL from AWS RDS components
+  // AWS_RDS_DATABASE_URL contains just the hostname, need to construct full URL
+  const host = process.env.AWS_RDS_DATABASE_URL || 'ls-85945ed6753f404b7b7d74097b833502d2a152ef.co1kq0qg0vtn.us-east-1.rds.amazonaws.com';
+  const port = '5432';
+  const database = process.env.AWS_RDS_DATABASE_NAME || 'video-transcipt'; // Use exact name from env
   const username = process.env.AWS_RDS_USERNAME;
   const password = process.env.AWS_RDS_PASSWORD;
   
-  databaseUrl = `postgresql://${username}:${password}@${host}:${port}/${database}`;
+  // URL encode the password to handle special characters
+  const encodedPassword = encodeURIComponent(password);
+  databaseUrl = `postgresql://${username}:${encodedPassword}@${host}:${port}/${database}`;
+  
   console.log('✅ Using AWS RDS connection');
   console.log(`   Host: ${host}`);
   console.log(`   Database: ${database}`);
-  console.log(`   URL format: postgresql://${username}:***@${host}:${port}/${database}`);
+  console.log(`   Username: ${username}`);
+  console.log(`   Constructed URL: postgresql://${username}:***@${host}:${port}/${database}`);
 }
 
 if (!databaseUrl) {
@@ -29,7 +35,9 @@ if (!databaseUrl) {
 
 export const pool = new Pool({ 
   connectionString: databaseUrl,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: {
+    rejectUnauthorized: false // AWS RDS requires SSL but with self-signed certificates
+  }
 });
 export const db = drizzle(pool, { schema });
 

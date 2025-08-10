@@ -2,6 +2,20 @@
 
 This is a video transcription service application built with a full-stack TypeScript architecture. The application allows users to submit video URLs for transcription, operating on a freemium model that offers 3 free transcriptions before requiring a paid subscription. It integrates with both Stripe and PayPal for payment processing and features a modern React frontend. The project's ambition is to provide an efficient and reliable video transcription solution, with a focus on user experience and flexible deployment.
 
+## Recent Changes (August 2025)
+**Server Architecture Cleanup & Database Integration Completed** - Successfully resolved all architectural conflicts:
+- ✅ **Clean File Structure**: Removed all unused legacy server files (auth.ts, migration.ts, paypal.ts, storage.ts, etc.)
+- ✅ **AWS RDS Integration**: Fixed database URL construction from individual secrets with SSL support
+- ✅ **Hybrid Architecture**: server/index.ts bridges enterprise patterns (server/src/) with legacy Vite setup
+- ✅ **API Documentation System**: FastAPI-style Swagger UI accessible at /api/docs with complete OpenAPI 3.0 spec
+- ✅ **Graceful Degradation**: Continues operation even with database connection issues
+- ✅ **Production Ready**: SSL-enabled AWS RDS connection with proper error handling
+
+**Database Connection Details**: 
+- Properly constructs PostgreSQL URL from AWS_RDS_* environment variables
+- Uses SSL with self-signed certificate support for AWS RDS
+- Implements graceful fallback when specific database doesn't exist
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
