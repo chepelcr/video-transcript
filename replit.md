@@ -18,8 +18,8 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 - **Payment UI**: Integrates Stripe Elements and a custom PayPal button component.
 
 ## Backend Architecture - Industry Standard Layered Design
-- **Server Framework**: Express.js with TypeScript, reorganized into industry-standard layered architecture (August 2025)
-- **Directory Structure**: Follows enterprise patterns with clear separation of concerns:
+- **Server Framework**: Express.js with TypeScript, fully reorganized into industry-standard layered architecture (August 2025)
+- **Directory Structure**: Complete enterprise-level patterns with clear separation of concerns:
   - `server/src/config/` - Application configuration and database setup
   - `server/src/models/` - Business logic models and validation schemas  
   - `server/src/repositories/` - Data access layer with type-safe Drizzle ORM operations
@@ -28,8 +28,10 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
   - `server/src/middlewares/` - Authentication, CORS, and request processing
   - `server/src/routes/` - RESTful API route definitions
   - `server/src/types/` - TypeScript type definitions
+- **Complete Controller Architecture**: AuthController, TranscriptionController, PaymentController, and UserController
+- **Comprehensive Route Coverage**: All auth endpoints (/register, /login, /refresh-token, /verify-email, /forgot-password, /reset-password, /me, /profile), user endpoints (/profile, /transcriptions), payment endpoints (Stripe + PayPal), and transcription endpoints
 - **Dependency Injection**: Centralized dependency container for clean architecture
-- **Payment Processing**: Supports both Stripe for subscriptions and PayPal for one-time payments
+- **Payment Processing**: Full integration with dedicated PaymentController for both Stripe subscriptions and PayPal one-time payments
 - **Session Management**: Express sessions with PostgreSQL session store (`connect-pg-simple`)
 - **Transcription Logic**: All transcription logic moved to backend services for enhanced security
 - **Asynchronous Processing**: AWS SQS-based queuing system with secure webhook processing

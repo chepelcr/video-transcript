@@ -1,7 +1,7 @@
 import express, { Express } from 'express';
 import { connectDatabase } from './config/database';
 import { APP_CONFIG } from './config/app';
-import { authRoutes, transcriptionRoutes, paymentRoutes } from './dependency-injection';
+import { authRoutes, transcriptionRoutes, paymentRoutes, userRoutes } from './dependency-injection';
 
 export async function createApp(): Promise<Express> {
   const app: Express = express();
@@ -45,6 +45,7 @@ export async function createApp(): Promise<Express> {
   app.use('/api/auth', authRoutes.getRouter());
   app.use('/api/transcriptions', transcriptionRoutes.getRouter());
   app.use('/api/payments', paymentRoutes.getRouter());
+  app.use('/api/users', userRoutes.getRouter());
 
   // TODO: Migrate old routes to new architecture
 

@@ -18,6 +18,9 @@ export class AuthRoutes {
     this.router.post('/register', (req, res) => this.authController.register(req, res));
     this.router.post('/login', (req, res) => this.authController.login(req, res));
     this.router.post('/refresh-token', (req, res) => this.authController.refreshToken(req, res));
+    this.router.post('/verify-email', (req, res) => this.authController.verifyEmail(req, res));
+    this.router.post('/forgot-password', (req, res) => this.authController.forgotPassword(req, res));
+    this.router.post('/reset-password', (req, res) => this.authController.resetPassword(req, res));
 
     // Protected routes
     this.router.get('/me', 
@@ -28,6 +31,11 @@ export class AuthRoutes {
     this.router.post('/logout',
       (req, res, next) => this.authMiddleware.authenticate(req, res, next),
       (req, res) => this.authController.logout(req, res)
+    );
+
+    this.router.put('/profile',
+      (req, res, next) => this.authMiddleware.authenticate(req, res, next),
+      (req, res) => this.authController.updateProfile(req, res)
     );
   }
 

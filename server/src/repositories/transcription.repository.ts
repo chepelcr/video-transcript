@@ -1,4 +1,4 @@
-import { eq, desc, and } from 'drizzle-orm';
+import { eq, desc, and, sql } from 'drizzle-orm';
 import { db } from '../config/database';
 import { transcriptions } from '@shared/auth-schema';
 import { 
@@ -12,10 +12,8 @@ import {
 export interface ITranscriptionRepository {
   create(input: CreateTranscriptionInput): Promise<ITranscription>;
   findById(id: string): Promise<ITranscription | null>;
-  findByUserId(userId: string, limit?: number, offset?: number): Promise<{
-    transcriptions: ITranscription[];
-    total: number;
-  }>;
+  findByUserId(userId: string, limit?: number, offset?: number): Promise<ITranscription[]>;
+  countByUserId(userId: string): Promise<number>;
   update(id: string, input: UpdateTranscriptionInput): Promise<ITranscription | null>;
   delete(id: string): Promise<boolean>;
   findByStatus(status: TranscriptionStatus): Promise<ITranscription[]>;
@@ -56,34 +54,43 @@ export class TranscriptionRepository implements ITranscriptionRepository {
     return this.mapToModel(transcription);
   }
 
-  async findByUserId(userId: string, limit = 50, offset = 0): Promise<{
-    transcriptions: ITranscription[];
-    total: number;
-  }> {
-    console.log(`🔍 Finding transcriptions for user: ${userId.substring(0, 8)}... (limit: ${limit}, offset: ${offset})`);
+  async findByUserId(userId: string, limit?: number, offset?: number): Promise<ITranscription[]> {
+    console.log(`🔍 Finding transcriptions for user: ${userId.substring(0, 8)}... (limit: ${limit || 'all'}, offset: ${offset || 0})`);
     
-    const userTranscriptions = await db
+    let query = db
       .select()
       .from(transcriptions)
       .where(eq(transcriptions.userId, userId))
-      .orderBy(desc(transcriptions.createdAt))
-      .limit(limit)
-      .offset(offset);
+      .orderBy(desc(transcriptions.createdAt));
 
-    // Get total count
+    if (limit !== undefined) {
+      query = query.limit(limit);
+    }
+
+    if (offset !== undefined) {
+      query = query.offset(offset);
+    }
+
+    const userTranscriptions = await query;
+    
+    console.log(`✅ Found ${userTranscriptions.length} transcriptions for user: ${userId.substring(0, 8)}...`);
+    
+    return userTranscriptions.map(t => this.mapToModel(t));
+  }
+
+  async countByUserId(userId: string): Promise<number> {
+    console.log(`🔢 Counting transcriptions for user: ${userId.substring(0, 8)}...`);
+    
     const totalResult = await db
-      .select({ count: transcriptions.id })
+      .select({ count: sql`count(*)` })
       .from(transcriptions)
       .where(eq(transcriptions.userId, userId));
 
-    const total = totalResult.length;
+    const total = Number(totalResult[0].count);
     
-    console.log(`✅ Found ${userTranscriptions.length} transcriptions (Total: ${total})`);
+    console.log(`✅ Total transcriptions for user ${userId.substring(0, 8)}...: ${total}`);
     
-    return {
-      transcriptions: userTranscriptions.map(t => this.mapToModel(t)),
-      total
-    };
+    return total;
   }
 
   async update(id: string, input: UpdateTranscriptionInput): Promise<ITranscription | null> {
