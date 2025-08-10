@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import CognitoAuthService from '@/lib/cognito';
+import { signUp, signIn, signOut, getCurrentUser, fetchAuthSession, confirmSignUp, resetPassword, confirmResetPassword } from 'aws-amplify/auth';
 import type { 
   AuthResponse, 
   UserResponse, 
@@ -10,59 +10,28 @@ import type {
   RefreshTokenRequest 
 } from '@shared/auth-schema';
 
-const AUTH_STORAGE_KEY = 'cognito_tokens';
+// Amplify handles token storage automatically, so we don't need manual storage utilities
 
-interface CognitoTokens {
-  accessToken: string;
-  refreshToken: string;
-  idToken: string;
-}
-
-// Cognito token storage utilities
-const getStoredTokens = (): CognitoTokens | null => {
-  try {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    console.log('Getting stored tokens:', stored ? 'Found' : 'Not found');
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error('Error getting stored tokens:', error);
-    return null;
-  }
-};
-
-const setStoredTokens = (tokens: CognitoTokens | null): void => {
-  try {
-    if (tokens) {
-      console.log('Storing Cognito tokens:', { 
-        hasAccess: !!tokens.accessToken, 
-        hasRefresh: !!tokens.refreshToken,
-        hasId: !!tokens.idToken 
-      });
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(tokens));
-    } else {
-      console.log('Clearing Cognito tokens');
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-    }
-  } catch (error) {
-    console.error('Error storing tokens:', error);
-  }
-};
-
-// Cognito authenticated request
+// Amplify authenticated request
 const authenticatedRequest = async (
   method: string,
   endpoint: string,
   data?: any
 ): Promise<Response> => {
-  // Get fresh session from Cognito
-  const session = await CognitoAuthService.getCurrentSession();
-  
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
 
-  if (session) {
-    headers.Authorization = `Bearer ${session.getIdToken().getJwtToken()}`;
+  try {
+    // Get current user session using Amplify v6
+    const session = await fetchAuthSession();
+    const idToken = session.tokens?.idToken?.toString();
+    if (idToken) {
+      headers.Authorization = `Bearer ${idToken}`;
+    }
+  } catch (error) {
+    console.log('No valid Amplify session found');
+    // Continue without token for public endpoints
   }
 
   // Build full URL
@@ -75,24 +44,24 @@ const authenticatedRequest = async (
     body: data ? JSON.stringify(data) : undefined,
   });
 
-  // Handle token refresh on 401/403 using Cognito
-  if ((response.status === 401 || response.status === 403) && session) {
+  // Handle token refresh on 401/403 - Amplify handles this automatically
+  if ((response.status === 401 || response.status === 403)) {
     try {
-      const refreshedSession = await CognitoAuthService.refreshSession();
-      if (refreshedSession) {
-        // Retry with new tokens
-        headers.Authorization = `Bearer ${refreshedSession.getIdToken().getJwtToken()}`;
+      // Amplify automatically refreshes tokens, so we can retry
+      const session = await fetchAuthSession({ forceRefresh: true });
+      const idToken = session.tokens?.idToken?.toString();
+      if (idToken) {
+        headers.Authorization = `Bearer ${idToken}`;
+        
         return fetch(fullUrl, {
           method,
           headers,
           body: data ? JSON.stringify(data) : undefined,
         });
-      } else {
-        throw new Error('Failed to refresh session');
       }
     } catch (refreshError) {
-      console.error('Failed to refresh Cognito session, logging out:', refreshError);
-      CognitoAuthService.logout();
+      console.error('Failed to refresh session, logging out:', refreshError);
+      await signOut();
       throw new Error('Session expired. Please log in again.');
     }
   }
@@ -103,97 +72,150 @@ const authenticatedRequest = async (
 export function useAuth() {
   const queryClient = useQueryClient();
 
-  // Get current user using Cognito session
+  // Get current user using Amplify Auth
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['/api/auth/me'],
     queryFn: async () => {
-      // Check if user has valid Cognito session
-      const session = await CognitoAuthService.getCurrentSession();
-      if (!session) {
-        console.log('No valid Cognito session found');
-        return null;
-      }
-
-      const idToken = session.getIdToken().getJwtToken();
-      console.log('Attempting to fetch user with Cognito token:', idToken.substring(0, 20) + '...');
-      
-      const response = await authenticatedRequest('GET', '/api/auth/me');
-      if (!response.ok) {
-        console.log('Auth request failed with status:', response.status);
-        if (response.status === 401 || response.status === 403) {
-          CognitoAuthService.logout();
+      try {
+        // Check if user is authenticated with Amplify
+        const amplifyUser = await getCurrentUser();
+        if (!amplifyUser) {
+          console.log('No valid Amplify session found');
           return null;
         }
-        throw new Error('Failed to fetch user');
+
+        console.log('Amplify user found, fetching backend user data...');
+        
+        const response = await authenticatedRequest('GET', '/api/auth/me');
+        if (!response.ok) {
+          console.log('Auth request failed with status:', response.status);
+          if (response.status === 401 || response.status === 403) {
+            await signOut();
+            return null;
+          }
+          throw new Error('Failed to fetch user');
+        }
+        
+        const result = await response.json() as UserResponse;
+        console.log('User fetched successfully:', result.username);
+        return result;
+      } catch (error) {
+        console.log('No authenticated user found');
+        return null;
       }
-      
-      const result = await response.json() as UserResponse;
-      console.log('User fetched successfully:', result.username);
-      return result;
     },
     retry: false,
   });
 
-  // Register mutation using Cognito
+  // Register mutation using Amplify Auth
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterRequest) => {
-      // Register with Cognito first, then sync to backend
-      const cognitoResult = await CognitoAuthService.register({
-        username: data.username,
-        email: data.email,
+      // Register with Amplify Auth
+      const result = await signUp({
+        username: data.email, // Use email as username
         password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName,
+        options: {
+          userAttributes: {
+            email: data.email,
+            given_name: data.firstName || '',
+            family_name: data.lastName || '',
+          },
+        },
       });
 
-      // After Cognito registration, sync to backend
+      console.log('Amplify signup result:', result);
+
+      // Sync to backend after Amplify registration
       const response = await apiRequest('POST', '/api/auth/register', data);
-      return response;
+      
+      return {
+        amplifyResult: result,
+        backendResponse: response,
+        needsVerification: !result.isSignUpComplete,
+      };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
     },
   });
 
-  // Login mutation using Cognito
+  // Login mutation using Amplify Auth
   const loginMutation = useMutation({
     mutationFn: async (data: LoginRequest) => {
-      // Login with Cognito
-      const cognitoResult = await CognitoAuthService.login(data.email, data.password);
-      
-      // Store tokens
-      setStoredTokens({
-        accessToken: cognitoResult.accessToken,
-        refreshToken: cognitoResult.refreshToken,
-        idToken: cognitoResult.idToken,
+      // Login with Amplify Auth
+      const amplifyResult = await signIn({
+        username: data.email,
+        password: data.password,
       });
+      
+      console.log('Amplify login successful:', amplifyResult);
 
       // Sync with backend to get user data
       const response = await authenticatedRequest('GET', '/api/auth/me');
       const userData = await response.json() as UserResponse;
       
-      return { user: userData, ...cognitoResult };
+      return { 
+        user: userData, 
+        amplifyResult,
+        needsVerification: amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'
+      };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
     },
   });
 
-  // Verify email mutation (Cognito handles verification)
+  // Verify email mutation using Amplify Auth
   const verifyEmailMutation = useMutation({
     mutationFn: async (data: VerifyEmailRequest) => {
-      // With Cognito, verification is handled during registration
+      // Verify signup with Amplify
+      const result = await confirmSignUp({
+        username: data.email,
+        confirmationCode: data.code,
+      });
+      
+      console.log('Amplify verification result:', result);
+      
+      // Sync verification status with backend
       const response = await apiRequest('POST', '/api/auth/verify-email', data);
-      return response.json();
+      return {
+        amplifyResult: result,
+        backendResponse: response.json(),
+      };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
     },
   });
 
-  // Logout function
-  const logout = () => {
-    console.log('🔐 Logging out user');
-    CognitoAuthService.logout();
-    setStoredTokens(null);
+  // Forgot password mutation
+  const forgotPasswordMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const result = await resetPassword({ username: email });
+      console.log('Forgot password initiated:', result);
+      return result;
+    },
+  });
+
+  // Reset password mutation  
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (data: { email: string; code: string; newPassword: string }) => {
+      const result = await confirmResetPassword({
+        username: data.email,
+        confirmationCode: data.code,
+        newPassword: data.newPassword,
+      });
+      console.log('Password reset completed:', result);
+      return result;
+    },
+  });
+
+  // Logout function using Amplify Auth
+  const logout = async () => {
+    console.log('Logging out user via Amplify');
+    await signOut();
     queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+    queryClient.clear();
   };
 
   return {
@@ -204,6 +226,8 @@ export function useAuth() {
     register: registerMutation,
     login: loginMutation,
     verifyEmail: verifyEmailMutation,
+    forgotPassword: forgotPasswordMutation,
+    resetPassword: resetPasswordMutation,
     logout,
   };
 }

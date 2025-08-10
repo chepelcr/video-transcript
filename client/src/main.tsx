@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import "./lib/amplify"; // Initialize Amplify configuration
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Global error logging for debugging white screen
