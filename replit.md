@@ -28,8 +28,9 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
   - `server/src/middlewares/` - Authentication, CORS, and request processing
   - `server/src/routes/` - RESTful API route definitions
   - `server/src/types/` - TypeScript type definitions
-- **Complete Controller Architecture**: AuthController, TranscriptionController, PaymentController, and UserController
-- **Comprehensive Route Coverage**: All auth endpoints (/register, /login, /refresh-token, /verify-email, /forgot-password, /reset-password, /me, /profile), user endpoints (/profile, /transcriptions), payment endpoints (Stripe + PayPal), and transcription endpoints
+- **Complete Controller Architecture**: AuthController, TranscriptionController, PaymentController, UserController, and HealthController
+- **Comprehensive Route Coverage**: All auth endpoints (/register, /login, /refresh-token, /verify-email, /forgot-password, /reset-password, /me, /profile), user endpoints (/profile, /transcriptions), payment endpoints (Stripe + PayPal), transcription endpoints, and health monitoring endpoints
+- **Health Monitoring System**: Production-ready health checks (/health, /readiness, /liveness, /ping) with service dependency monitoring
 - **Dependency Injection**: Centralized dependency container for clean architecture
 - **Payment Processing**: Full integration with dedicated PaymentController for both Stripe subscriptions and PayPal one-time payments
 - **Session Management**: Express sessions with PostgreSQL session store (`connect-pg-simple`)

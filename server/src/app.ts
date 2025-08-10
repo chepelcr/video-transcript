@@ -1,7 +1,7 @@
 import express, { Express } from 'express';
 import { connectDatabase } from './config/database';
 import { APP_CONFIG } from './config/app';
-import { authRoutes, transcriptionRoutes, paymentRoutes, userRoutes } from './dependency-injection';
+import { authRoutes, transcriptionRoutes, paymentRoutes, userRoutes, healthRoutes } from './dependency-injection';
 
 export async function createApp(): Promise<Express> {
   const app: Express = express();
@@ -40,6 +40,9 @@ export async function createApp(): Promise<Express> {
 
   // Connect to database
   await connectDatabase();
+
+  // Health endpoints (no /api prefix for load balancer compatibility)
+  app.use('/', healthRoutes.getRouter());
 
   // New API routes (industry standard architecture)
   app.use('/api/auth', authRoutes.getRouter());
