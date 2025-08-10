@@ -63,16 +63,3 @@ pool.on('error', (err) => {
 });
 
 export const db = drizzle(pool, { schema });
-
-export const connectDatabase = async () => {
-  try {
-    console.log('🗄️ Connecting to AWS RDS PostgreSQL database...');
-    // Test connection
-    await pool.connect();
-    console.log('Database connection configured successfully');
-    return true;
-  } catch (error) {
-    console.error('Database connection failed:', error);
-    throw error;
-  }
-};

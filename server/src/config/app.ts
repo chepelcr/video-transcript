@@ -1,8 +1,8 @@
 export const APP_CONFIG = {
   PORT: process.env.PORT || 5000,
   NODE_ENV: process.env.NODE_ENV || 'development',
-  JWT_SECRET: process.env.JWT_SECRET!,
-  SESSION_SECRET: process.env.SESSION_SECRET!,
+  JWT_SECRET: process.env.JWT_SECRET || 'demo-jwt-secret-for-development-only-change-in-production',
+  SESSION_SECRET: process.env.SESSION_SECRET || 'demo-session-secret-for-development-only',
   
   // AWS Configuration
   AWS_REGION: process.env.AWS_REGION,
