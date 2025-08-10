@@ -95,12 +95,8 @@ app.use((req, res, next) => {
       app.use('/', enterpriseApp);
       console.log('✅ Using enterprise architecture with full database support');
     } catch (error) {
-      console.warn('⚠️ Enterprise architecture failed, falling back to legacy routes:', error.message);
-      
-      // Fallback to legacy routes for demonstration
-      const { registerRoutes } = await import('./routes');
-      const fallbackServer = await registerRoutes(app);
-      console.log('✅ Using legacy routes for demonstration');
+      console.error('❌ Failed to start enterprise architecture:', error);
+      throw error;
     }
     
     // Create HTTP server

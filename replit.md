@@ -23,7 +23,7 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 
 # System Architecture
 
-**Architecture Cleanup (August 2025)**: Removed legacy server files (auth.ts, auth-routes.ts, auth-storage.ts, migration.ts, paypal.ts, sqs-service.ts, storage.ts, transcription-service.ts) - functionality fully migrated to new enterprise-level layered architecture in server/src/.
+**Architecture Cleanup (August 2025)**: Removed all legacy server files (auth.ts, auth-routes.ts, auth-storage.ts, migration.ts, paypal.ts, sqs-service.ts, storage.ts, transcription-service.ts, routes.ts) - functionality fully migrated to new enterprise-level layered architecture in server/src/.
 
 ## Frontend Architecture
 - **Technology Stack**: React with TypeScript, using Vite as the build tool.
