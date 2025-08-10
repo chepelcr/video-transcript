@@ -107,8 +107,8 @@ const swaggerOptions = {
     ]
   },
   apis: [
-    './server/src/routes/*.swagger.ts',
-    './server/src/controllers/*.ts'
+    './server/src/controllers/*.modern.ts',
+    './server/src/routes/*.swagger.ts'
   ]
 };
 

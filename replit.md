@@ -51,6 +51,8 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 
 **Architecture Cleanup (August 2025)**: Removed all legacy server files (auth.ts, auth-routes.ts, auth-storage.ts, migration.ts, paypal.ts, sqs-service.ts, storage.ts, transcription-service.ts, routes.ts) - functionality fully migrated to new enterprise-level layered architecture in server/src/.
 
+**Controller-Only Architecture (August 2025)**: Eliminated redundant routes/controllers separation by implementing modern controller-based architecture where controllers contain both business logic and route definitions with JSDoc documentation.
+
 ## Frontend Architecture
 - **Technology Stack**: React with TypeScript, using Vite as the build tool.
 - **UI/UX**: Utilizes `shadcn/ui` components built on Radix UI primitives, styled with Tailwind CSS.
@@ -59,16 +61,15 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 - **Forms**: React Hook Form with Zod validation schemas.
 - **Payment UI**: Integrates Stripe Elements and a custom PayPal button component.
 
-## Backend Architecture - Industry Standard Layered Design
-- **Server Framework**: Express.js with TypeScript, fully reorganized into industry-standard layered architecture (August 2025)
-- **Directory Structure**: Complete enterprise-level patterns with clear separation of concerns:
+## Backend Architecture - Modern Controller-Based Design
+- **Server Framework**: Express.js with TypeScript, reorganized into modern controller-only architecture (August 2025)
+- **Directory Structure**: Streamlined enterprise patterns with controllers containing both logic and routing:
   - `server/src/config/` - Application configuration and database setup
   - `server/src/models/` - Business logic models and validation schemas  
   - `server/src/repositories/` - Data access layer with type-safe Drizzle ORM operations
   - `server/src/services/` - Business logic layer handling core application functionality
-  - `server/src/controllers/` - HTTP request/response handling and validation
+  - `server/src/controllers/` - HTTP request/response handling, routing, and JSDoc documentation
   - `server/src/middlewares/` - Authentication, CORS, and request processing
-  - `server/src/routes/` - RESTful API route definitions
   - `server/src/types/` - TypeScript type definitions
 - **Complete Controller Architecture**: AuthController, TranscriptionController, PaymentController, UserController, and HealthController
 - **Comprehensive Route Coverage**: All auth endpoints (/register, /login, /refresh-token, /verify-email, /forgot-password, /reset-password, /me, /profile), user endpoints (/profile, /transcriptions), payment endpoints (Stripe + PayPal), transcription endpoints, and health monitoring endpoints

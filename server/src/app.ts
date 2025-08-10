@@ -2,7 +2,7 @@ import express, { Express } from 'express';
 import { connectDatabase } from './config/database';
 import { APP_CONFIG } from './config/app';
 import { SwaggerAutoConfig } from './config/swagger-auto';
-import { authRoutes, transcriptionRoutes, paymentRoutes, userRoutes, healthRoutes } from './dependency-injection';
+import { authRoutes, transcriptionRoutes, paymentRoutes, userRoutes, healthRoutes, modernTranscriptionController } from './dependency-injection';
 
 export async function createApp(): Promise<Express> {
   const app: Express = express();
@@ -56,9 +56,11 @@ export async function createApp(): Promise<Express> {
   // Health endpoints (no /api prefix for load balancer compatibility)
   app.use('/', healthRoutes.getRouter());
 
-  // API routes (industry standard architecture)
+  // API routes - Modern controller-based architecture (with JSDoc documentation)
+  app.use('/api', modernTranscriptionController.getRouter());
+  
+  // Legacy routes (temporary - to be migrated to modern controllers)
   app.use('/api/auth', authRoutes.getRouter());
-  app.use('/api/transcriptions', transcriptionRoutes.getRouter());
   app.use('/api/payments', paymentRoutes.getRouter());
   app.use('/api/users', userRoutes.getRouter());
 

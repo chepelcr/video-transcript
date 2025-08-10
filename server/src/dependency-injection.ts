@@ -14,11 +14,8 @@ import { PaymentController } from './controllers/payment.controller';
 import { UserController } from './controllers/user.controller';
 import { HealthController } from './controllers/health.controller';
 import { AuthMiddleware } from './middlewares/auth.middleware';
-import { TranscriptionRoutes } from './routes/transcription.routes';
-import { AuthRoutes } from './routes/auth.routes';
-import { PaymentRoutes } from './routes/payment.routes';
-import { UserRoutes } from './routes/user.routes';
-import { HealthRoutes } from './routes/health.routes';
+// Modern controllers include routing
+import { TranscriptionController as ModernTranscriptionController } from './controllers/transcription.controller.modern';
 
 // Create repositories
 export const transcriptionRepository = new TranscriptionRepository();
@@ -36,7 +33,7 @@ export const transcriptionService = new TranscriptionService(
   videoTitleService
 );
 
-// Create controllers
+// Create controllers (legacy for now)
 export const authController = new AuthController(authService, userRepository);
 export const transcriptionController = new TranscriptionController(transcriptionService);
 export const paymentController = new PaymentController(userRepository);
@@ -46,7 +43,16 @@ export const healthController = new HealthController();
 // Create middlewares
 export const authMiddleware = new AuthMiddleware(authService);
 
-// Create routes
+// Modern controller with embedded routes
+export const modernTranscriptionController = new ModernTranscriptionController(transcriptionService, authMiddleware);
+
+// Legacy route exports (for backwards compatibility - will be removed)
+import { TranscriptionRoutes } from './routes/transcription.routes';
+import { AuthRoutes } from './routes/auth.routes';
+import { PaymentRoutes } from './routes/payment.routes';
+import { UserRoutes } from './routes/user.routes';
+import { HealthRoutes } from './routes/health.routes';
+
 export const authRoutes = new AuthRoutes(authController, authMiddleware);
 export const transcriptionRoutes = new TranscriptionRoutes(transcriptionController, authMiddleware);
 export const paymentRoutes = new PaymentRoutes(paymentController, authMiddleware);
