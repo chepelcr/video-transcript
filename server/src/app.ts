@@ -1,7 +1,7 @@
 import express, { Express } from 'express';
 import { connectDatabase } from './config/database';
 import { APP_CONFIG } from './config/app';
-import { SwaggerConfig } from './config/swagger';
+import { SwaggerAutoConfig } from './config/swagger-auto';
 import { authRoutes, transcriptionRoutes, paymentRoutes, userRoutes, healthRoutes } from './dependency-injection';
 
 export async function createApp(): Promise<Express> {
@@ -50,8 +50,8 @@ export async function createApp(): Promise<Express> {
   }
 
   // API Documentation endpoints (must be before frontend fallback)
-  const swaggerConfig = new SwaggerConfig();
-  swaggerConfig.setupSwaggerEndpoints(app);
+  const swaggerAutoConfig = new SwaggerAutoConfig();
+  swaggerAutoConfig.setupSwaggerEndpoints(app);
 
   // Health endpoints (no /api prefix for load balancer compatibility)
   app.use('/', healthRoutes.getRouter());

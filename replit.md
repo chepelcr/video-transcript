@@ -3,6 +3,12 @@
 This is a video transcription service application built with a full-stack TypeScript architecture. The application allows users to submit video URLs for transcription, operating on a freemium model that offers 3 free transcriptions before requiring a paid subscription. It integrates with both Stripe and PayPal for payment processing and features a modern React frontend. The project's ambition is to provide an efficient and reliable video transcription solution, with a focus on user experience and flexible deployment.
 
 ## Recent Changes (August 2025)
+**Automatic OpenAPI Documentation System** - Implemented library-based API documentation:
+- ✅ **Library Integration**: Uses swagger-jsdoc and swagger-ui-express for automatic OpenAPI generation
+- ✅ **JSDoc-Based Documentation**: Route documentation via JSDoc comments, no manual endpoint management
+- ✅ **Real-time Updates**: Documentation automatically reflects code changes without manual updates
+- ✅ **Complete OpenAPI 3.0 Spec**: Proper schemas, security definitions, and response examples
+
 **Domain-like URL Structure Implementation** - Restructured transcription API with domain-style URLs:
 - ✅ **URL Pattern Change**: Moved from /api/transcriptions to /users/{userId}/transcriptions structure
 - ✅ **Removed Anonymous Endpoints**: Deleted /api/transcriptions/anonymous (authentication always required)
