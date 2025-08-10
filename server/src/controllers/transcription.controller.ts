@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { ITranscriptionService } from '../services/transcription.service';
 import { 
   createTranscriptionSchema, 
-  createAnonymousTranscriptionSchema,
   updateTranscriptionSchema,
   TranscriptionStatus 
 } from '../models/transcription.model';
@@ -10,7 +9,6 @@ import { AuthRequest } from '../types/auth.types';
 
 export interface ITranscriptionController {
   createTranscription(req: AuthRequest, res: Response): Promise<void>;
-  createAnonymousTranscription(req: AuthRequest, res: Response): Promise<void>;
   getTranscription(req: AuthRequest, res: Response): Promise<void>;
   getUserTranscriptions(req: AuthRequest, res: Response): Promise<void>;
   updateTranscription(req: AuthRequest, res: Response): Promise<void>;
@@ -22,18 +20,27 @@ export class TranscriptionController implements ITranscriptionController {
 
   async createTranscription(req: AuthRequest, res: Response): Promise<void> {
     try {
-      console.log(`📝 Creating transcription for user: ${req.userId?.substring(0, 8)}...`);
+      const userId = req.params.userId;
+      const authenticatedUserId = req.userId;
+      
+      // Verify user can only create transcriptions for themselves
+      if (userId !== authenticatedUserId) {
+        res.status(403).json({ error: 'You can only create transcriptions for your own account' });
+        return;
+      }
+
+      console.log(`📝 Creating transcription for user: ${userId?.substring(0, 8)}...`);
       
       const { videoUrl } = req.body;
       
       // Validate input
       const validatedInput = createTranscriptionSchema.parse({
-        userId: req.userId!,
+        userId: userId!,
         videoUrl
       });
 
       // Check if user can create transcription
-      const canCreate = await this.transcriptionService.canUserCreateTranscription(req.userId!);
+      const canCreate = await this.transcriptionService.canUserCreateTranscription(userId!);
       if (!canCreate) {
         res.status(403).json({ 
           error: 'You have reached your transcription limit for your current plan' 
@@ -67,54 +74,11 @@ export class TranscriptionController implements ITranscriptionController {
     }
   }
 
-  // Lambda-style endpoint: No authentication required
-  async createAnonymousTranscription(req: AuthRequest, res: Response): Promise<void> {
-    try {
-      console.log(`🚀 Creating anonymous transcription (lambda-style)`);
-      
-      const { videoUrl } = req.body;
-      
-      // Validate input for anonymous transcription
-      const validatedData = createAnonymousTranscriptionSchema.parse({
-        videoUrl
-      });
-      
-      const validatedInput = {
-        userId: null, // No user ID for anonymous transcriptions
-        videoUrl: validatedData.videoUrl,
-        videoTitle: validatedData.videoTitle
-      };
-
-      // Create anonymous transcription (bypasses user limits)
-      const transcription = await this.transcriptionService.createAnonymousTranscription(validatedInput);
-      
-      // Submit for processing
-      await this.transcriptionService.submitForProcessing(transcription.id);
-      
-      console.log(`✅ Anonymous transcription created: ${transcription.id.substring(0, 8)}...`);
-      
-      res.status(201).json({
-        id: transcription.id,
-        videoUrl: transcription.videoUrl,
-        videoTitle: transcription.videoTitle,
-        status: transcription.status,
-        createdAt: transcription.createdAt,
-        anonymous: true
-      });
-      
-    } catch (error: any) {
-      console.error('Error creating anonymous transcription:', error);
-      if (error.name === 'ZodError') {
-        res.status(400).json({ error: 'Invalid input data', details: error.errors });
-        return;
-      }
-      res.status(500).json({ error: error.message || 'Failed to create transcription' });
-    }
-  }
-
   async getTranscription(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const userId = req.params.userId;
+      const authenticatedUserId = req.userId;
       
       const transcription = await this.transcriptionService.getTranscription(id);
       if (!transcription) {
@@ -122,8 +86,14 @@ export class TranscriptionController implements ITranscriptionController {
         return;
       }
 
-      // Allow access if user owns it OR if it's anonymous transcription (no userId)
-      if (req.userId && transcription.userId && transcription.userId !== req.userId) {
+      // For domain-style routes (/users/{userId}/transcriptions/{id}), verify user access
+      if (userId && userId !== authenticatedUserId) {
+        res.status(403).json({ error: 'You can only access your own transcriptions' });
+        return;
+      }
+
+      // For transcription ownership verification
+      if (transcription.userId && transcription.userId !== authenticatedUserId) {
         res.status(403).json({ error: 'Access denied to this transcription' });
         return;
       }
@@ -133,7 +103,11 @@ export class TranscriptionController implements ITranscriptionController {
         videoUrl: transcription.videoUrl,
         videoTitle: transcription.videoTitle,
         status: transcription.status,
-        result: transcription.result,
+        transcript: transcription.transcript,
+        duration: transcription.duration,
+        wordCount: transcription.wordCount,
+        processingTime: transcription.processingTime,
+        accuracy: transcription.accuracy,
         createdAt: transcription.createdAt,
         updatedAt: transcription.updatedAt
       });
@@ -146,55 +120,81 @@ export class TranscriptionController implements ITranscriptionController {
 
   async getUserTranscriptions(req: AuthRequest, res: Response): Promise<void> {
     try {
+      const userId = req.params.userId;
+      const authenticatedUserId = req.userId;
+      
+      // Verify user can only access their own transcriptions
+      if (userId !== authenticatedUserId) {
+        res.status(403).json({ error: 'You can only access your own transcriptions' });
+        return;
+      }
+
+      console.log(`📝 Get user transcriptions: ${userId?.substring(0, 8)}...`);
+      
       const limit = parseInt(req.query.limit as string) || 50;
       const offset = parseInt(req.query.offset as string) || 0;
-      
-      const result = await this.transcriptionService.getUserTranscriptions(
-        req.userId!,
-        limit,
-        offset
-      );
 
-      // AGGRESSIVE cache prevention
-      res.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, private');
-      res.set('Pragma', 'no-cache');
-      res.set('Expires', '0');
-      res.set('ETag', Math.random().toString());
-      res.set('Last-Modified', new Date().toUTCString());
-      res.set('Vary', '*');
+      const result = await this.transcriptionService.getUserTranscriptions(userId!, limit, offset);
       
-      res.json({
-        transcriptions: result.transcriptions,
-        total: result.total,
-        page: Math.floor(offset / limit) + 1,
-        limit: limit
-      });
+      console.log(`✅ Retrieved ${result.transcriptions.length} transcriptions for user: ${userId?.substring(0, 8)}...`);
+      
+      res.json(result);
       
     } catch (error: any) {
-      console.error('Error getting user transcriptions:', error);
-      res.status(500).json({ error: error.message || 'Failed to get transcriptions' });
+      console.error('Error fetching user transcriptions:', error);
+      res.status(500).json({ error: error.message || 'Failed to fetch transcriptions' });
     }
   }
 
   async updateTranscription(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const userId = req.params.userId;
+      const authenticatedUserId = req.userId;
       
-      // Validate input
-      const validatedInput = updateTranscriptionSchema.parse(req.body);
+      // Verify user can only update their own transcriptions
+      if (userId !== authenticatedUserId) {
+        res.status(403).json({ error: 'You can only update your own transcriptions' });
+        return;
+      }
 
-      // Ensure user can only update their own transcriptions
       const transcription = await this.transcriptionService.getTranscription(id);
-      if (!transcription || transcription.userId !== req.userId) {
+      if (!transcription) {
         res.status(404).json({ error: 'Transcription not found' });
         return;
       }
 
-      // Update transcription
+      // Verify transcription belongs to the user
+      if (transcription.userId !== authenticatedUserId) {
+        res.status(403).json({ error: 'Access denied to this transcription' });
+        return;
+      }
+
+      console.log(`🔄 Updating transcription ${id.substring(0, 8)}... for user: ${userId?.substring(0, 8)}...`);
+      
+      const validatedInput = updateTranscriptionSchema.parse(req.body);
       const updatedTranscription = await this.transcriptionService.updateTranscription(id, validatedInput);
       
+      if (!updatedTranscription) {
+        res.status(404).json({ error: 'Transcription not found' });
+        return;
+      }
+      
       console.log(`✅ Transcription updated: ${id.substring(0, 8)}...`);
-      res.json(updatedTranscription);
+      
+      res.json({
+        id: updatedTranscription.id,
+        videoUrl: updatedTranscription.videoUrl,
+        videoTitle: updatedTranscription.videoTitle,
+        status: updatedTranscription.status,
+        transcript: updatedTranscription.transcript,
+        duration: updatedTranscription.duration,
+        wordCount: updatedTranscription.wordCount,
+        processingTime: updatedTranscription.processingTime,
+        accuracy: updatedTranscription.accuracy,
+        createdAt: updatedTranscription.createdAt,
+        updatedAt: updatedTranscription.updatedAt
+      });
       
     } catch (error: any) {
       console.error('Error updating transcription:', error);
@@ -209,35 +209,35 @@ export class TranscriptionController implements ITranscriptionController {
   async processWebhook(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const signature = req.headers['x-webhook-signature'] as string;
+      const result = req.body;
+
+      console.log(`📞 Processing webhook for transcription: ${id.substring(0, 8)}...`);
       
-      console.log(`🔌 Processing webhook for transcription: ${id.substring(0, 8)}...`);
-      
-      // Verify webhook signature (implementation depends on your webhook setup)
-      if (!signature) {
-        res.status(401).json({ error: 'Missing webhook signature' });
-        return;
+      // Validate webhook secret if configured
+      const webhookSecret = process.env.TRANSCRIPTION_WEBHOOK_SECRET;
+      if (webhookSecret) {
+        const providedSecret = req.headers['x-webhook-secret'] as string;
+        if (providedSecret !== webhookSecret) {
+          console.log(`❌ Invalid webhook secret for transcription: ${id}`);
+          res.status(401).json({ error: 'Invalid webhook secret' });
+          return;
+        }
       }
 
-      // Process webhook result
-      const result = {
-        success: req.body.success,
-        transcript: req.body.transcript,
-        duration: req.body.duration,
-        wordCount: req.body.wordCount,
-        processingTime: req.body.processingTime,
-        accuracy: req.body.accuracy,
-        error: req.body.error
-      };
+      const updatedTranscription = await this.transcriptionService.processWebhookResult(id, result);
       
-      const transcription = await this.transcriptionService.processWebhookResult(id, result);
-      if (!transcription) {
+      if (!updatedTranscription) {
         res.status(404).json({ error: 'Transcription not found' });
         return;
       }
       
-      console.log(`✅ Webhook processed for: ${id.substring(0, 8)}...`);
-      res.json({ message: 'Webhook processed successfully' });
+      console.log(`✅ Webhook processed for transcription: ${id.substring(0, 8)}... - Status: ${updatedTranscription.status}`);
+      
+      res.json({
+        success: true,
+        transcriptionId: updatedTranscription.id,
+        status: updatedTranscription.status
+      });
       
     } catch (error: any) {
       console.error('Error processing webhook:', error);

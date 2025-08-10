@@ -59,12 +59,7 @@ export const createTranscriptionSchema = z.object({
   status: z.nativeEnum(TranscriptionStatus).optional()
 });
 
-// Anonymous transcription schema (no userId required)
-export const createAnonymousTranscriptionSchema = z.object({
-  videoUrl: z.string().url(),
-  videoTitle: z.string().optional(),
-  status: z.nativeEnum(TranscriptionStatus).optional()
-});
+
 
 export const updateTranscriptionSchema = z.object({
   transcript: z.string().optional(),

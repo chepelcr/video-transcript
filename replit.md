@@ -3,10 +3,17 @@
 This is a video transcription service application built with a full-stack TypeScript architecture. The application allows users to submit video URLs for transcription, operating on a freemium model that offers 3 free transcriptions before requiring a paid subscription. It integrates with both Stripe and PayPal for payment processing and features a modern React frontend. The project's ambition is to provide an efficient and reliable video transcription solution, with a focus on user experience and flexible deployment.
 
 ## Recent Changes (August 2025)
+**Domain-like URL Structure Implementation** - Restructured transcription API with domain-style URLs:
+- ✅ **URL Pattern Change**: Moved from /api/transcriptions to /users/{userId}/transcriptions structure
+- ✅ **Removed Anonymous Endpoints**: Deleted /api/transcriptions/anonymous (authentication always required)
+- ✅ **User Authorization**: Users can only access/modify their own transcriptions via URL validation
+- ✅ **Domain-style Routes**: POST/GET/PATCH /users/{userId}/transcriptions/{id} pattern implemented
+- ✅ **Public Access Routes**: GET /transcriptions/{id}/public for public transcription viewing
+- ✅ **Webhook Integration**: POST /transcriptions/webhook/{id} for processing callbacks
+
 **AWS API Gateway Lambda Integration Completed** - Successfully implemented comprehensive AWS Lambda/API Gateway architecture:
 - ✅ **AWS API Gateway Authorization**: Policy-based IAM authorization with API key validation
 - ✅ **Lambda Handler Pattern**: Complete AWS Lambda entry point with request type detection
-- ✅ **Anonymous Transcription Endpoints**: POST /api/transcriptions/anonymous (no auth required, working)
 - ✅ **Public Retrieval Endpoints**: GET /api/transcriptions/{id}/public (optional auth)
 - ✅ **API Gateway Middleware**: Automatic detection and handling of API Gateway requests vs normal app requests  
 - ✅ **Stateless Operation**: Perfect for serverless/lambda deployments without persistent state
