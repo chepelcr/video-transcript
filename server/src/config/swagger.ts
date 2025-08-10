@@ -726,14 +726,28 @@ export class SwaggerConfig {
   }
 
   public setupSwaggerEndpoints(app: Express): void {
-    // OpenAPI JSON endpoint
-    app.get('/api-docs', (req, res) => {
+    // OpenAPI JSON endpoint - use /api path to avoid Vite interference
+    app.get('/api/docs/openapi.json', (req, res) => {
+      res.set('Content-Type', 'application/json');
       res.json(this.getOpenApiSpec());
     });
 
-    // Swagger UI HTML endpoint
+    // Swagger UI HTML endpoint - use /api path to avoid Vite interference
+    app.get('/api/docs', (req, res) => {
+      const swaggerHtml = this.generateSwaggerHtml();
+      res.set('Content-Type', 'text/html');
+      res.send(swaggerHtml);
+    });
+    
+    // Legacy endpoints for backward compatibility (these may be intercepted by Vite)
+    app.get('/api-docs', (req, res) => {
+      res.set('Content-Type', 'application/json');
+      res.json(this.getOpenApiSpec());
+    });
+
     app.get('/docs', (req, res) => {
       const swaggerHtml = this.generateSwaggerHtml();
+      res.set('Content-Type', 'text/html');
       res.send(swaggerHtml);
     });
   }
@@ -775,7 +789,7 @@ export class SwaggerConfig {
     <script>
         window.onload = function() {
             const ui = SwaggerUIBundle({
-                url: '/api-docs',
+                url: '/api/docs/openapi.json',
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [

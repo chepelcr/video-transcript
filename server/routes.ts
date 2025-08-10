@@ -8,6 +8,7 @@ import {
   capturePaypalOrder,
   loadPaypalDefault,
 } from "./paypal";
+import { SwaggerConfig } from './src/config/swagger';
 import { transcriptionService } from "./transcription-service";
 import { insertTranscriptionSchema } from "@shared/schema";
 import { authenticateToken } from "./auth";
@@ -23,6 +24,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup Swagger API documentation (must be first to avoid Vite interference)
+  const swaggerConfig = new SwaggerConfig();
+  swaggerConfig.setupSwaggerEndpoints(app);
+
   // Health check endpoint for Docker
   app.get("/health", (req, res) => {
     res.status(200).json({
@@ -31,6 +36,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       version: process.env.npm_package_version || "1.0.0",
     });
   });
+  
   // Setup authentication routes
    setupAuthRoutes(app);
   // PayPal routes

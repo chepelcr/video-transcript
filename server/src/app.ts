@@ -42,29 +42,20 @@ export async function createApp(): Promise<Express> {
   // Connect to database
   await connectDatabase();
 
-  // Setup Swagger API documentation
+  // API Documentation endpoints (must be before frontend fallback)
   const swaggerConfig = new SwaggerConfig();
   swaggerConfig.setupSwaggerEndpoints(app);
 
   // Health endpoints (no /api prefix for load balancer compatibility)
   app.use('/', healthRoutes.getRouter());
 
-  // New API routes (industry standard architecture)
+  // API routes (industry standard architecture)
   app.use('/api/auth', authRoutes.getRouter());
   app.use('/api/transcriptions', transcriptionRoutes.getRouter());
   app.use('/api/payments', paymentRoutes.getRouter());
   app.use('/api/users', userRoutes.getRouter());
 
-  // TODO: Migrate old routes to new architecture
-
-  // Health check endpoint
-  app.get('/health', (req, res) => {
-    res.json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      version: '1.0.0'
-    });
-  });
+  // Remove duplicate health endpoint (handled by healthRoutes)
 
   // Error handling middleware
   app.use((err: any, req: any, res: any, next: any) => {
