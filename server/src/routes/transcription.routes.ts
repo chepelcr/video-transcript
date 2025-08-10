@@ -14,6 +14,17 @@ export class TranscriptionRoutes {
   }
 
   private setupRoutes(): void {
+    // Lambda-style endpoints - no authentication required
+    this.router.post('/anonymous', (req, res) => 
+      this.transcriptionController.createAnonymousTranscription(req, res)
+    );
+
+    // Public endpoint to get transcription by ID (lambda-style)
+    this.router.get('/:id/public',
+      (req, res, next) => this.authMiddleware.optionalAuthenticate(req, res, next),
+      (req, res) => this.transcriptionController.getTranscription(req, res)
+    );
+
     // Protected routes - require authentication
     this.router.post('/',
       (req, res, next) => this.authMiddleware.authenticate(req, res, next),

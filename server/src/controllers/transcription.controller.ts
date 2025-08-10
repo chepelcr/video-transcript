@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ITranscriptionService } from '../services/transcription.service';
 import { 
   createTranscriptionSchema, 
+  createAnonymousTranscriptionSchema,
   updateTranscriptionSchema,
   TranscriptionStatus 
 } from '../models/transcription.model';
@@ -9,6 +10,7 @@ import { AuthRequest } from '../types/auth.types';
 
 export interface ITranscriptionController {
   createTranscription(req: AuthRequest, res: Response): Promise<void>;
+  createAnonymousTranscription(req: AuthRequest, res: Response): Promise<void>;
   getTranscription(req: AuthRequest, res: Response): Promise<void>;
   getUserTranscriptions(req: AuthRequest, res: Response): Promise<void>;
   updateTranscription(req: AuthRequest, res: Response): Promise<void>;
@@ -55,8 +57,53 @@ export class TranscriptionController implements ITranscriptionController {
         createdAt: transcription.createdAt
       });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating transcription:', error);
+      if (error.name === 'ZodError') {
+        res.status(400).json({ error: 'Invalid input data', details: error.errors });
+        return;
+      }
+      res.status(500).json({ error: error.message || 'Failed to create transcription' });
+    }
+  }
+
+  // Lambda-style endpoint: No authentication required
+  async createAnonymousTranscription(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      console.log(`🚀 Creating anonymous transcription (lambda-style)`);
+      
+      const { videoUrl } = req.body;
+      
+      // Validate input for anonymous transcription
+      const validatedData = createAnonymousTranscriptionSchema.parse({
+        videoUrl
+      });
+      
+      const validatedInput = {
+        userId: null, // No user ID for anonymous transcriptions
+        videoUrl: validatedData.videoUrl,
+        videoTitle: validatedData.videoTitle
+      };
+
+      // Create anonymous transcription (bypasses user limits)
+      const transcription = await this.transcriptionService.createAnonymousTranscription(validatedInput);
+      
+      // Submit for processing
+      await this.transcriptionService.submitForProcessing(transcription.id);
+      
+      console.log(`✅ Anonymous transcription created: ${transcription.id.substring(0, 8)}...`);
+      
+      res.status(201).json({
+        id: transcription.id,
+        videoUrl: transcription.videoUrl,
+        videoTitle: transcription.videoTitle,
+        status: transcription.status,
+        createdAt: transcription.createdAt,
+        anonymous: true
+      });
+      
+    } catch (error: any) {
+      console.error('Error creating anonymous transcription:', error);
       if (error.name === 'ZodError') {
         res.status(400).json({ error: 'Invalid input data', details: error.errors });
         return;
@@ -75,17 +122,25 @@ export class TranscriptionController implements ITranscriptionController {
         return;
       }
 
-      // Ensure user can only access their own transcriptions
-      if (transcription.userId !== req.userId) {
-        res.status(403).json({ error: 'Access denied' });
+      // Allow access if user owns it OR if it's anonymous transcription (no userId)
+      if (req.userId && transcription.userId && transcription.userId !== req.userId) {
+        res.status(403).json({ error: 'Access denied to this transcription' });
         return;
       }
 
-      res.json(transcription);
+      res.json({
+        id: transcription.id,
+        videoUrl: transcription.videoUrl,
+        videoTitle: transcription.videoTitle,
+        status: transcription.status,
+        result: transcription.result,
+        createdAt: transcription.createdAt,
+        updatedAt: transcription.updatedAt
+      });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting transcription:', error);
-      res.status(500).json({ error: 'Failed to get transcription' });
+      res.status(500).json({ error: error.message || 'Failed to get transcription' });
     }
   }
 
@@ -115,9 +170,9 @@ export class TranscriptionController implements ITranscriptionController {
         limit: limit
       });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting user transcriptions:', error);
-      res.status(500).json({ error: 'Failed to get transcriptions' });
+      res.status(500).json({ error: error.message || 'Failed to get transcriptions' });
     }
   }
 
@@ -127,34 +182,27 @@ export class TranscriptionController implements ITranscriptionController {
       
       // Validate input
       const validatedInput = updateTranscriptionSchema.parse(req.body);
-      
-      // Get transcription to verify ownership
+
+      // Ensure user can only update their own transcriptions
       const transcription = await this.transcriptionService.getTranscription(id);
-      if (!transcription) {
+      if (!transcription || transcription.userId !== req.userId) {
         res.status(404).json({ error: 'Transcription not found' });
         return;
       }
 
-      // Ensure user can only update their own transcriptions
-      if (transcription.userId !== req.userId) {
-        res.status(403).json({ error: 'Access denied' });
-        return;
-      }
-
       // Update transcription
-      const updated = await this.transcriptionService.updateTranscription(id, validatedInput);
+      const updatedTranscription = await this.transcriptionService.updateTranscription(id, validatedInput);
       
-      console.log(`✅ Transcription updated: ${id.substring(0, 8)}... - Status: ${updated?.status}`);
+      console.log(`✅ Transcription updated: ${id.substring(0, 8)}...`);
+      res.json(updatedTranscription);
       
-      res.json(updated);
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating transcription:', error);
       if (error.name === 'ZodError') {
         res.status(400).json({ error: 'Invalid input data', details: error.errors });
         return;
       }
-      res.status(500).json({ error: 'Failed to update transcription' });
+      res.status(500).json({ error: error.message || 'Failed to update transcription' });
     }
   }
 
@@ -163,37 +211,37 @@ export class TranscriptionController implements ITranscriptionController {
       const { id } = req.params;
       const signature = req.headers['x-webhook-signature'] as string;
       
-      console.log(`📞 Processing webhook for transcription: ${id.substring(0, 8)}...`);
+      console.log(`🔌 Processing webhook for transcription: ${id.substring(0, 8)}...`);
       
-      // Verify webhook signature (skip for testing)
+      // Verify webhook signature (implementation depends on your webhook setup)
       if (!signature) {
-        console.log('⚠️ Webhook signature missing, continuing anyway for testing');
-      }
-
-      const { success, transcript, duration, wordCount, processingTime, accuracy, error } = req.body;
-
-      // Process webhook result
-      const result = await this.transcriptionService.processWebhookResult(id, {
-        success,
-        transcript,
-        duration,
-        wordCount,
-        processingTime,
-        accuracy,
-        error
-      });
-
-      if (!result) {
-        res.status(404).json({ error: 'Transcription not found' });
+        res.status(401).json({ error: 'Missing webhook signature' });
         return;
       }
 
-      console.log(`✅ Webhook processed successfully for: ${id.substring(0, 8)}...`);
+      // Process webhook result
+      const result = {
+        success: req.body.success,
+        transcript: req.body.transcript,
+        duration: req.body.duration,
+        wordCount: req.body.wordCount,
+        processingTime: req.body.processingTime,
+        accuracy: req.body.accuracy,
+        error: req.body.error
+      };
+      
+      const transcription = await this.transcriptionService.processWebhookResult(id, result);
+      if (!transcription) {
+        res.status(404).json({ error: 'Transcription not found' });
+        return;
+      }
+      
+      console.log(`✅ Webhook processed for: ${id.substring(0, 8)}...`);
       res.json({ message: 'Webhook processed successfully' });
       
-    } catch (error) {
-      console.error('Webhook processing error:', error);
-      res.status(500).json({ error: 'Failed to process webhook' });
+    } catch (error: any) {
+      console.error('Error processing webhook:', error);
+      res.status(500).json({ error: error.message || 'Failed to process webhook' });
     }
   }
 }

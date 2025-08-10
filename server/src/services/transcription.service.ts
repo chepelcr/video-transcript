@@ -11,6 +11,7 @@ import { VideoTitleService } from './video-title.service';
 
 export interface ITranscriptionService {
   createTranscription(input: CreateTranscriptionInput): Promise<ITranscription>;
+  createAnonymousTranscription(input: CreateTranscriptionInput): Promise<ITranscription>;
   getTranscription(id: string): Promise<ITranscription | null>;
   getUserTranscriptions(userId: string, limit?: number, offset?: number): Promise<{
     transcriptions: ITranscription[];
@@ -59,6 +60,34 @@ export class TranscriptionService implements ITranscriptionService {
     });
 
     console.log(`✅ Transcription created: ${transcription.id.substring(0, 8)}... - ${videoTitle}`);
+    return transcription;
+  }
+
+  // Lambda-style: Create transcription without user authentication
+  async createAnonymousTranscription(input: CreateTranscriptionInput): Promise<ITranscription> {
+    console.log(`🚀 Creating anonymous transcription for video: ${input.videoUrl}`);
+    
+    // Extract video title if not provided
+    let videoTitle = input.videoTitle;
+    if (!videoTitle) {
+      try {
+        videoTitle = await this.videoTitleService.extractTitle(input.videoUrl);
+        console.log(`✅ Extracted video title: "${videoTitle}"`);
+      } catch (error) {
+        console.log(`⚠️ Failed to extract video title, using fallback`);
+        videoTitle = 'Unknown Video';
+      }
+    }
+
+    // Create anonymous transcription (no user limits applied)
+    const transcription = await this.transcriptionRepository.create({
+      ...input,
+      userId: null, // Anonymous transcription
+      videoTitle,
+      status: TranscriptionStatus.PENDING
+    });
+
+    console.log(`✅ Anonymous transcription created: ${transcription.id.substring(0, 8)}... - ${videoTitle}`);
     return transcription;
   }
 

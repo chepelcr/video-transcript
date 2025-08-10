@@ -11,7 +11,7 @@ export enum TranscriptionStatus {
 // Base transcription interface
 export interface ITranscription {
   id: string;
-  userId: string;
+  userId: string | null; // Allow null for anonymous transcriptions
   videoUrl: string;
   videoTitle?: string | null;
   transcript?: string | null;
@@ -21,11 +21,13 @@ export interface ITranscription {
   processingTime?: number | null;
   accuracy?: number | null;
   createdAt: Date;
+  updatedAt?: Date;
+  result?: any; // For backwards compatibility
 }
 
 // Create transcription input
 export interface CreateTranscriptionInput {
-  userId: string;
+  userId: string | null; // Allow null for anonymous transcriptions
   videoUrl: string;
   videoTitle?: string;
   status?: TranscriptionStatus;
@@ -52,6 +54,13 @@ export interface TranscriptionQueryOptions {
 // Validation schemas
 export const createTranscriptionSchema = z.object({
   userId: z.string().uuid(),
+  videoUrl: z.string().url(),
+  videoTitle: z.string().optional(),
+  status: z.nativeEnum(TranscriptionStatus).optional()
+});
+
+// Anonymous transcription schema (no userId required)
+export const createAnonymousTranscriptionSchema = z.object({
   videoUrl: z.string().url(),
   videoTitle: z.string().optional(),
   status: z.nativeEnum(TranscriptionStatus).optional()
