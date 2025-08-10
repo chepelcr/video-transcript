@@ -339,32 +339,24 @@ export class SwaggerConfig {
       }
     });
 
-    this.registerEndpoint({
-      method: 'GET',
-      path: '/api/users/transcriptions',
-      name: 'Get User Transcriptions',
-      description: 'Get all transcriptions for authenticated user',
-      tags: ['Users'],
-      middleware: ['auth'],
-      responses: {
-        '200': {
-          description: 'User transcriptions retrieved'
-        },
-        '401': {
-          description: 'Not authenticated'
-        }
-      }
-    });
 
-    // Transcription endpoints
+
+    // Domain-style Transcription endpoints
     this.registerEndpoint({
       method: 'POST',
-      path: '/api/transcriptions',
-      name: 'Create Transcription',
-      description: 'Submit video URL for transcription processing',
+      path: '/users/{userId}/transcriptions',
+      name: 'Create User Transcription',
+      description: 'Submit video URL for transcription processing for specific user',
       tags: ['Transcriptions'],
       middleware: ['auth'],
       parameters: [
+        {
+          name: 'userId',
+          in: 'path',
+          required: true,
+          description: 'User UUID (must match authenticated user)',
+          type: 'string'
+        },
         {
           name: 'videoUrl',
           in: 'body',
@@ -383,35 +375,57 @@ export class SwaggerConfig {
         },
         '401': {
           description: 'Not authenticated'
+        },
+        '403': {
+          description: 'User can only access their own transcriptions'
         }
       }
     });
 
     this.registerEndpoint({
       method: 'GET',
-      path: '/api/transcriptions',
-      name: 'Get All Transcriptions',
-      description: 'Get all transcriptions for authenticated user',
+      path: '/users/{userId}/transcriptions',
+      name: 'Get User Transcriptions',
+      description: 'Get all transcriptions for specific user',
       tags: ['Transcriptions'],
       middleware: ['auth'],
+      parameters: [
+        {
+          name: 'userId',
+          in: 'path',
+          required: true,
+          description: 'User UUID (must match authenticated user)',
+          type: 'string'
+        }
+      ],
       responses: {
         '200': {
           description: 'Transcriptions retrieved successfully'
         },
         '401': {
           description: 'Not authenticated'
+        },
+        '403': {
+          description: 'User can only access their own transcriptions'
         }
       }
     });
 
     this.registerEndpoint({
       method: 'GET',
-      path: '/api/transcriptions/:id',
-      name: 'Get Transcription By ID',
-      description: 'Get specific transcription by ID',
+      path: '/users/{userId}/transcriptions/{id}',
+      name: 'Get User Transcription By ID',
+      description: 'Get specific transcription by ID for specific user',
       tags: ['Transcriptions'],
       middleware: ['auth'],
       parameters: [
+        {
+          name: 'userId',
+          in: 'path',
+          required: true,
+          description: 'User UUID (must match authenticated user)',
+          type: 'string'
+        },
         {
           name: 'id',
           in: 'path',
@@ -427,6 +441,9 @@ export class SwaggerConfig {
         '401': {
           description: 'Not authenticated'
         },
+        '403': {
+          description: 'User can only access their own transcriptions'
+        },
         '404': {
           description: 'Transcription not found'
         }
@@ -434,12 +451,65 @@ export class SwaggerConfig {
     });
 
     this.registerEndpoint({
-      method: 'DELETE',
-      path: '/api/transcriptions/:id',
-      name: 'Delete Transcription',
-      description: 'Delete specific transcription by ID',
+      method: 'PATCH',
+      path: '/users/{userId}/transcriptions/{id}',
+      name: 'Update User Transcription',
+      description: 'Update specific transcription for specific user',
       tags: ['Transcriptions'],
       middleware: ['auth'],
+      parameters: [
+        {
+          name: 'userId',
+          in: 'path',
+          required: true,
+          description: 'User UUID (must match authenticated user)',
+          type: 'string'
+        },
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Transcription UUID',
+          type: 'string'
+        },
+        {
+          name: 'transcript',
+          in: 'body',
+          required: false,
+          description: 'Updated transcript text',
+          type: 'string'
+        },
+        {
+          name: 'status',
+          in: 'body',
+          required: false,
+          description: 'Updated transcription status',
+          type: 'string'
+        }
+      ],
+      responses: {
+        '200': {
+          description: 'Transcription updated successfully'
+        },
+        '401': {
+          description: 'Not authenticated'
+        },
+        '403': {
+          description: 'User can only access their own transcriptions'
+        },
+        '404': {
+          description: 'Transcription not found'
+        }
+      }
+    });
+
+    // Public access endpoints
+    this.registerEndpoint({
+      method: 'GET',
+      path: '/transcriptions/{id}/public',
+      name: 'Get Public Transcription',
+      description: 'Get transcription for public viewing (no authentication required)',
+      tags: ['Transcriptions'],
       parameters: [
         {
           name: 'id',
@@ -451,10 +521,49 @@ export class SwaggerConfig {
       ],
       responses: {
         '200': {
-          description: 'Transcription deleted successfully'
+          description: 'Public transcription retrieved successfully'
         },
-        '401': {
-          description: 'Not authenticated'
+        '404': {
+          description: 'Transcription not found or not public'
+        }
+      }
+    });
+
+    this.registerEndpoint({
+      method: 'POST',
+      path: '/transcriptions/webhook/{id}',
+      name: 'Transcription Webhook',
+      description: 'Webhook endpoint for transcription processing updates',
+      tags: ['Transcriptions'],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Transcription UUID',
+          type: 'string'
+        },
+        {
+          name: 'status',
+          in: 'body',
+          required: true,
+          description: 'Updated transcription status',
+          type: 'string'
+        },
+        {
+          name: 'transcript',
+          in: 'body',
+          required: false,
+          description: 'Transcription text (if completed)',
+          type: 'string'
+        }
+      ],
+      responses: {
+        '200': {
+          description: 'Webhook processed successfully'
+        },
+        '400': {
+          description: 'Invalid webhook payload'
         },
         '404': {
           description: 'Transcription not found'
