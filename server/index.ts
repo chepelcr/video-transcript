@@ -86,15 +86,15 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    // Use the new enterprise app but with legacy Vite integration
-    console.log('🚀 Starting hybrid server (new architecture + legacy Vite)...');
+    // For now, let's use the working legacy routes instead of the new architecture
+    // until we can debug the database connection issue
+    console.log('🚀 Starting server with legacy routes (working configuration)...');
     
-    // Create the new enterprise app and mount it
-    const enterpriseApp = await createApp();
-    app.use('/', enterpriseApp);
+    // Import and use the working legacy routes
+    const { registerRoutes } = await import('./routes');
+    const server = await registerRoutes(app);
     
-    // Create server
-    const server = await import('http').then(http => http.createServer(app));
+    // Server is created by registerRoutes above
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
