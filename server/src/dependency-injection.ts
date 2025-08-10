@@ -50,7 +50,7 @@ export const authMiddleware = new AuthMiddleware(authService);
 // Modern controllers with embedded routes (AWS API Gateway compatible)
 export const modernTranscriptionController = new ModernTranscriptionController(transcriptionService);
 export const modernAuthController = new ModernAuthController(authService, userRepository);
-export const modernUserController = new ModernUserController(userRepository, transcriptionRepository);
+export const modernUserController = new ModernUserController(userRepository);
 export const modernPaymentController = new ModernPaymentController(userRepository);
 export const modernHealthController = new ModernHealthController();
 

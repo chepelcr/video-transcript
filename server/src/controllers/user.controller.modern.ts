@@ -1,13 +1,11 @@
 import { Request, Response, Router } from 'express';
 import { IUserRepository } from '../repositories/user.repository';
-import { ITranscriptionRepository } from '../repositories/transcription.repository';
 import { UpdateUserInput } from '../models/user.model';
 import { apiGatewayMiddleware } from '../middlewares/api-gateway.middleware';
 
 export interface IUserController {
   getProfile(req: Request, res: Response): Promise<void>;
   updateProfile(req: Request, res: Response): Promise<void>;
-  getTranscriptions(req: Request, res: Response): Promise<void>;
   getRouter(): Router;
 }
 
@@ -15,8 +13,7 @@ export class UserController implements IUserController {
   private router: Router;
 
   constructor(
-    private userRepository: IUserRepository,
-    private transcriptionRepository: ITranscriptionRepository
+    private userRepository: IUserRepository
   ) {
     this.router = Router();
     this.setupRoutes();
@@ -25,11 +22,18 @@ export class UserController implements IUserController {
   private setupRoutes(): void {
     /**
      * @swagger
-     * /api/users/profile:
+     * /api/users/{userId}/profile:
      *   get:
      *     summary: Get User Profile
      *     description: Get detailed user profile information
      *     tags: [Users]
+     *     parameters:
+     *       - in: path
+     *         name: userId
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: User ID
      *     responses:
      *       200:
      *         description: User profile retrieved
@@ -43,16 +47,35 @@ export class UserController implements IUserController {
      *           application/json:
      *             schema:
      *               $ref: '#/components/schemas/ErrorResponse'
+     *       403:
+     *         description: User can only access their own profile
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ErrorResponse'
+     *       404:
+     *         description: User not found
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ErrorResponse'
      */
-    this.router.get('/profile', apiGatewayMiddleware, this.getProfile.bind(this));
+    this.router.get('/:userId/profile', apiGatewayMiddleware, this.getProfile.bind(this));
 
     /**
      * @swagger
-     * /api/users/profile:
+     * /api/users/{userId}/profile:
      *   put:
      *     summary: Update User Profile
-     *     description: Update user profile information (username only)
+     *     description: Update user profile information (username, firstName, lastName)
      *     tags: [Users]
+     *     parameters:
+     *       - in: path
+     *         name: userId
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: User ID
      *     requestBody:
      *       required: false
      *       content:
@@ -62,7 +85,16 @@ export class UserController implements IUserController {
      *             properties:
      *               username:
      *                 type: string
-     *                 description: New username
+     *                 description: New username (3-20 characters)
+     *                 example: "johndoe123"
+     *               firstName:
+     *                 type: string
+     *                 description: User's first name
+     *                 example: "John"
+     *               lastName:
+     *                 type: string
+     *                 description: User's last name
+     *                 example: "Doe"
      *     responses:
      *       200:
      *         description: Profile updated successfully
@@ -71,7 +103,7 @@ export class UserController implements IUserController {
      *             schema:
      *               $ref: '#/components/schemas/User'
      *       400:
-     *         description: Username already taken
+     *         description: Invalid input or username already taken
      *         content:
      *           application/json:
      *             schema:
@@ -82,56 +114,38 @@ export class UserController implements IUserController {
      *           application/json:
      *             schema:
      *               $ref: '#/components/schemas/ErrorResponse'
+     *       403:
+     *         description: User can only update their own profile
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ErrorResponse'
+     *       404:
+     *         description: User not found
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ErrorResponse'
      */
-    this.router.put('/profile', apiGatewayMiddleware, this.updateProfile.bind(this));
+    this.router.put('/:userId/profile', apiGatewayMiddleware, this.updateProfile.bind(this));
 
-    /**
-     * @swagger
-     * /api/users/transcriptions:
-     *   get:
-     *     summary: Get User Transcriptions (Legacy)
-     *     description: Get all transcriptions for authenticated user (legacy endpoint, use /users/{userId}/transcriptions instead)
-     *     tags: [Users]
-     *     deprecated: true
-     *     responses:
-     *       200:
-     *         description: User transcriptions retrieved
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 transcriptions:
-     *                   type: array
-     *                   items:
-     *                     $ref: '#/components/schemas/Transcription'
-     *                 total:
-     *                   type: integer
-     *       401:
-     *         description: Not authenticated
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ErrorResponse'
-     */
-    this.router.get('/transcriptions', apiGatewayMiddleware, this.getTranscriptions.bind(this));
+
   }
 
   async getProfile(req: Request, res: Response): Promise<void> {
     try {
-      const authHeader = req.headers.authorization;
-      const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
+      const userId = req.params.userId;
       
-      if (!token) {
-        res.status(401).json({ error: 'No token provided' });
+      if (!userId) {
+        res.status(400).json({ error: 'User ID is required' });
         return;
       }
 
-      // Extract user ID from token or use AWS API Gateway user context
-      const userId = req.headers['x-user-id'] as string;
+      // AWS API Gateway handles authorization - verify user can access this profile
+      const authenticatedUserId = req.headers['x-user-id'] as string;
       
-      if (!userId) {
-        res.status(401).json({ error: 'User ID not found' });
+      if (authenticatedUserId && userId !== authenticatedUserId) {
+        res.status(403).json({ error: 'You can only access your own profile' });
         return;
       }
 
@@ -156,19 +170,18 @@ export class UserController implements IUserController {
 
   async updateProfile(req: Request, res: Response): Promise<void> {
     try {
-      const authHeader = req.headers.authorization;
-      const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
+      const userId = req.params.userId;
       
-      if (!token) {
-        res.status(401).json({ error: 'No token provided' });
+      if (!userId) {
+        res.status(400).json({ error: 'User ID is required' });
         return;
       }
 
-      // Extract user ID from token or use AWS API Gateway user context
-      const userId = req.headers['x-user-id'] as string;
+      // AWS API Gateway handles authorization - verify user can update this profile
+      const authenticatedUserId = req.headers['x-user-id'] as string;
       
-      if (!userId) {
-        res.status(401).json({ error: 'User ID not found' });
+      if (authenticatedUserId && userId !== authenticatedUserId) {
+        res.status(403).json({ error: 'You can only update your own profile' });
         return;
       }
 
@@ -197,45 +210,7 @@ export class UserController implements IUserController {
     }
   }
 
-  async getTranscriptions(req: Request, res: Response): Promise<void> {
-    try {
-      const authHeader = req.headers.authorization;
-      const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
-      
-      if (!token) {
-        res.status(401).json({ error: 'No token provided' });
-        return;
-      }
 
-      // Extract user ID from token or use AWS API Gateway user context
-      const userId = req.headers['x-user-id'] as string;
-      
-      if (!userId) {
-        res.status(401).json({ error: 'User ID not found' });
-        return;
-      }
-
-      console.log(`📝 Get user transcriptions: ${userId.substring(0, 8)}...`);
-
-      const limit = parseInt(req.query.limit as string) || 50;
-      const offset = parseInt(req.query.offset as string) || 0;
-
-      const transcriptions = await this.transcriptionRepository.findByUserId(userId, Math.min(limit, 100), Math.max(offset, 0));
-
-      const total = await this.transcriptionRepository.countByUserId(userId);
-      
-      console.log(`✅ Retrieved ${transcriptions.length} transcriptions for user: ${userId.substring(0, 8)}...`);
-      
-      res.json({
-        transcriptions,
-        total
-      });
-      
-    } catch (error: any) {
-      console.error('Error getting user transcriptions:', error);
-      res.status(500).json({ error: error.message || 'Failed to get transcriptions' });
-    }
-  }
 
   public getRouter(): Router {
     return this.router;

@@ -14,7 +14,6 @@ export interface IAuthController {
   forgotPassword(req: Request, res: Response): Promise<void>;
   resetPassword(req: Request, res: Response): Promise<void>;
   refreshToken(req: Request, res: Response): Promise<void>;
-  getCurrentUser(req: Request, res: Response): Promise<void>;
   getRouter(): Router;
 }
 
@@ -276,28 +275,7 @@ export class AuthController implements IAuthController {
      */
     this.router.post('/refresh-token', apiGatewayMiddleware, this.refreshToken.bind(this));
 
-    /**
-     * @swagger
-     * /api/auth/me:
-     *   get:
-     *     summary: Get Current User
-     *     description: Get authenticated user information
-     *     tags: [Authentication]
-     *     responses:
-     *       200:
-     *         description: User information retrieved
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/User'
-     *       401:
-     *         description: Not authenticated
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ErrorResponse'
-     */
-    this.router.get('/me', apiGatewayMiddleware, this.getCurrentUser.bind(this));
+
   }
 
   async register(req: Request, res: Response): Promise<void> {
@@ -439,36 +417,7 @@ export class AuthController implements IAuthController {
     }
   }
 
-  async getCurrentUser(req: Request, res: Response): Promise<void> {
-    try {
-      const authHeader = req.headers.authorization;
-      const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
-      
-      if (!token) {
-        res.status(401).json({ error: 'No token provided' });
-        return;
-      }
 
-      console.log('👤 Getting current user');
-      
-      // Note: getCurrentUser method needs to be implemented in AuthService
-      // const user = await this.authService.getCurrentUser(token);
-      const user = await this.userRepository.findById('user_id_from_token');
-      
-      if (!user) {
-        res.status(401).json({ error: 'Invalid token' });
-        return;
-      }
-      
-      console.log(`✅ Current user: ${user.username}`);
-      
-      res.json(user);
-      
-    } catch (error: any) {
-      console.error('Error getting current user:', error);
-      res.status(401).json({ error: error.message || 'Authentication failed' });
-    }
-  }
 
   public getRouter(): Router {
     return this.router;
