@@ -1,8 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupAuthRoutes } from "./auth-routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { runMigration } from "./migration";
+// Migration functionality moved to src/config/database.ts
 
 const app = express();
 
@@ -78,11 +77,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Run migration to ensure video_title column exists
-  await runMigration();
-  
-  // Register authentication routes
-  setupAuthRoutes(app);
+  // Migration handled by new database configuration
   
   const server = await registerRoutes(app);
 

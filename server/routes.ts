@@ -1,18 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
-import { authStorage } from "./auth-storage";
-import { setupAuthRoutes } from "./auth-routes";
-import {
-  createPaypalOrder,
-  capturePaypalOrder,
-  loadPaypalDefault,
-} from "./paypal";
 import { SwaggerConfig } from './src/config/swagger';
-import { transcriptionService } from "./transcription-service";
 import { insertTranscriptionSchema } from "@shared/schema";
-import { authenticateToken } from "./auth";
-import { sqsService } from "./sqs-service";
+// Legacy imports removed - functionality migrated to src/ architecture
 import crypto from "crypto";
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -37,20 +28,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   
-  // Setup authentication routes
-   setupAuthRoutes(app);
-  // PayPal routes
-  app.get("/api/paypal/setup", async (req, res) => {
-    await loadPaypalDefault(req, res);
-  });
-
-  app.post("/api/paypal/order", async (req, res) => {
-    await createPaypalOrder(req, res);
-  });
-
-  app.post("/api/paypal/order/:orderID/capture", async (req, res) => {
-    await capturePaypalOrder(req, res);
-  });
+  // Legacy routes removed - migrated to new architecture
+  // TODO: Remove this file once fully migrated to src/app.ts
 
   // Stripe payment route for one-time payments
   app.post("/api/create-payment-intent", async (req, res) => {
