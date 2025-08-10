@@ -154,7 +154,13 @@ export class AuthController implements IAuthController {
         return;
       }
       
-      // For now, just return success - implement email verification logic later
+      const isVerified = await this.authService.verifyEmail(email, code);
+      
+      if (!isVerified) {
+        res.status(400).json({ error: 'Invalid or expired verification code' });
+        return;
+      }
+      
       res.json({ message: 'Email verified successfully' });
       
     } catch (error) {
@@ -173,6 +179,8 @@ export class AuthController implements IAuthController {
         res.status(400).json({ error: 'Email is required' });
         return;
       }
+      
+      await this.authService.sendPasswordResetEmail(email);
       
       // For security, always return success regardless of whether email exists
       res.json({ 
@@ -196,7 +204,13 @@ export class AuthController implements IAuthController {
         return;
       }
       
-      // Implement password reset logic later
+      const isReset = await this.authService.resetPassword(token, newPassword);
+      
+      if (!isReset) {
+        res.status(400).json({ error: 'Invalid or expired reset token' });
+        return;
+      }
+      
       res.json({ 
         message: 'Password reset successfully. You can now log in with your new password.' 
       });

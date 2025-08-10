@@ -5,6 +5,7 @@ import { TranscriptionRepository } from './repositories/transcription.repository
 import { UserRepository } from './repositories/user.repository';
 import { TranscriptionService } from './services/transcription.service';
 import { AuthService } from './services/auth.service';
+import { EmailService } from './services/email.service';
 import { SQSService } from './services/sqs.service';
 import { VideoTitleService } from './services/video-title.service';
 import { TranscriptionController } from './controllers/transcription.controller';
@@ -24,7 +25,8 @@ export const userRepository = new UserRepository();
 // Create services
 export const sqsService = new SQSService();
 export const videoTitleService = new VideoTitleService();
-export const authService = new AuthService(userRepository);
+export const emailService = new EmailService();
+export const authService = new AuthService(userRepository, emailService);
 export const transcriptionService = new TranscriptionService(
   transcriptionRepository,
   userRepository,
