@@ -10,7 +10,7 @@ export class EmailService implements IEmailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: 'email-smtp.us-east-1.amazonaws.com',
       port: 587,
       secure: false, // true for 465, false for other ports
