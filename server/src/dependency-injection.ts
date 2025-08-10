@@ -9,9 +9,11 @@ import { SQSService } from './services/sqs.service';
 import { VideoTitleService } from './services/video-title.service';
 import { TranscriptionController } from './controllers/transcription.controller';
 import { AuthController } from './controllers/auth.controller';
+import { PaymentController } from './controllers/payment.controller';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 import { TranscriptionRoutes } from './routes/transcription.routes';
 import { AuthRoutes } from './routes/auth.routes';
+import { PaymentRoutes } from './routes/payment.routes';
 
 // Create repositories
 export const transcriptionRepository = new TranscriptionRepository();
@@ -31,6 +33,7 @@ export const transcriptionService = new TranscriptionService(
 // Create controllers
 export const authController = new AuthController(authService, userRepository);
 export const transcriptionController = new TranscriptionController(transcriptionService);
+export const paymentController = new PaymentController(userRepository);
 
 // Create middlewares
 export const authMiddleware = new AuthMiddleware(authService);
@@ -38,3 +41,4 @@ export const authMiddleware = new AuthMiddleware(authService);
 // Create routes
 export const authRoutes = new AuthRoutes(authController, authMiddleware);
 export const transcriptionRoutes = new TranscriptionRoutes(transcriptionController, authMiddleware);
+export const paymentRoutes = new PaymentRoutes(paymentController, authMiddleware);

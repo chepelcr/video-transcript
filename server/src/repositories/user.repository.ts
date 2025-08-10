@@ -19,6 +19,12 @@ export interface IUserRepository {
   delete(id: string): Promise<boolean>;
   verifyPassword(user: IUser, password: string): Promise<boolean>;
   incrementTranscriptionsUsed(userId: string): Promise<void>;
+  updateStripeCustomerId(userId: string, customerId: string): Promise<IUser>;
+  updateUserStripeInfo(userId: string, stripeInfo: { 
+    stripeCustomerId: string; 
+    stripeSubscriptionId: string 
+  }): Promise<IUser>;
+  toResponse(user: IUser): UserResponse;
 }
 
 export class UserRepository implements IUserRepository {
@@ -106,9 +112,6 @@ export class UserRepository implements IUserRepository {
     
     const updateData: any = { ...input };
     
-    // Remove password field as it's not part of UpdateUserInput
-    // Password updates should be handled separately
-    
     const [updatedUser] = await db
       .update(users)
       .set({
@@ -164,6 +167,50 @@ export class UserRepository implements IUserRepository {
       .where(eq(users.id, userId));
 
     console.log(`✅ Incremented transcriptions used for user: ${userId.substring(0, 8)}...`);
+  }
+
+  async updateStripeCustomerId(userId: string, customerId: string): Promise<IUser> {
+    console.log(`💳 Updating Stripe customer ID for user: ${userId.substring(0, 8)}...`);
+    
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        stripeCustomerId: customerId,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    if (!updatedUser) {
+      throw new Error('Failed to update user Stripe customer ID');
+    }
+
+    console.log(`✅ Stripe customer ID updated for user: ${userId.substring(0, 8)}...`);
+    return this.mapToModel(updatedUser);
+  }
+
+  async updateUserStripeInfo(userId: string, stripeInfo: { 
+    stripeCustomerId: string; 
+    stripeSubscriptionId: string 
+  }): Promise<IUser> {
+    console.log(`💳 Updating Stripe info for user: ${userId.substring(0, 8)}...`);
+    
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        stripeCustomerId: stripeInfo.stripeCustomerId,
+        stripeSubscriptionId: stripeInfo.stripeSubscriptionId,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    if (!updatedUser) {
+      throw new Error('Failed to update user Stripe info');
+    }
+
+    console.log(`✅ Stripe info updated for user: ${userId.substring(0, 8)}...`);
+    return this.mapToModel(updatedUser);
   }
 
   // Convert database record to model (excluding password)

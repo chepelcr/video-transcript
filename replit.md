@@ -50,6 +50,7 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 - **Multi-language Support**: Comprehensive bilingual support for UI elements, password reset flow, and notifications.
 - **Freemium Model Enforcement**: Usage tracking implemented at service layer to enforce the 3-free-transcription limit.
 - **Enterprise Architecture**: Follows industry-standard layered architecture with proper separation of concerns, dependency injection, and comprehensive error handling.
+- **Payment Integration**: Dedicated payment controllers for both Stripe and PayPal with proper service layer integration.
 - **Deployment**: Optimized for GitHub Pages with custom domain configuration.
 
 # External Dependencies
