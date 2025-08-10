@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import CognitoAuthService from '@/lib/cognito';
 import type { 
   AuthResponse, 
   UserResponse, 
@@ -9,15 +10,16 @@ import type {
   RefreshTokenRequest 
 } from '@shared/auth-schema';
 
-const AUTH_STORAGE_KEY = 'auth_tokens';
+const AUTH_STORAGE_KEY = 'cognito_tokens';
 
-interface AuthTokens {
+interface CognitoTokens {
   accessToken: string;
   refreshToken: string;
+  idToken: string;
 }
 
-// Storage utilities
-const getStoredTokens = (): AuthTokens | null => {
+// Cognito token storage utilities
+const getStoredTokens = (): CognitoTokens | null => {
   try {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
     console.log('Getting stored tokens:', stored ? 'Found' : 'Not found');
@@ -28,13 +30,17 @@ const getStoredTokens = (): AuthTokens | null => {
   }
 };
 
-const setStoredTokens = (tokens: AuthTokens | null): void => {
+const setStoredTokens = (tokens: CognitoTokens | null): void => {
   try {
     if (tokens) {
-      console.log('Storing tokens:', { hasAccess: !!tokens.accessToken, hasRefresh: !!tokens.refreshToken });
+      console.log('Storing Cognito tokens:', { 
+        hasAccess: !!tokens.accessToken, 
+        hasRefresh: !!tokens.refreshToken,
+        hasId: !!tokens.idToken 
+      });
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(tokens));
     } else {
-      console.log('Clearing tokens');
+      console.log('Clearing Cognito tokens');
       localStorage.removeItem(AUTH_STORAGE_KEY);
     }
   } catch (error) {
@@ -42,20 +48,21 @@ const setStoredTokens = (tokens: AuthTokens | null): void => {
   }
 };
 
-// Custom fetch with token
+// Cognito authenticated request
 const authenticatedRequest = async (
   method: string,
   endpoint: string,
   data?: any
 ): Promise<Response> => {
-  const tokens = getStoredTokens();
+  // Get fresh session from Cognito
+  const session = await CognitoAuthService.getCurrentSession();
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
 
-  if (tokens) {
-    headers.Authorization = `Bearer ${tokens.accessToken}`;
+  if (session) {
+    headers.Authorization = `Bearer ${session.getIdToken().getJwtToken()}`;
   }
 
   // Build full URL
@@ -68,38 +75,25 @@ const authenticatedRequest = async (
     body: data ? JSON.stringify(data) : undefined,
   });
 
-  // Handle token refresh on 401/403
-  if ((response.status === 401 || response.status === 403) && tokens) {
+  // Handle token refresh on 401/403 using Cognito
+  if ((response.status === 401 || response.status === 403) && session) {
     try {
-      const refreshResponse = await apiRequest('POST', '/api/auth/refresh', {
-        refreshToken: tokens.refreshToken,
-      });
-      
-      const authData = refreshResponse as unknown as AuthResponse;
-      const newTokens = {
-        accessToken: authData.accessToken,
-        refreshToken: authData.refreshToken,
-      };
-      
-      setStoredTokens(newTokens);
-      
-      // Retry original request with new token
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
-      const fullUrl = baseUrl + endpoint;
-      const retryResponse = await fetch(fullUrl, {
-        method,
-        headers: {
-          ...headers,
-          Authorization: `Bearer ${newTokens.accessToken}`,
-        },
-        body: data ? JSON.stringify(data) : undefined,
-      });
-      
-      return retryResponse;
-    } catch {
-      // Refresh failed, clear tokens
-      setStoredTokens(null);
-      throw new Error('Authentication failed');
+      const refreshedSession = await CognitoAuthService.refreshSession();
+      if (refreshedSession) {
+        // Retry with new tokens
+        headers.Authorization = `Bearer ${refreshedSession.getIdToken().getJwtToken()}`;
+        return fetch(fullUrl, {
+          method,
+          headers,
+          body: data ? JSON.stringify(data) : undefined,
+        });
+      } else {
+        throw new Error('Failed to refresh session');
+      }
+    } catch (refreshError) {
+      console.error('Failed to refresh Cognito session, logging out:', refreshError);
+      CognitoAuthService.logout();
+      throw new Error('Session expired. Please log in again.');
     }
   }
 
@@ -109,23 +103,25 @@ const authenticatedRequest = async (
 export function useAuth() {
   const queryClient = useQueryClient();
 
-  // Get current user
+  // Get current user using Cognito session
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['/api/auth/me'],
     queryFn: async () => {
-      const tokens = getStoredTokens();
-      if (!tokens?.accessToken) {
-        console.log('No access token found');
+      // Check if user has valid Cognito session
+      const session = await CognitoAuthService.getCurrentSession();
+      if (!session) {
+        console.log('No valid Cognito session found');
         return null;
       }
 
-      console.log('Attempting to fetch user with token:', tokens.accessToken.substring(0, 20) + '...');
+      const idToken = session.getIdToken().getJwtToken();
+      console.log('Attempting to fetch user with Cognito token:', idToken.substring(0, 20) + '...');
       
       const response = await authenticatedRequest('GET', '/api/auth/me');
       if (!response.ok) {
         console.log('Auth request failed with status:', response.status);
         if (response.status === 401 || response.status === 403) {
-          setStoredTokens(null);
+          CognitoAuthService.logout();
           return null;
         }
         throw new Error('Failed to fetch user');
@@ -138,115 +134,76 @@ export function useAuth() {
     retry: false,
   });
 
-  // Register mutation
+  // Register mutation using Cognito
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterRequest) => {
+      // Register with Cognito first, then sync to backend
+      const cognitoResult = await CognitoAuthService.register({
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        firstName: data.firstName,
+        lastName: data.lastName,
+      });
+
+      // After Cognito registration, sync to backend
       const response = await apiRequest('POST', '/api/auth/register', data);
       return response;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+    },
   });
 
-  // Verify email mutation
-  const verifyEmailMutation = useMutation({
-    mutationFn: async (data: VerifyEmailRequest) => {
-      const response = await apiRequest('POST', '/api/auth/verify-email', data);
-      const authData = await response.json() as AuthResponse;
-      
-      console.log('Verify email response:', { 
-        hasUser: !!authData.user, 
-        hasTokens: !!(authData.accessToken && authData.refreshToken),
-        username: authData.user?.username,
-        actualData: authData
-      });
+  // Login mutation using Cognito
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginRequest) => {
+      // Login with Cognito
+      const cognitoResult = await CognitoAuthService.login(data.email, data.password);
       
       // Store tokens
       setStoredTokens({
-        accessToken: authData.accessToken,
-        refreshToken: authData.refreshToken,
+        accessToken: cognitoResult.accessToken,
+        refreshToken: cognitoResult.refreshToken,
+        idToken: cognitoResult.idToken,
       });
+
+      // Sync with backend to get user data
+      const response = await authenticatedRequest('GET', '/api/auth/me');
+      const userData = await response.json() as UserResponse;
       
-      return authData;
+      return { user: userData, ...cognitoResult };
     },
-    onSuccess: (authData) => {
-      console.log('Verify email success, refetching user data...');
-      // Force immediate refetch of user data
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
     },
   });
 
-  // Login mutation
-  const loginMutation = useMutation({
-    mutationFn: async (data: LoginRequest) => {
-      console.log('Attempting login...');
-      const response = await apiRequest('POST', '/api/auth/login', data);
-      const authData = await response.json() as AuthResponse;
-      
-      console.log('Login response received:', { 
-        hasUser: !!authData.user, 
-        hasTokens: !!(authData.accessToken && authData.refreshToken),
-        actualData: authData 
-      });
-      
-      // Store tokens
-      const tokens = {
-        accessToken: authData.accessToken,
-        refreshToken: authData.refreshToken,
-      };
-      
-      setStoredTokens(tokens);
-      console.log('Tokens stored successfully');
-      
-      return authData;
-    },
-    onSuccess: (data) => {
-      console.log('Login mutation success, refetching user data...');
-      // Force refetch user data immediately after successful login
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
-    },
-    onError: (error) => {
-      console.error('Login mutation error:', error);
+  // Verify email mutation (Cognito handles verification)
+  const verifyEmailMutation = useMutation({
+    mutationFn: async (data: VerifyEmailRequest) => {
+      // With Cognito, verification is handled during registration
+      const response = await apiRequest('POST', '/api/auth/verify-email', data);
+      return response.json();
     },
   });
 
-  // Logout mutation
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      const tokens = getStoredTokens();
-      if (tokens) {
-        try {
-          await authenticatedRequest('POST', '/api/auth/logout', {
-            refreshToken: tokens.refreshToken,
-          });
-        } catch {
-          // Ignore logout errors
-        }
-      }
-      
-      // Clear local storage
-      setStoredTokens(null);
-      
-      // Clear all queries
-      queryClient.clear();
-    },
-  });
+  // Logout function
+  const logout = () => {
+    console.log('🔐 Logging out user');
+    CognitoAuthService.logout();
+    setStoredTokens(null);
+    queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+  };
 
   return {
     user,
     isLoading,
     isAuthenticated: !!user,
     error,
-    register: registerMutation.mutateAsync,
-    registerLoading: registerMutation.isPending,
-    registerError: registerMutation.error,
-    verifyEmail: verifyEmailMutation.mutateAsync,
-    verifyEmailLoading: verifyEmailMutation.isPending,
-    verifyEmailError: verifyEmailMutation.error,
-    login: loginMutation.mutateAsync,
-    loginLoading: loginMutation.isPending,
-    loginError: loginMutation.error,
-    logout: logoutMutation.mutateAsync,
-    logoutLoading: logoutMutation.isPending,
+    register: registerMutation,
+    login: loginMutation,
+    verifyEmail: verifyEmailMutation,
+    logout,
   };
 }
