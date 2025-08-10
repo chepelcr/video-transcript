@@ -611,12 +611,11 @@ export default function Dashboard() {
                           </div>
 
                           {/* Transcript Preview or Status */}
-                          {transcription.transcript ||
-                            (transcription.status === "completed" && (
-                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
-                                {transcription.transcript}
-                              </p>
-                            ))}
+                          {transcription.status === "completed" && transcription.transcript && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
+                              {transcription.transcript}
+                            </p>
+                          )}
                           {!transcription.transcript &&
                             transcription.status === "processing" && (
                               <p className="text-sm text-yellow-600 dark:text-yellow-400 italic mb-3">

@@ -17,15 +17,25 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 - **Forms**: React Hook Form with Zod validation schemas.
 - **Payment UI**: Integrates Stripe Elements and a custom PayPal button component.
 
-## Backend Architecture
-- **Server**: Express.js with TypeScript, incorporating request logging middleware and robust error handling.
-- **Development Workflow**: Vite dev server integration for hot module replacement.
-- **Payment Processing**: Supports both Stripe for subscriptions and PayPal for one-time payments.
-- **Session Management**: Express sessions with PostgreSQL session store (`connect-pg-simple`).
-- **Transcription Logic**: All transcription logic is moved to the backend for enhanced security.
-- **Asynchronous Processing**: Implements an asynchronous transcription system using AWS SQS for queuing, with a secure webhook for receiving processed transcriptions.
-- **Video Title Extraction**: Intelligent title extraction for YouTube, Vimeo, and generic URLs.
-- **Dockerization**: Comprehensive Docker setup for both development and production environments, including PostgreSQL integration and health check endpoints.
+## Backend Architecture - Industry Standard Layered Design
+- **Server Framework**: Express.js with TypeScript, reorganized into industry-standard layered architecture (August 2025)
+- **Directory Structure**: Follows enterprise patterns with clear separation of concerns:
+  - `server/src/config/` - Application configuration and database setup
+  - `server/src/models/` - Business logic models and validation schemas  
+  - `server/src/repositories/` - Data access layer with type-safe Drizzle ORM operations
+  - `server/src/services/` - Business logic layer handling core application functionality
+  - `server/src/controllers/` - HTTP request/response handling and validation
+  - `server/src/middlewares/` - Authentication, CORS, and request processing
+  - `server/src/routes/` - RESTful API route definitions
+  - `server/src/types/` - TypeScript type definitions
+- **Dependency Injection**: Centralized dependency container for clean architecture
+- **Payment Processing**: Supports both Stripe for subscriptions and PayPal for one-time payments
+- **Session Management**: Express sessions with PostgreSQL session store (`connect-pg-simple`)
+- **Transcription Logic**: All transcription logic moved to backend services for enhanced security
+- **Asynchronous Processing**: AWS SQS-based queuing system with secure webhook processing
+- **Video Title Extraction**: Intelligent title extraction service for YouTube, Vimeo, and generic URLs
+- **Development Workflow**: Vite dev server integration for hot module replacement
+- **Dockerization**: Comprehensive Docker setup for both development and production environments
 
 ## Data Layer
 - **Database**: PostgreSQL, with Drizzle ORM for type-safe operations.
@@ -35,10 +45,11 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 
 ## System Design Choices
 - **Two-Step Transcription**: A workflow that first validates the URL, then processes the transcription.
-- **Authentication**: Robust authentication middleware and API endpoints with seamless session continuation via automatic access token refresh.
+- **Authentication**: JWT-based authentication with refresh token support, implemented through dedicated auth service layer.
 - **Real-Time Updates**: Intelligent polling system with variable intervals (5-10 seconds) for real-time dashboard updates, coupled with a bilingual toast notification system for status changes. Aggressive client-side cache busting ensures fresh data.
 - **Multi-language Support**: Comprehensive bilingual support for UI elements, password reset flow, and notifications.
-- **Freemium Model Enforcement**: Usage tracking to enforce the 3-free-transcription limit.
+- **Freemium Model Enforcement**: Usage tracking implemented at service layer to enforce the 3-free-transcription limit.
+- **Enterprise Architecture**: Follows industry-standard layered architecture with proper separation of concerns, dependency injection, and comprehensive error handling.
 - **Deployment**: Optimized for GitHub Pages with custom domain configuration.
 
 # External Dependencies
