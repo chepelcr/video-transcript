@@ -3,13 +3,15 @@
 This is a video transcription service application built with a full-stack TypeScript architecture. The application allows users to submit video URLs for transcription, operating on a freemium model that offers 3 free transcriptions before requiring a paid subscription. It integrates with both Stripe and PayPal for payment processing and features a modern React frontend. The project's ambition is to provide an efficient and reliable video transcription solution, with a focus on user experience and flexible deployment.
 
 ## Recent Changes (August 2025)
-**Lambda-Style Stateless System Implemented** - Successfully created comprehensive lambda/serverless-ready architecture:
-- ✅ **Anonymous Transcription Endpoints**: POST /api/transcriptions/anonymous (no auth required)
+**AWS API Gateway Lambda Integration Completed** - Successfully implemented comprehensive AWS Lambda/API Gateway architecture:
+- ✅ **AWS API Gateway Authorization**: Policy-based IAM authorization with API key validation
+- ✅ **Lambda Handler Pattern**: Complete AWS Lambda entry point with request type detection
+- ✅ **Anonymous Transcription Endpoints**: POST /api/transcriptions/anonymous (no auth required, working)
 - ✅ **Public Retrieval Endpoints**: GET /api/transcriptions/{id}/public (optional auth)
-- ✅ **Optional Authentication Middleware**: Graceful fallback when tokens are missing or invalid
+- ✅ **API Gateway Middleware**: Automatic detection and handling of API Gateway requests vs normal app requests  
 - ✅ **Stateless Operation**: Perfect for serverless/lambda deployments without persistent state
-- ✅ **Database-Optional Design**: Works with or without database connection
-- ✅ **Token-Free Functionality**: Core transcription features available without authentication
+- ✅ **Policy Generator**: AWS IAM policy generation following Python example pattern
+- ✅ **Lambda Deployment Ready**: server/lambda.ts entry point for AWS deployment
 
 **Server Architecture Cleanup & Database Integration Completed** - Successfully resolved all architectural conflicts:
 - ✅ **Clean File Structure**: Removed all unused legacy server files (auth.ts, migration.ts, paypal.ts, storage.ts, etc.)

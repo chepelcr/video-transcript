@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { ITranscriptionController } from '../controllers/transcription.controller';
 import { IAuthMiddleware } from '../middlewares/auth.middleware';
+import { apiGatewayMiddleware, apiGatewayAuthBypass } from '../middlewares/api-gateway.middleware';
 
 export class TranscriptionRoutes {
   private router: Router;
@@ -14,9 +15,13 @@ export class TranscriptionRoutes {
   }
 
   private setupRoutes(): void {
-    // Lambda-style endpoints - no authentication required
-    this.router.post('/anonymous', (req, res) => 
-      this.transcriptionController.createAnonymousTranscription(req, res)
+    // Apply API Gateway middleware to all routes
+    this.router.use(apiGatewayMiddleware);
+
+    // Lambda-style endpoints - API Gateway auth bypass + anonymous transcription
+    this.router.post('/anonymous', 
+      apiGatewayAuthBypass,
+      (req, res) => this.transcriptionController.createAnonymousTranscription(req, res)
     );
 
     // Public endpoint to get transcription by ID (lambda-style)

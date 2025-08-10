@@ -1,0 +1,114 @@
+from typing import Any, Dict, Optional
+
+from mangum import Mangum  # <--- Importar Mangum
+
+from configuration.fast_api_config import FastApiConfig
+from services.api_keys_manager import ApiKeysManager
+from utils.response_utils import ResponseUtils
+import logging
+
+import re
+
+
+# ------------------------------------------------------------------------
+# Invocación desde EventBridge
+# ------------------------------------------------------------------------
+def handle_event_bridge_invocation(event: Dict[str, Any]) -> Dict[str, str]:
+    """
+    Lógica para manejar la invocación desde EventBridge.
+    """
+
+
+def handle_authorizer_request(event: Dict[str, Any]) -> Dict:
+    """
+    Handle API Gateway authorization requests
+    """
+
+    api_gateway_arn = "*"
+
+    http_method = event.get("httpMethod")
+
+    if http_method == "OPTIONS":
+        return ResponseUtils.generate_policy('cors-user', 'Allow', api_gateway_arn)
+
+    # For REQUEST type authorizer
+    if 'headers' in event:
+        api_key_value = event['headers'].get('x-api-key')
+    # For TOKEN type authorizer
+    elif 'headers' in event.get('identitySource', {}):
+        api_key_value = event['identitySource'].get('x-api-key')
+    else:
+        api_key_value = None
+
+    if not api_key_value:
+        return ResponseUtils.generate_policy(None, 'Deny', api_gateway_arn)
+
+    try:
+        # Get the requested path
+        path = event['path']
+
+        print("Path: ", path)
+
+        patron = re.compile(r"^/taxpayers/(?P<id>.+?)/activate-api-key$")
+
+        activation_path = patron.match(path)
+        is_activation_endpoint = False
+
+        if activation_path:
+            is_activation_endpoint = True
+
+            print("Ruta de activación, ID =", activation_path.group("id"))
+        else:
+            # La ruta no coincide con el patrón
+            print("Ruta normal")
+
+        with ApiKeysManager() as service:
+            api_key = service.get_api_key(api_key_value)
+
+            if api_key.status == 1 or is_activation_endpoint:
+                return ResponseUtils.generate_policy(api_key.name, 'Allow', api_gateway_arn, api_key_value)
+            else:
+                return ResponseUtils.generate_policy(None, 'Deny', api_gateway_arn)
+
+            return ResponseUtils.generate_policy(None, 'Deny', api_gateway_arn)
+    except Exception as e:
+        # Log the error here if needed
+        print(f"Error in handle_authorizer_request: {str(e)}")
+        logging.error(f"Error in handle_authorizer_request: {str(e)}")
+
+        return ResponseUtils.generate_policy(None, 'Deny', api_gateway_arn)
+
+    # return ResponseUtils.generate_policy("User", 'Allow', method_arn)
+
+
+# ------------------------------------------------------------------------
+# Lambda Handler
+# ------------------------------------------------------------------------
+def lambda_handler(event: Dict[str, Any], context: Any):
+    """
+    Handler para manejar invocaciones Lambda.
+    """
+    # Check if this is an authorizer request
+    if event.get('type') == 'TOKEN' or event.get('type') == 'REQUEST':
+        return handle_authorizer_request(event)
+
+    # Detectar si el evento proviene de EventBridge
+    if "source" in event and event["source"] == "aws.events":
+        return handle_event_bridge_invocation(event)
+
+    else:
+        # Pasar otros eventos a Mangum para manejar solicitudes HTTP
+        return handler(event, context)
+
+
+app = FastApiConfig().get_app()
+
+# Instancia de Mangum para manejar eventos HTTP
+handler = Mangum(app)
+
+# Ejecución local
+
+# if __name__ == "__main__":
+#     import uvicorn
+#
+#     uvicorn.run(app, host="0.0.0.0", port=8052)

@@ -35,9 +35,11 @@ export class TranscriptionService implements ITranscriptionService {
     console.log(`🎬 Creating transcription for video: ${input.videoUrl}`);
     
     // Check if user can create transcription (free tier limits)
-    const canCreate = await this.canUserCreateTranscription(input.userId);
-    if (!canCreate) {
-      throw new Error('User has reached their transcription limit for the current tier');
+    if (input.userId) {
+      const canCreate = await this.canUserCreateTranscription(input.userId);
+      if (!canCreate) {
+        throw new Error('User has reached their transcription limit for the current tier');
+      }
     }
 
     // Extract video title if not provided
@@ -79,10 +81,10 @@ export class TranscriptionService implements ITranscriptionService {
       }
     }
 
-    // Create anonymous transcription (no user limits applied)
+    // Create anonymous transcription (no user limits checked)
     const transcription = await this.transcriptionRepository.create({
       ...input,
-      userId: null, // Anonymous transcription
+      userId: null, // Force null for anonymous
       videoTitle,
       status: TranscriptionStatus.PENDING
     });
@@ -107,8 +109,8 @@ export class TranscriptionService implements ITranscriptionService {
     
     const updated = await this.transcriptionRepository.update(id, input);
     
-    if (updated && input.status === TranscriptionStatus.COMPLETED) {
-      // Increment user's transcription count
+    if (updated && input.status === TranscriptionStatus.COMPLETED && updated.userId) {
+      // Increment user's transcription count (only for authenticated users)
       await this.userRepository.incrementTranscriptionsUsed(updated.userId);
       console.log(`✅ Incremented transcription count for user: ${updated.userId.substring(0, 8)}...`);
     }
@@ -184,7 +186,13 @@ export class TranscriptionService implements ITranscriptionService {
     }
   }
 
-  async canUserCreateTranscription(userId: string): Promise<boolean> {
+  async canUserCreateTranscription(userId: string | null): Promise<boolean> {
+    if (!userId) {
+      // Anonymous users can always create transcriptions
+      console.log(`✅ Anonymous user - transcription allowed`);
+      return true;
+    }
+
     console.log(`🔍 Checking transcription limits for user: ${userId.substring(0, 8)}...`);
     
     const user = await this.userRepository.findById(userId);
