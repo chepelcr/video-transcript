@@ -1,0 +1,93 @@
+import logging
+
+from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
+
+from configuration.AppConfig import AppConfig
+from controllers.padron_controller import PadronCRController
+
+
+class FastApiConfig:
+    """
+    Aplicación que se encarga de administrar las API Keys de un usuario
+    """
+
+    def __init__(self):
+        AppConfig.init()
+        self.app = self._create_app()
+
+        self._configure_cors()
+
+        PadronCRController(self.app)
+
+        self.logger = logging.getLogger()
+
+    def _create_app(self) -> FastAPI:
+        """
+        Crea la aplicación FastAPI
+
+        Returns:
+
+            FastAPI: La aplicación FastAPI creada
+        """
+
+        app_name = AppConfig.get_key("app.name") or "Ivois-Data-Citizen"
+        app_description = AppConfig.get_key("app.description") or "Servicio para administración de padrón electoral de Costa Rica"
+        app_version = AppConfig.get_key("app.version") or "1.0.1"
+        swagger_url = AppConfig.get_key("app.swaggerUrl") or "/data-citizen/swagger-ui.html"
+        openapi_url = AppConfig.get_key("app.openapiUrl") or "/data-citizen/api-docs"
+        services_url = AppConfig.get_key("app.ivois.servicesUrl") or "http://localhost:8051/"
+
+        localhost_url = "http://localhost:8051"
+
+        tags_metadata = [
+            {
+                "name": "Padrón electoral CR",
+                "description": "Consulta del padrón electoral de Costa Rica",
+            },
+        ]
+
+        app = FastAPI(
+            title=app_name,
+            description=app_description,
+            version=app_version,
+            docs_url=swagger_url,
+            swagger_ui_parameters={"operationsSorter": "method"},
+            redoc_url=None,
+            openapi_url=openapi_url,
+            openapi_tags=tags_metadata,
+            servers=[
+                {"url": services_url, "description": "Ivois Development API"},
+                {"url": localhost_url, "description": "Local Development API"}
+            ],
+        )
+
+        app.openapi_version = "3.0.3"
+
+        return app
+
+    def _configure_cors(self):
+        """
+        Configura las políticas CORS para la aplicación
+        """
+
+        origins = ["*"]
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+            # configuration.setExposedHeaders(
+            expose_headers=["X-Page-Number", "X-Page-Size", "X-Total-Elements", "X-Total-Pages", "X-Last"],
+            max_age=600,  # 10 minutes
+        )
+
+    def get_app(self) -> FastAPI:
+        """
+        Retorna la aplicación creada
+
+        Returns:
+            FastAPI: Aplicación creada
+        """
+        return self.app

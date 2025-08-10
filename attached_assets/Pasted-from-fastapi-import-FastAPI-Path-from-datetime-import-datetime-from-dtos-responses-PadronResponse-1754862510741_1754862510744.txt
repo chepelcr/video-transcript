@@ -1,0 +1,143 @@
+from fastapi import FastAPI, Path
+
+from datetime import datetime
+
+from dtos.responses.PadronResponseDTO import PadronResponseDTO
+from enums.iso_codes import CountryCode
+from services.padron_service import PadronCRService
+from exceptions.exception_log import ExceptionLog
+from exceptions.data_base_exception import DataBaseException
+from exceptions.not_found_exception import NotFoundException
+from exceptions.schema_exception import SchemaException
+from marshmallow import ValidationError
+from exceptions.request_exception import RequestException
+import logging
+from enums.error_codes import ErrorCode
+from utils.PadronUtils import PadronUtils
+
+
+class PadronCRController:
+    """
+    Controller class responsible for handling padron-related HTTP requests, 
+    such as retrieving, updating, and deleting padron entries. This acts as a layer
+    between the PadronCRService and the external HTTP requests, providing the
+    necessary business logic and error handling.
+
+    Attributes:
+        logger (logging.Logger): Logger for the controller to log events and errors.
+    """
+
+    def __init__(self, app: FastAPI) -> None:
+        """
+        Initializes the PadronCRController class.
+        Sets up a logger instance for logging activities.
+        """
+        self.logger = logging.getLogger(__name__)
+        self.__register_routes(app)
+
+    def __register_routes(self, app: FastAPI):
+        """
+        Registers routes for the PadronCRController with the provided FastAPI application.
+        Defines the routes and their corresponding HTTP methods and handlers.
+        """
+
+        error_example = {
+            "timestamp": datetime.now().isoformat() + "Z",
+            "status": 400,
+            "error": "Bad Request",
+            "message": "004",
+            "path": "/data-citizen"
+        }
+
+        @app.get("/countries/{isoCode}/citizens/{identificationNumber}",
+                 tags=["Padrón electoral CR"],
+                 response_model=PadronResponseDTO,
+                 name="Obtener una persona",
+                 description="Obtiene una persona del padrón electoral",
+                 responses={
+                     404: {"content": {
+                         "application/json": {
+                             "example": error_example
+                         }
+                     }}, 422: {"content": {
+                         "application/json": {
+                             "example": error_example
+                         }
+                     }}, 400: {"content": {
+                         "application/json": {
+                             "example": error_example
+                         }}
+                     }, 500: {"content": {
+                         "application/json": {
+                             "example": error_example
+                         }}
+                     }})
+        def get_padron_by_id(
+                isoCode: str = Path(..., description="Código ISO del país", example="188"),
+                identificationNumber: str = Path(..., description="Identificación de la persona solicitada",
+                                                 example="123456789")):
+            """
+            Retrieves a padron entry by its ID.
+
+            Args:
+                isoCode (str): Código ISO del padrón solicitado
+                identificationNumber (int): Número de identificación de la persona solicitada
+
+            Returns:
+                dict: Persona solicitada
+
+            """
+            try:
+                self.logger.info("PadronCRController - get_padron_by_id")
+
+                if isoCode == CountryCode.costa_rica["isoCode"]:
+                    with PadronCRService() as padron_service:
+                        padron = padron_service.get_padron_by_id(identificationNumber)
+
+                        return PadronUtils.create_response(padron)
+                else:
+                    raise NotFoundException(ErrorCode.country_not_found_error_code["code"],
+                                            ErrorCode.country_not_found_error_code["message"])
+
+            except NotFoundException as e:
+                self.logger.error(
+                    ExceptionLog(self.__class__.__name__, "get_padron_by_id", identificationNumber, "Exception",
+                                 type(
+                                     e).__name__, e.args, e.code).to_dict())
+
+                return PadronUtils.create_error_response(404, e.code,
+                                                         f'/countries/{isoCode}/citizens/{identificationNumber}')
+
+            except RequestException as e:
+                self.logger.error(
+                    ExceptionLog(self.__class__.__name__, "get_padron_by_id", identificationNumber, "Exception", type(
+                        e).__name__, e.args, e.code).to_dict())
+
+                return PadronUtils.create_error_response(400, e.code,
+                                                         f'/countries/{isoCode}/citizens/{identificationNumber}')
+
+            except DataBaseException as e:
+
+                self.logger.error(
+                    ExceptionLog(self.__class__.__name__, "get_padron_by_id", identificationNumber, "Exception", type(
+                        e).__name__, e.args, 500).to_dict())
+
+                return PadronUtils.create_error_response(500, e.code,
+                                                         f'/countries/{isoCode}/citizens/{identificationNumber}')
+
+            except ValidationError as e:
+
+                self.logger.error(
+                    ExceptionLog(self.__class__.__name__, "get_padron_by_id", identificationNumber, "Exception", type(
+                        e).__name__, e.args, 500).to_dict())
+
+                return PadronUtils.create_error_response(500, SchemaException.to_json_string(errors=e.messages.items()),
+                                                         f'/countries/{isoCode}/citizens/{identificationNumber}')
+
+            except Exception as e:
+                self.logger.error(
+                    ExceptionLog(self.__class__.__name__, "get_padron_by_id", identificationNumber, "Exception", type(
+                        e).__name__, e.args, 400).to_dict())
+
+                return PadronUtils.create_error_response(400, ErrorCode.error['message'],
+                                                         f'/countries/{isoCode}/citizens/{identificationNumber}')

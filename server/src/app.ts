@@ -1,6 +1,7 @@
 import express, { Express } from 'express';
 import { connectDatabase } from './config/database';
 import { APP_CONFIG } from './config/app';
+import { SwaggerConfig } from './config/swagger';
 import { authRoutes, transcriptionRoutes, paymentRoutes, userRoutes, healthRoutes } from './dependency-injection';
 
 export async function createApp(): Promise<Express> {
@@ -40,6 +41,10 @@ export async function createApp(): Promise<Express> {
 
   // Connect to database
   await connectDatabase();
+
+  // Setup Swagger API documentation
+  const swaggerConfig = new SwaggerConfig();
+  swaggerConfig.setupSwaggerEndpoints(app);
 
   // Health endpoints (no /api prefix for load balancer compatibility)
   app.use('/', healthRoutes.getRouter());
