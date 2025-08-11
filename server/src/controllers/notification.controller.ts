@@ -250,6 +250,69 @@ export class NotificationController {
     }
   }
 
+  /**
+   * Test endpoint to create a completed transcription with notification
+   */
+  async createTestTranscriptionComplete(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const { db } = await import('../config/database');
+      const { transcriptions } = await import('../../../shared/schema');
+      
+      console.log('🧪 Creating test completed transcription for user:', userId);
+
+      // Create completed transcription directly in database
+      const [transcription] = await db
+        .insert(transcriptions)
+        .values({
+          userId,
+          videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+          videoTitle: 'Rick Astley - Never Gonna Give You Up (Official Video)',
+          status: 'completed',
+          transcript: `This is a sample transcript for testing purposes. 
+
+The video "Rick Astley - Never Gonna Give You Up" contains spoken content that would normally be transcribed by our AI service. In this test scenario, we are simulating a completed transcription to demonstrate the notification system and download functionality.
+
+Key features being tested:
+- Notification creation when transcription completes
+- Download and copy buttons enabled in the dashboard
+- Real-time updates in the user interface
+
+This transcript contains approximately 300 words and demonstrates how the system handles completed transcriptions. Users can copy this text to their clipboard or download it as a text file for further use.
+
+Thank you for testing the VideoScript transcription service!`,
+          duration: 180,
+          wordCount: 95,
+          processingTime: 45,
+          accuracy: 95.8
+        })
+        .returning();
+
+      // Create completion notification
+      const notification = await this.notificationService.createTranscriptionCompletedNotification(
+        userId,
+        transcription.id,
+        transcription.videoTitle || 'Test Video'
+      );
+
+      res.status(201).json({
+        message: 'Test completed transcription created with notification',
+        transcription: {
+          id: transcription.id,
+          videoTitle: transcription.videoTitle,
+          status: transcription.status
+        },
+        notification
+      });
+    } catch (error: any) {
+      console.error('❌ Error creating test completed transcription:', error);
+      res.status(500).json({ 
+        message: 'Failed to create test completed transcription',
+        error: error.message 
+      });
+    }
+  }
+
   getRouter(): Router {
     const router = Router();
     
@@ -264,6 +327,9 @@ export class NotificationController {
 
     // Test endpoint for development
     router.post('/users/:userId/notifications/test', this.createTestNotification.bind(this));
+    
+    // Test completed transcription endpoint
+    router.post('/users/:userId/notifications/test-transcription', this.createTestTranscriptionComplete.bind(this));
 
     return router;
   }
