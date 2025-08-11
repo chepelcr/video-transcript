@@ -134,7 +134,6 @@ export class AuthController implements IAuthController {
           id: cognitoUserId,
           username: cognitoUserData.email.split('@')[0], // Generate username from email
           email: cognitoUserData.email,
-          password: 'cognito-managed', // Placeholder since Cognito manages passwords
           firstName: cognitoUserData.firstName,
           lastName: cognitoUserData.lastName,
         });
@@ -164,7 +163,6 @@ export class AuthController implements IAuthController {
         id: validatedInput.cognitoUserId, // Use Cognito user ID if provided
         username: validatedInput.username,
         email: validatedInput.email,
-        password: validatedInput.password, // Required by CreateUserInput
         firstName: validatedInput.firstName,
         lastName: validatedInput.lastName,
       });

@@ -1,4 +1,4 @@
-import { CognitoIdentityProviderClient, AdminCreateUserCommand, AdminSetUserPasswordCommand, AdminUpdateUserAttributesCommand, ForgotPasswordCommand, ConfirmForgotPasswordCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoIdentityProviderClient, AdminCreateUserCommand, AdminSetUserPasswordCommand, AdminUpdateUserAttributesCommand, ForgotPasswordCommand, ConfirmForgotPasswordCommand, AdminGetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 
 export interface CognitoConfig {
   region: string;
@@ -120,6 +120,52 @@ export class CognitoService {
     } catch (error: any) {
       console.error('Error updating Cognito user attributes:', error);
       throw new Error(`Failed to update Cognito user: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get user data from Cognito by user ID
+   */
+  async getUser(userId: string): Promise<CognitoUser | null> {
+    try {
+      console.log(`🔍 Getting Cognito user data for: ${userId.substring(0, 8)}...`);
+
+      const command = new AdminGetUserCommand({
+        UserPoolId: this.config.userPoolId,
+        Username: userId,
+      });
+
+      const result = await this.client.send(command);
+      
+      if (!result.UserAttributes) {
+        console.log(`❌ No user attributes found for: ${userId.substring(0, 8)}...`);
+        return null;
+      }
+
+      // Extract user attributes
+      const getAttribute = (name: string) => 
+        result.UserAttributes?.find(attr => attr.Name === name)?.Value;
+
+      const email = getAttribute('email') || '';
+      const firstName = getAttribute('given_name');
+      const lastName = getAttribute('family_name');
+      const sub = getAttribute('sub') || userId;
+
+      const userData = {
+        username: email.split('@')[0], // Generate username from email
+        email,
+        firstName,
+        lastName,
+        sub,
+      };
+
+      console.log(`✅ Retrieved Cognito user: ${userData.username} (${email})`);
+      return userData;
+
+    } catch (error: any) {
+      console.error('Error getting Cognito user:', error);
+      // Return null instead of throwing to handle non-existent users gracefully
+      return null;
     }
   }
 

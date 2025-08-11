@@ -117,18 +117,39 @@ export class UserRepository implements IUserRepository {
   async findById(id: string): Promise<IUser | null> {
     console.log(`🔍 Finding user by ID: ${id.substring(0, 8)}...`);
     
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, id));
+    try {
+      // Debug: Check if any users exist in the database
+      const userCount = await db
+        .select({ count: sql`count(*)` })
+        .from(users);
+      console.log(`📊 Total users in database: ${userCount[0]?.count || 0}`);
+      
+      // Debug: Show recent users for comparison
+      if (userCount[0]?.count > 0) {
+        const recentUsers = await db
+          .select({ id: users.id, username: users.username, email: users.email })
+          .from(users)
+          .orderBy(sql`${users.createdAt} DESC`)
+          .limit(3);
+        console.log(`📋 Recent users:`, recentUsers.map(u => ({ id: u.id.substring(0, 8), username: u.username, email: u.email })));
+      }
+      
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, id));
 
-    if (!user) {
-      console.log(`❌ User not found: ${id.substring(0, 8)}...`);
+      if (!user) {
+        console.log(`❌ User not found: ${id.substring(0, 8)}...`);
+        return null;
+      }
+
+      console.log(`✅ Found user: ${user.username} (${user.email})`);
+      return this.mapToModel(user);
+    } catch (error) {
+      console.error('Database error finding user by ID:', error);
       return null;
     }
-
-    console.log(`✅ Found user: ${user.username} (${user.email})`);
-    return this.mapToModel(user);
   }
 
   async findByEmail(email: string): Promise<IUser | null> {
