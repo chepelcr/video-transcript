@@ -19,6 +19,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icons } from '@/components/ui/icons';
+import { ProgressSteps } from '@/components/ui/progress-steps';
+import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const verifyEmailSchema = z.object({
   code: z.string().length(6, 'Verification code must be 6 digits'),
@@ -90,10 +93,44 @@ export default function VerifyEmail() {
     return null;
   }
 
+  // Define the steps for the progress indicator
+  const steps = [
+    {
+      id: 'info',
+      title: t('auth.register.step1.title'),
+      description: t('auth.register.step1.subtitle'),
+    },
+    {
+      id: 'password',
+      title: t('auth.register.step2.title'),
+      description: t('auth.register.step2.subtitle'),
+    },
+    {
+      id: 'verify',
+      title: t('auth.register.step3.title'),
+      description: t('auth.register.step3.subtitle'),
+    },
+  ];
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      {/* Language and Theme Toggles */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <LanguageToggle />
+        <ThemeToggle />
+      </div>
+
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
+          {/* Progress Steps */}
+          <div className="mb-6">
+            <ProgressSteps 
+              steps={steps}
+              currentStep="verify"
+              completedSteps={['info', 'password']}
+            />
+          </div>
+          
           <CardTitle className="text-2xl font-bold text-center">
             {t('auth.verify.title')}
           </CardTitle>
