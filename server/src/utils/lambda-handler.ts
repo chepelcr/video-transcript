@@ -1,6 +1,7 @@
 import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { Request, Response } from 'express';
 import express from 'express';
+import serverlessHttp from 'serverless-http';
 
 // AWS API Gateway policy generator (similar to Python example)
 export class PolicyGenerator {
@@ -31,8 +32,8 @@ export class PolicyGenerator {
   }
 }
 
-// Handle API Gateway authorizer requests
-export function handleAuthorizerRequest(event: any) {
+// Handle API Gateway authorizer requests  
+export function handleAuthorizerRequest(event: any): any {
   console.log('🔐 Handling API Gateway authorizer request');
   
   const apiGatewayArn = "*";
@@ -110,14 +111,36 @@ export async function lambdaHandler(event: APIGatewayEvent, context: Context): P
   // Handle HTTP requests through Express app
   console.log('🌐 Processing HTTP request through Express');
   
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ 
-      message: 'Lambda handler working', 
-      path: event.path,
-      method: event.httpMethod 
-    })
-  };
+  try {
+    // Import and create the Express app
+    const { createApp } = await import('../app');
+    const app = await createApp();
+    
+    // Use serverless-http to handle the conversion
+    const handler = serverlessHttp(app);
+    
+    // Handle the request
+    const result = await handler(event, context) as APIGatewayProxyResult;
+    
+    console.log('✅ Lambda request processed successfully');
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error processing Lambda request:', error);
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      },
+      body: JSON.stringify({ 
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      })
+    };
+  }
 }
 
 // Simplified version - in production you'd integrate with your Express app

@@ -1,4 +1,4 @@
-# Multi-stage build for Node.js backend
+# Multi-stage build for Node.js backend with AWS Lambda support
 FROM node:20-alpine AS base
 
 # Install dependencies only when needed
@@ -50,7 +50,7 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Production stage
+# Production stage (Traditional Docker deployment)
 FROM base AS production
 WORKDIR /app
 
@@ -75,3 +75,18 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Start production server
 CMD ["node", "dist/server/index.js"]
+
+# AWS Lambda stage (optimized for Lambda runtime)
+FROM public.ecr.aws/lambda/nodejs:20 AS lambda
+
+# Copy built application from builder stage
+COPY --from=builder ${LAMBDA_TASK_ROOT}/dist ./dist
+COPY --from=builder ${LAMBDA_TASK_ROOT}/node_modules ./node_modules
+COPY --from=builder ${LAMBDA_TASK_ROOT}/package*.json ./
+
+# Lambda-specific configuration
+ENV NODE_ENV=production
+ENV AWS_LAMBDA_EXEC_WRAPPER=/opt/otel-instrument
+
+# Set the Lambda handler
+CMD ["dist/server/lambda.handler"]

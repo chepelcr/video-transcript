@@ -9,6 +9,7 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 Authentication Architecture: ✅ FIXED - Auto-sync functionality now working perfectly. Users created in AWS Cognito are automatically synced to backend database when they attempt login. System fetches complete user data from Cognito (name, email, user ID) and creates database records seamlessly. AWS IAM permission `cognito-idp:AdminGetUser` required for Cognito integration.
 Dashboard Architecture: ✅ FIXED - August 11, 2025 - Transcription dashboard fully operational with complete data retrieval. Service layer properly returns structured response with transcriptions array and total count. All backend layers (controller, service, repository) functioning correctly with AWS RDS PostgreSQL.
 GitHub Pages Deployment: ✅ UPDATED - August 11, 2025 - Added AWS Cognito environment variables (VITE_AWS_COGNITO_USER_POOL_ID, VITE_AWS_COGNITO_CLIENT_ID) to GitHub Actions workflow for proper authentication in production deployment. Updated deployment documentation with required repository secrets setup.
+Lambda Deployment: ✅ IMPLEMENTED - August 11, 2025 - Created AWS Lambda-optimized Dockerfile with multi-stage build targeting AWS Lambda runtime. Added serverless-http integration for Express app compatibility, Lambda-specific Docker Compose configuration, and comprehensive deployment documentation with IAM permissions, API Gateway setup, and cost optimization guidelines.
 
 # System Architecture
 
@@ -34,7 +35,7 @@ GitHub Pages Deployment: ✅ UPDATED - August 11, 2025 - Added AWS Cognito envir
 - **Asynchronous Processing**: AWS SQS-based queuing system with secure webhook processing.
 - **Video Title Extraction**: Intelligent title extraction service for YouTube, Vimeo, and generic URLs.
 - **Security Enhancement**: All password management removed from backend - fully delegated to AWS Cognito for enhanced security.
-- **Dockerization**: Comprehensive Docker setup for development and production.
+- **Dockerization**: Multi-stage Docker setup supporting development, production, and AWS Lambda deployments with optimized container configurations.
 
 ## Data Layer
 - **Database**: PostgreSQL, utilizing Drizzle ORM for type-safe operations.
@@ -51,7 +52,7 @@ GitHub Pages Deployment: ✅ UPDATED - August 11, 2025 - Added AWS Cognito envir
 - **Freemium Model Enforcement**: Usage tracking at the service layer enforces the 3-free-transcription limit.
 - **Enterprise Architecture**: Follows layered architecture with separation of concerns, dependency injection, and comprehensive error handling.
 - **Security Architecture**: Complete delegation of authentication to AWS Cognito - no passwords, verification codes, or refresh tokens stored locally.
-- **Deployment**: Optimized for GitHub Pages with custom domain configuration and AWS Cognito environment variables.
+- **Deployment**: Multi-deployment support including GitHub Pages (static frontend), traditional Docker containers, and AWS Lambda (serverless backend) with comprehensive documentation and Docker Compose configurations.
 
 # External Dependencies
 

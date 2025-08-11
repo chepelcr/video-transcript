@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # AWS Lambda Function Container
+  lambda-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: lambda
+    image: video-transcript-lambda:latest
+    container_name: video-transcript-lambda
+    platform: linux/amd64
+    environment:
+      # Database Configuration
+      - DATABASE_URL=${AWS_RDS_DATABASE_URL}
+      - PGHOST=${PGHOST}
+      - PGPORT=${PGPORT}
+      - PGUSER=${AWS_RDS_USERNAME}
+      - PGPASSWORD=${AWS_RDS_PASSWORD}
+      - PGDATABASE=${AWS_RDS_DATABASE_NAME}
+      
+      # AWS Configuration
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      
+      # Cognito Configuration  
+      - AWS_COGNITO_USER_POOL_ID=${AWS_COGNITO_USER_POOL_ID}
+      - AWS_COGNITO_CLIENT_ID=${AWS_COGNITO_CLIENT_ID}
+      
+      # SQS Configuration
+      - SQS_QUEUE_URL=${SQS_QUEUE_URL}
+      
+      # Email Configuration
+      - FROM_EMAIL=${FROM_EMAIL}
+      - AWS_SES_SMTP_USERNAME=${AWS_SES_SMTP_USERNAME}
+      - AWS_SES_SMTP_PASSWORD=${AWS_SES_SMTP_PASSWORD}
+      
+      # Payment Configuration
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
+      
+      # Webhook Configuration
+      - TRANSCRIPTION_WEBHOOK_SECRET=${TRANSCRIPTION_WEBHOOK_SECRET}
+      
+      # Lambda Runtime Configuration
+      - NODE_ENV=production
+      - _LAMBDA_SERVER_PORT=8080
+      - AWS_LAMBDA_RUNTIME_API=localhost:9001
+    ports:
+      - "8080:8080"
+    command: ["dist/server/lambda.handler"]
+    
+  # Local Lambda Runtime Interface Emulator (for testing)
+  lambda-rie:
+    image: public.ecr.aws/lambda/nodejs:20
+    container_name: lambda-rie
+    platform: linux/amd64
+    volumes:
+      - ./dist:/var/task
+    environment:
+      - AWS_LAMBDA_FUNCTION_NAME=video-transcript-api
+      - AWS_LAMBDA_FUNCTION_VERSION=1
+      - AWS_LAMBDA_RUNTIME_API=lambda-rie:9001
+    ports:
+      - "9000:8080"
+    command: ["dist/server/lambda.handler"]
+    depends_on:
+      - lambda-app
+
+networks:
+  default:
+    name: lambda-network
