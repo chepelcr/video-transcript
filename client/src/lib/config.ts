@@ -11,13 +11,13 @@ const config = {
       'http://localhost:5000',
   },
   production: {
-    // Replit backend API for hybrid deployment
-    apiBaseUrl: 'https://video-scribe-chepelcr.replit.app',
+    // Production API endpoint for GitHub Pages deployment
+    apiBaseUrl: 'https://api-video-transcript.jcampos.dev',
   }
 };
 
-// Force development mode but with smart URL detection
-const environment = 'development'; // import.meta.env.MODE === 'production' ? 'production' : 'development';
+// Detect environment properly for GitHub Pages deployment
+const environment = import.meta.env.MODE === 'production' ? 'production' : 'development';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || config[environment].apiBaseUrl;
 
