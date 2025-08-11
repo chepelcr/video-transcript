@@ -49,9 +49,9 @@ type Step1Form = z.infer<typeof step1Schema>;
 type Step2Form = z.infer<typeof step2Schema>;
 
 const registrationSteps = [
-  { id: 'info', title: 'Personal Info', description: 'Basic information' },
-  { id: 'password', title: 'Security', description: 'Create password' },
-  { id: 'verify', title: 'Verify', description: 'Email verification' }
+  { id: 'info', title: '', description: '' },
+  { id: 'password', title: '', description: '' },
+  { id: 'verify', title: '', description: '' }
 ];
 
 export default function Register() {
@@ -64,6 +64,13 @@ export default function Register() {
   const [step1Data, setStep1Data] = useState<Step1Form | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Create localized steps
+  const localizedSteps = [
+    { id: 'info', title: t('auth.register.steps.personalInfo'), description: 'Basic information' },
+    { id: 'password', title: t('auth.register.steps.security'), description: 'Create password' },
+    { id: 'verify', title: t('auth.register.steps.verify'), description: 'Email verification' }
+  ];
 
   // Step 1 form (Personal Info)
   const step1Form = useForm<Step1Form>({
@@ -178,7 +185,7 @@ export default function Register() {
           
           {/* Progress Steps */}
           <ProgressSteps
-            steps={registrationSteps}
+            steps={localizedSteps}
             currentStep={currentStep}
             completedSteps={completedSteps}
           />
@@ -194,9 +201,9 @@ export default function Register() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>{t('auth.register.firstName')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="John" {...field} />
+                          <Input placeholder={t('auth.register.firstNamePlaceholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -208,9 +215,9 @@ export default function Register() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>{t('auth.register.lastName')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Doe" {...field} />
+                          <Input placeholder={t('auth.register.lastNamePlaceholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -223,11 +230,11 @@ export default function Register() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t('auth.register.email')}</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="john@example.com"
+                          placeholder={t('auth.register.emailPlaceholder')}
                           {...field}
                         />
                       </FormControl>
@@ -241,9 +248,9 @@ export default function Register() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel>{t('auth.register.username')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="johndoe" {...field} />
+                        <Input placeholder={t('auth.register.usernamePlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -252,7 +259,7 @@ export default function Register() {
 
                 <Button type="submit" className="w-full">
                   <ArrowRight className="mr-2 h-4 w-4" />
-                  Continue to Password
+                  {t('auth.register.continue')}
                 </Button>
               </form>
             </Form>
@@ -267,12 +274,12 @@ export default function Register() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>{t('auth.register.password')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
-                            placeholder="Create a strong password"
+                            placeholder={t('auth.register.passwordPlaceholder')}
                             {...field}
                           />
                           <Button
@@ -305,12 +312,12 @@ export default function Register() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
+                      <FormLabel>{t('auth.register.confirmPassword')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showConfirmPassword ? "text" : "password"}
-                            placeholder="Confirm your password"
+                            placeholder={t('auth.register.confirmPasswordPlaceholder')}
                             {...field}
                           />
                           <Button
@@ -341,7 +348,7 @@ export default function Register() {
                     className="flex-1"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back
+                    {t('auth.register.back')}
                   </Button>
                   <Button 
                     type="submit" 
@@ -351,7 +358,7 @@ export default function Register() {
                     {register.isPending && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Create Account
+                    {t('auth.register.createAccount')}
                   </Button>
                 </div>
               </form>
