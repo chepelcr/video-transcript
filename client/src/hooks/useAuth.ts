@@ -170,6 +170,17 @@ export function useAuth() {
         
         console.log('Amplify login successful:', amplifyResult);
 
+        // Check if user needs to verify email
+        if (amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_UP') {
+          console.log('User needs email verification');
+          return { 
+            user: null, 
+            amplifyResult,
+            needsVerification: true,
+            email: data.email
+          };
+        }
+
         // Get current user to use their ID for profile endpoint
         const amplifyUser = await getCurrentUser();
         const response = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
@@ -218,6 +229,17 @@ export function useAuth() {
             username: data.email,
             password: data.password,
           });
+          
+          // Check if user needs to verify email in retry scenario
+          if (amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_UP') {
+            console.log('User needs email verification (retry)');
+            return { 
+              user: null, 
+              amplifyResult,
+              needsVerification: true,
+              email: data.email
+            };
+          }
           
           const amplifyUser = await getCurrentUser();
           const response = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);

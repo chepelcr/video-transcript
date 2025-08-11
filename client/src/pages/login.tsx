@@ -45,6 +45,24 @@ export default function Login() {
   const onSubmit = async (values: LoginForm) => {
     login.mutate(values, {
       onSuccess: (data) => {
+        // Check if user needs verification
+        if (data.needsVerification) {
+          // Store verification data for the verify page
+          sessionStorage.setItem('verificationData', JSON.stringify({
+            email: values.email,
+            password: values.password,
+            timestamp: Date.now()
+          }));
+          
+          toast({
+            title: t('auth.verify.title'),
+            description: t('auth.verify.description') + ' ' + values.email,
+          });
+          
+          navigate(`/${language}/verify-email`);
+          return;
+        }
+
         toast({
           title: t('auth.login.success.title'),
           description: t('auth.login.success.description'),
