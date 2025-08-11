@@ -72,9 +72,9 @@ const authenticatedRequest = async (
 export function useAuth() {
   const queryClient = useQueryClient();
 
-  // Get current user using Amplify Auth
+  // Get current user using Amplify Auth and user profile endpoint
   const { data: user, isLoading, error } = useQuery({
-    queryKey: ['/api/auth/me'],
+    queryKey: ['/users/profile'],
     queryFn: async () => {
       try {
         // Check if user is authenticated with Amplify
@@ -84,20 +84,21 @@ export function useAuth() {
           return null;
         }
 
-        console.log('Amplify user found, fetching backend user data...');
+        console.log('Amplify user found, fetching user profile...');
         
-        const response = await authenticatedRequest('GET', '/api/auth/me');
+        // Use the user profile endpoint with Cognito user ID
+        const response = await authenticatedRequest('GET', `/users/${amplifyUser.userId}/profile`);
         if (!response.ok) {
-          console.log('Auth request failed with status:', response.status);
+          console.log('Profile request failed with status:', response.status);
           if (response.status === 401 || response.status === 403) {
             await signOut();
             return null;
           }
-          throw new Error('Failed to fetch user');
+          throw new Error('Failed to fetch user profile');
         }
         
         const result = await response.json() as UserResponse;
-        console.log('User fetched successfully:', result.username);
+        console.log('User profile fetched successfully:', result.username);
         return result;
       } catch (error) {
         console.log('No authenticated user found');
@@ -143,7 +144,7 @@ export function useAuth() {
       };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      queryClient.invalidateQueries({ queryKey: ['/users/profile'] });
     },
   });
 
@@ -158,8 +159,9 @@ export function useAuth() {
       
       console.log('Amplify login successful:', amplifyResult);
 
-      // Sync with backend to get user data
-      const response = await authenticatedRequest('GET', '/api/auth/me');
+      // Get current user to use their ID for profile endpoint
+      const amplifyUser = await getCurrentUser();
+      const response = await authenticatedRequest('GET', `/users/${amplifyUser.userId}/profile`);
       const userData = await response.json() as UserResponse;
       
       return { 
@@ -169,7 +171,7 @@ export function useAuth() {
       };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      queryClient.invalidateQueries({ queryKey: ['/users/profile'] });
     },
   });
 
@@ -194,15 +196,12 @@ export function useAuth() {
         console.log('Auto-login successful:', loginResult);
       }
       
-      // Sync verification status with backend
-      const response = await apiRequest('POST', '/api/auth/verify-email', data);
       return {
         amplifyResult: result,
-        backendResponse: response.json(),
       };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      queryClient.invalidateQueries({ queryKey: ['/users/profile'] });
     },
   });
 
@@ -241,7 +240,7 @@ export function useAuth() {
   const logout = async () => {
     console.log('Logging out user via Amplify');
     await signOut();
-    queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+    queryClient.invalidateQueries({ queryKey: ['/users/profile'] });
     queryClient.clear();
   };
 
