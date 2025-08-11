@@ -29,7 +29,7 @@ type VerifyEmailForm = z.infer<typeof verifyEmailSchema>;
 export default function VerifyEmail() {
   const [, navigate] = useLocation();
   const search = useSearch();
-  const { verifyEmail, verifyEmailLoading, verifyEmailError } = useAuth();
+  const { verifyEmail } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const [email, setEmail] = useState('');
@@ -55,28 +55,29 @@ export default function VerifyEmail() {
   const onSubmit = async (values: VerifyEmailForm) => {
     if (!email) return;
 
-    try {
-      await verifyEmail({
-        email,
-        code: values.code,
-      });
+    verifyEmail.mutate({
+      email,
+      code: values.code,
+    }, {
+      onSuccess: () => {
+        toast({
+          title: t('auth.verify.success.title'),
+          description: t('auth.verify.success.description'),
+        });
 
-      toast({
-        title: t('auth.verify.success.title'),
-        description: t('auth.verify.success.description'),
-      });
-
-      // Small delay to ensure authentication state updates properly
-      setTimeout(() => {
-        navigate(`/${language}/`);
-      }, 500);
-    } catch (error: any) {
-      toast({
-        title: t('common.error'),
-        description: error.message || t('auth.verify.error'),
-        variant: 'destructive',
-      });
-    }
+        // Small delay to ensure authentication state updates properly
+        setTimeout(() => {
+          navigate(`/${language}/`);
+        }, 500);
+      },
+      onError: (error: any) => {
+        toast({
+          title: t('common.error'),
+          description: error.message || t('auth.verify.error'),
+          variant: 'destructive',
+        });
+      }
+    });
   };
 
   if (!email) {
@@ -116,8 +117,8 @@ export default function VerifyEmail() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={verifyEmailLoading}>
-                {verifyEmailLoading && (
+              <Button type="submit" className="w-full" disabled={verifyEmail.isPending}>
+                {verifyEmail.isPending && (
                   <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                 )}
                 {t('auth.verify.submit')}
