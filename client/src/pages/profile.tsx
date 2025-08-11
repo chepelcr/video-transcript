@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { useRequireEmailVerification } from '@/hooks/useEmailVerification';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLocation } from 'wouter';
@@ -33,10 +34,18 @@ type ProfileForm = z.infer<typeof profileSchema>;
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
+  const { checkAndRedirect } = useRequireEmailVerification();
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
+
+  // Check email verification when component loads
+  useEffect(() => {
+    if (!isLoading && user) {
+      checkAndRedirect();
+    }
+  }, [isLoading, user, checkAndRedirect]);
 
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),

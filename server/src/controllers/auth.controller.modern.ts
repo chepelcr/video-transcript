@@ -133,6 +133,7 @@ export class AuthController implements IAuthController {
           email: cognitoUserData.email,
           firstName: cognitoUserData.firstName,
           lastName: cognitoUserData.lastName,
+          emailVerified: cognitoUserData.emailVerified || false,
         });
         
         console.log(`✅ User auto-synced from Cognito: ${dbUser.username}`);

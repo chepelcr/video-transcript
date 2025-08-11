@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useRequireEmailVerification } from "@/hooks/useEmailVerification";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
@@ -49,6 +50,7 @@ interface TranscriptionHistoryResponse {
 export default function Dashboard() {
   const [, navigate] = useLocation();
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const { checkAndRedirect } = useRequireEmailVerification();
   const { t, language } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -100,12 +102,15 @@ export default function Dashboard() {
     }
   };
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated or verify email if needed
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       navigate(`/${language}/login`);
+    } else if (isAuthenticated) {
+      // Check email verification
+      checkAndRedirect();
     }
-  }, [isAuthenticated, authLoading, navigate, language]);
+  }, [isAuthenticated, authLoading, navigate, language, checkAndRedirect]);
 
   const {
     data: transcriptionData,

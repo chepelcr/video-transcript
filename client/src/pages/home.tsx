@@ -14,6 +14,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useEmailVerificationGuard } from "@/hooks/useEmailVerification";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { transcribeVideo } from "@/lib/transcription-api";
@@ -41,6 +42,9 @@ export default function Home() {
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [, navigate] = useLocation();
+
+  // Check email verification if authenticated
+  useEmailVerificationGuard();
 
   // Debug authentication state
   useEffect(() => {
