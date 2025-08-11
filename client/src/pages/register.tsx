@@ -20,6 +20,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressSteps } from '@/components/ui/progress-steps';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
+import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Home, Loader2, Eye, EyeOff, ArrowLeft, ArrowRight } from 'lucide-react';
 
 // AWS Cognito password policy: min 8 chars, uppercase, lowercase, number, special char
@@ -171,6 +173,12 @@ export default function Register() {
         <Home className="w-4 h-4 mr-2" />
         Back to Home
       </Button>
+
+      {/* Language and Theme Toggles */}
+      <div className="absolute top-4 right-4 flex items-center space-x-2">
+        <LanguageToggle />
+        <ThemeToggle />
+      </div>
       
       <Card className="w-full max-w-lg">
         <CardHeader className="space-y-4">

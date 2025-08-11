@@ -17,6 +17,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Home, Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
@@ -72,6 +74,12 @@ export default function Login() {
         <Home className="w-4 h-4 mr-2" />
         Back to Home
       </Button>
+
+      {/* Language and Theme Toggles */}
+      <div className="absolute top-4 right-4 flex items-center space-x-2">
+        <LanguageToggle />
+        <ThemeToggle />
+      </div>
       
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
