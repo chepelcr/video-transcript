@@ -103,11 +103,16 @@ const swaggerOptions = {
       {
         name: 'Health',
         description: 'System health monitoring and status checks'
+      },
+      {
+        name: 'Notifications',
+        description: 'User notification system with real-time updates'
       }
     ]
   },
   apis: [
     './server/src/controllers/*.modern.ts',
+    './server/src/controllers/notification.controller.ts',
     './server/src/routes/*.swagger.ts'
   ]
 };
