@@ -102,66 +102,6 @@ export class UserController implements IUserController {
 
     /**
      * @swagger
-     * /api/users/sync-from-cognito:
-     *   post:
-     *     summary: Sync User from AWS Cognito (Public endpoint)
-     *     description: Creates or updates user from Cognito data during verification process. No authentication required.
-     *     tags: [Users]
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             required:
-     *               - cognitoUserId
-     *               - email
-     *             properties:
-     *               cognitoUserId:
-     *                 type: string
-     *                 description: AWS Cognito user ID
-     *                 example: "54384458-c0d1-705c-3ebb-46cf191cd791"
-     *               email:
-     *                 type: string
-     *                 format: email
-     *                 description: User's email address
-     *                 example: "user@example.com"
-     *               username:
-     *                 type: string
-     *                 description: User's username
-     *                 example: "johndoe"
-     *               firstName:
-     *                 type: string
-     *                 description: User's first name
-     *                 example: "John"
-     *               lastName:
-     *                 type: string
-     *                 description: User's last name
-     *                 example: "Doe"
-     *     responses:
-     *       200:
-     *         description: User synchronized successfully
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 user:
-     *                   $ref: '#/components/schemas/User'
-     *                 message:
-     *                   type: string
-     *                   example: "User synchronized successfully"
-     *       400:
-     *         description: Invalid request data
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ErrorResponse'
-     */
-    this.router.post('/sync-from-cognito', this.syncFromCognito.bind(this));
-
-    /**
-     * @swagger
      * /api/users/{userId}/verify-email-complete:
      *   post:
      *     summary: Complete Email Verification
@@ -509,11 +449,47 @@ export class UserController implements IUserController {
         return;
       }
       
-      // Find user by ID
-      const user = await this.userRepository.findById(userId);
-      if (!user) {
-        res.status(404).json({ error: 'User not found' });
+      // AWS API Gateway handles authorization - ensure user can access this endpoint
+      const authenticatedUserId = req.headers['x-user-id'] as string;
+      
+      if (authenticatedUserId && userId !== authenticatedUserId) {
+        res.status(403).json({ error: 'You can only complete verification for your own account' });
         return;
+      }
+      
+      console.log(`🔍 Finding user by ID: ${userId.substring(0, 8)}...`);
+      
+      // First check if user exists in our database
+      let user = await this.userRepository.findById(userId);
+      
+      if (!user) {
+        console.log('User not found in database, syncing from Cognito...');
+        
+        // Get user data from Cognito and create in database
+        const cognitoUserData = await this.cognitoService.getUser(userId);
+        
+        if (!cognitoUserData) {
+          res.status(404).json({ error: 'User not found in Cognito' });
+          return;
+        }
+        
+        // Create user in our database using Cognito data
+        user = await this.userRepository.create({
+          id: userId,
+          email: cognitoUserData.email,
+          username: cognitoUserData.username,
+          firstName: cognitoUserData.firstName || undefined,
+          lastName: cognitoUserData.lastName || undefined,
+          subscriptionTier: 'free',
+          transcriptionsUsed: 0,
+          stripeCustomerId: null,
+          stripeSubscriptionId: null,
+          isActive: true
+        });
+        
+        console.log(`✅ User created from Cognito: ${user.username} (${user.email})`);
+      } else {
+        console.log(`✅ Found user: ${user.username} (${user.email})`);
       }
       
       // Get language from query parameter or detect from headers
@@ -523,22 +499,15 @@ export class UserController implements IUserController {
       try {
         console.log(`🎉 Sending welcome materials for verified user: ${user.email}`);
         
-        // Send welcome email (async, don't block response)
-        this.emailService.sendWelcomeEmail(
-          user.email, 
-          user.firstName || '', 
-          user.lastName || '',
-          userLanguage
-        ).catch(error => {
-          console.error('Failed to send welcome email:', error);
-        });
+        // Send welcome email
+        const fullName = user.firstName && user.lastName ? 
+          `${user.firstName} ${user.lastName}` : 
+          user.firstName || user.username;
+        
+        await this.emailService.sendWelcomeEmail(user.email, fullName, userLanguage);
         
         // Create welcome notification
-        await this.notificationService.createWelcomeNotification(
-          user.id,
-          user.firstName || '',
-          userLanguage
-        );
+        await this.notificationService.createWelcomeNotification(userId, fullName, userLanguage);
         
         console.log(`✅ Welcome materials sent for verified user: ${user.username} (${userLanguage})`);
         
@@ -555,72 +524,6 @@ export class UserController implements IUserController {
     } catch (error: any) {
       console.error('Error processing email verification completion:', error);
       res.status(500).json({ error: error.message || 'Failed to process verification completion' });
-    }
-  }
-
-  async syncFromCognito(req: Request, res: Response): Promise<void> {
-    try {
-      console.log('🔄 Syncing user from Cognito (public endpoint)');
-      
-      const { cognitoUserId, email, username, firstName, lastName } = req.body;
-      
-      if (!cognitoUserId || !email) {
-        res.status(400).json({ error: 'Cognito User ID and email are required' });
-        return;
-      }
-      
-      // Check if user already exists
-      const existingUser = await this.userRepository.findById(cognitoUserId);
-      if (existingUser) {
-        console.log(`✅ User already exists: ${existingUser.username}`);
-        res.status(200).json({ 
-          user: existingUser, 
-          message: 'User already synchronized' 
-        });
-        return;
-      }
-      
-      // Get additional user data from Cognito if not provided
-      let userData = { cognitoUserId, email, username, firstName, lastName };
-      
-      if (!username || !firstName || !lastName) {
-        console.log('Fetching additional user data from Cognito...');
-        const cognitoUserData = await this.cognitoService.getUser(cognitoUserId);
-        if (cognitoUserData) {
-          userData = {
-            cognitoUserId,
-            email: email || cognitoUserData.email,
-            username: username || cognitoUserData.username,
-            firstName: firstName || cognitoUserData.firstName,
-            lastName: lastName || cognitoUserData.lastName
-          };
-        }
-      }
-      
-      // Create new user in database
-      const newUser = await this.userRepository.create({
-        id: cognitoUserId,
-        email: userData.email,
-        username: userData.username || userData.email.split('@')[0],
-        firstName: userData.firstName || null,
-        lastName: userData.lastName || null,
-        subscriptionTier: 'free',
-        transcriptionsUsed: 0,
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        isActive: true
-      });
-      
-      console.log(`✅ User synchronized: ${newUser.username} (${newUser.email})`);
-      
-      res.status(200).json({ 
-        user: newUser, 
-        message: 'User synchronized successfully' 
-      });
-      
-    } catch (error: any) {
-      console.error('Error syncing user from Cognito:', error);
-      res.status(500).json({ error: error.message || 'Failed to sync user' });
     }
   }
 
