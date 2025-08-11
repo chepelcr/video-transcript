@@ -1,85 +1,6 @@
 # Overview
 
-This is a video transcription service application built with a full-stack TypeScript architecture. The application allows users to submit video URLs for transcription, operating on a freemium model that offers 3 free transcriptions before requiring a paid subscription. It integrates with both Stripe and PayPal for payment processing and features a modern React frontend. The project's ambition is to provide an efficient and reliable video transcription solution, with a focus on user experience and flexible deployment.
-
-## Recent Changes (August 2025)
-**Server Architecture Cleanup (August 2025)** - Streamlined authentication endpoints and removed redundancy:
-- ✅ **Removed /me Endpoint**: Deleted redundant /me endpoint in favor of existing /users/{userId}/profile structure
-- ✅ **Authentication Cleanup**: Removed unnecessary /forgot-password, /reset-password, and /verify-email endpoints since AWS Amplify handles these
-- ✅ **Simplified Auth Controller**: Streamlined auth controller to only handle registration sync with Cognito
-- ✅ **Endpoint Consolidation**: Frontend now uses /users/{userId}/profile endpoint for user data access
-- ✅ **Clean Architecture**: Maintained proper separation between authentication (Amplify) and user profile management (backend)
-
-**Critical Login Authentication Fix (August 2025)** - Resolved ID mismatch between Cognito and database:
-- ✅ **ID Synchronization Fix**: Fixed critical issue where users could register but not login due to Cognito user ID vs database UUID mismatch
-- ✅ **Cognito ID Integration**: Modified registration flow to use Cognito user IDs as database primary keys
-- ✅ **Database Sync Method**: Added createWithCognitoId method to user repository for proper ID synchronization
-- ✅ **Authentication Flow**: Updated frontend to pass Cognito user ID during registration sync with backend
-- ✅ **User Resolution**: Fixed /me endpoint to properly find users by their Cognito IDs in database
-
-**Multi-Step Registration with Password Policies (August 2025)** - Implemented enhanced registration flow with progress indicators:
-- ✅ **Multi-Step UI**: 3-step registration (Personal Info → Password → Verification) with bubble progress indicators
-- ✅ **AWS Cognito Password Policies**: Enforced minimum 8 characters, uppercase, lowercase, number, and special character requirements
-- ✅ **Password Strength Indicator**: Real-time visual feedback for password requirements with color-coded strength meter
-- ✅ **Step Navigation**: Back/forward navigation between steps with data persistence
-- ✅ **Progress Steps Component**: Reusable component showing completion status with check marks and connecting lines
-- ✅ **Form Validation**: Separate validation schemas for each step with proper error handling
-- ✅ **Enhanced UX**: Password visibility toggles, step completion tracking, and smooth transitions
-
-**AWS Amplify Frontend Integration Completed (August 2025)** - Successfully migrated from custom Cognito implementation to AWS Amplify:
-- ✅ **Frontend Authentication**: Complete AWS Amplify Auth integration replacing custom Cognito client
-- ✅ **Simplified Backend**: Removed `/api/auth/login` endpoint - Amplify handles authentication directly with Cognito
-- ✅ **Token Management**: Amplify automatically manages JWT tokens, refresh, and session state
-- ✅ **Authentication Flow**: Registration, login, password reset, and email verification through Amplify
-- ✅ **Backend Sync**: `/api/auth/me` endpoint syncs Cognito user data with application database
-- ✅ **Cognito Integration**: Backend maintains Cognito service for user creation and management
-
-**Complete Controller-Only Architecture Migration (January 2025)** - Final modernization completed:
-- ✅ **Modern Controller Pattern**: All 5 controllers migrated to self-contained architecture with embedded routing
-- ✅ **JWT/API Key Validation Removed**: All internal authentication removed - AWS API Gateway handles authorization
-- ✅ **Routes Folder Deleted**: Complete consolidation into controller-only pattern
-- ✅ **Service Method Alignment**: Fixed all service method calls to match actual implementations
-- ✅ **AWS API Gateway Ready**: Full compatibility with external authorization via x-user-id headers
-- ✅ **Profile Endpoints Consolidated**: Unified /users/{userId}/profile pattern with proper user access validation
-
-**Automatic OpenAPI Documentation System** - Implemented library-based API documentation:
-- ✅ **Library Integration**: Uses swagger-jsdoc and swagger-ui-express for automatic OpenAPI generation
-- ✅ **JSDoc-Based Documentation**: Route documentation via JSDoc comments, no manual endpoint management
-- ✅ **Real-time Updates**: Documentation automatically reflects code changes without manual updates
-- ✅ **Complete OpenAPI 3.0 Spec**: Proper schemas, security definitions, and response examples
-
-**Domain-like URL Structure Implementation** - Restructured transcription API with domain-style URLs:
-- ✅ **URL Pattern Change**: Moved from /api/transcriptions to /users/{userId}/transcriptions structure
-- ✅ **Removed Anonymous Endpoints**: Deleted /api/transcriptions/anonymous (authentication always required)
-- ✅ **User Authorization**: Users can only access/modify their own transcriptions via URL validation
-- ✅ **Domain-style Routes**: POST/GET/PATCH /users/{userId}/transcriptions/{id} pattern implemented
-- ✅ **Public Access Routes**: GET /transcriptions/{id}/public for public transcription viewing
-- ✅ **Webhook Integration**: POST /transcriptions/webhook/{id} for processing callbacks
-
-**AWS API Gateway Lambda Integration Completed** - Successfully implemented comprehensive AWS Lambda/API Gateway architecture:
-- ✅ **AWS API Gateway Authorization**: Policy-based IAM authorization with API key validation
-- ✅ **Lambda Handler Pattern**: Complete AWS Lambda entry point with request type detection
-- ✅ **Public Retrieval Endpoints**: GET /api/transcriptions/{id}/public (optional auth)
-- ✅ **API Gateway Middleware**: Automatic detection and handling of API Gateway requests vs normal app requests  
-- ✅ **Stateless Operation**: Perfect for serverless/lambda deployments without persistent state
-- ✅ **Policy Generator**: AWS IAM policy generation following Python example pattern
-- ✅ **Lambda Deployment Ready**: server/lambda.ts entry point for AWS deployment
-
-**Server Architecture Cleanup & Database Integration Completed** - Successfully resolved all architectural conflicts:
-- ✅ **Clean File Structure**: Removed all unused legacy server files (auth.ts, migration.ts, paypal.ts, storage.ts, etc.)
-- ✅ **AWS RDS Integration**: Fixed database URL construction from individual secrets with SSL support
-- ✅ **Hybrid Architecture**: server/index.ts bridges enterprise patterns (server/src/) with legacy Vite setup
-- ✅ **API Documentation System**: FastAPI-style Swagger UI accessible at /api/docs with complete OpenAPI 3.0 spec
-- ✅ **Graceful Degradation**: Continues operation even with database connection issues
-- ✅ **Production Ready**: SSL-enabled AWS RDS connection with proper error handling
-- ✅ **Demo Mode Authentication**: Successfully implemented fallback authentication system that creates demo users when database is unavailable
-- ✅ **JWT Configuration**: Fixed JWT secret configuration with development fallbacks for seamless operation
-
-**Database Connection Details**: 
-- Properly constructs PostgreSQL URL from AWS_RDS_* environment variables with typo correction ('video-transcipt' → 'video-transcript')
-- Uses SSL with self-signed certificate support for AWS RDS  
-- Implements graceful fallback when database connection fails, creating demo users for continued operation
-- Authentication system fully operational with JWT token generation in both database and demo modes
+This project is a video transcription service application built with a full-stack TypeScript architecture. It enables users to submit video URLs for transcription and operates on a freemium model, offering 3 free transcriptions before requiring a paid subscription. The application integrates with Stripe and PayPal for payment processing and features a modern React frontend. The primary goal is to provide an efficient and reliable video transcription solution, prioritizing user experience and flexible deployment.
 
 # User Preferences
 
@@ -88,56 +9,42 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 
 # System Architecture
 
-**Complete Architecture Migration (January 2025)**: All functionality migrated to modern controller-only architecture. Removed legacy routes folder entirely and eliminated all JWT/API key validation in favor of AWS API Gateway authorization.
-
-**Self-Contained Controllers (January 2025)**: Five controllers now handle both routing and business logic with embedded route definitions and JSDoc documentation for automatic OpenAPI generation.
-
 ## Frontend Architecture
-- **Technology Stack**: React with TypeScript, using Vite as the build tool.
-- **UI/UX**: Utilizes `shadcn/ui` components built on Radix UI primitives, styled with Tailwind CSS.
-- **Routing**: Client-side routing handled by Wouter for pages such as home, checkout, and subscription.
-- **State Management**: TanStack Query for server state management and local storage hooks for client state.
-- **Forms**: React Hook Form with Zod validation schemas.
-- **Payment UI**: Integrates Stripe Elements and a custom PayPal button component.
+- **Technology Stack**: React with TypeScript, using Vite.
+- **UI/UX**: `shadcn/ui` components built on Radix UI primitives, styled with Tailwind CSS.
+- **Routing**: Client-side routing handled by Wouter.
+- **State Management**: TanStack Query for server state and local storage hooks for client state.
+- **Forms**: React Hook Form with Zod validation.
+- **Payment UI**: Integrates Stripe Elements and a custom PayPal button.
+- **User Authentication**: Integrated with AWS Amplify for registration, login, password reset, and email verification.
 
 ## Backend Architecture - Modern Controller-Based Design
-- **Server Framework**: Express.js with TypeScript, reorganized into modern controller-only architecture (August 2025)
-- **Directory Structure**: Streamlined enterprise patterns with controllers containing both logic and routing:
-  - `server/src/config/` - Application configuration and database setup
-  - `server/src/models/` - Business logic models and validation schemas  
-  - `server/src/repositories/` - Data access layer with type-safe Drizzle ORM operations
-  - `server/src/services/` - Business logic layer handling core application functionality
-  - `server/src/controllers/` - HTTP request/response handling, routing, and JSDoc documentation
-  - `server/src/middlewares/` - Authentication, CORS, and request processing
-  - `server/src/types/` - TypeScript type definitions
-- **Modern Controller Architecture**: AuthController, TranscriptionController, PaymentController, UserController, and HealthController (all with embedded routing)
-- **AWS API Gateway Compatible**: No internal JWT validation - relies on external AWS API Gateway authorization via x-user-id headers
-- **Comprehensive Route Coverage**: All auth endpoints (/register, /login, /refresh-token, /verify-email, /forgot-password, /reset-password, /me, /profile), user endpoints (/profile, /transcriptions), payment endpoints (Stripe + PayPal), transcription endpoints, and health monitoring endpoints
-- **Health Monitoring System**: Production-ready health checks (/health, /readiness, /liveness, /ping) with service dependency monitoring
-- **API Documentation System**: FastAPI-style Swagger documentation with auto-generated OpenAPI 3.0 spec (/docs for UI, /api-docs for JSON)
-- **Dependency Injection**: Centralized dependency container for clean architecture
-- **Payment Processing**: Full integration with dedicated PaymentController for both Stripe subscriptions and PayPal one-time payments
-- **Session Management**: Express sessions with PostgreSQL session store (`connect-pg-simple`)
-- **Transcription Logic**: All transcription logic moved to backend services for enhanced security
-- **Asynchronous Processing**: AWS SQS-based queuing system with secure webhook processing
-- **Video Title Extraction**: Intelligent title extraction service for YouTube, Vimeo, and generic URLs
-- **Development Workflow**: Vite dev server integration for hot module replacement
-- **Dockerization**: Comprehensive Docker setup for both development and production environments
+- **Server Framework**: Express.js with TypeScript, organized into a controller-only architecture.
+- **Directory Structure**: Enterprise patterns with controllers containing both logic and routing: `config/`, `models/`, `repositories/`, `services/`, `controllers/`, `middlewares/`, `types/`.
+- **Controllers**: AuthController, TranscriptionController, PaymentController, UserController, and HealthController with embedded routing.
+- **AWS API Gateway Compatible**: Relies on external AWS API Gateway authorization via `x-user-id` headers, with no internal JWT validation.
+- **API Documentation System**: FastAPI-style Swagger documentation with auto-generated OpenAPI 3.0 spec.
+- **Dependency Injection**: Centralized dependency container.
+- **Payment Processing**: Integration with dedicated PaymentController for Stripe subscriptions and PayPal one-time payments.
+- **Session Management**: Express sessions with PostgreSQL session store.
+- **Transcription Logic**: All transcription logic resides in backend services.
+- **Asynchronous Processing**: AWS SQS-based queuing system with secure webhook processing.
+- **Video Title Extraction**: Intelligent title extraction service for YouTube, Vimeo, and generic URLs.
+- **Dockerization**: Comprehensive Docker setup for development and production.
 
 ## Data Layer
-- **Database**: PostgreSQL, with Drizzle ORM for type-safe operations.
-- **Schema Design**: Includes `Users` table for subscription tracking and `Transcriptions` table for storing processing results, including video title and status.
-- **Storage Interface**: Abstracted storage layer, with a database implementation for production.
+- **Database**: PostgreSQL, utilizing Drizzle ORM for type-safe operations.
+- **Schema Design**: Includes `Users` for subscription tracking and `Transcriptions` for storing processing results (including video title and status).
+- **Storage Interface**: Abstracted storage layer.
 - **Database Provider**: AWS RDS PostgreSQL.
 
 ## System Design Choices
-- **Two-Step Transcription**: A workflow that first validates the URL, then processes the transcription.
-- **Authentication**: JWT-based authentication with refresh token support, implemented through dedicated auth service layer.
-- **Real-Time Updates**: Intelligent polling system with variable intervals (5-10 seconds) for real-time dashboard updates, coupled with a bilingual toast notification system for status changes. Aggressive client-side cache busting ensures fresh data.
-- **Multi-language Support**: Comprehensive bilingual support for UI elements, password reset flow, and notifications.
-- **Freemium Model Enforcement**: Usage tracking implemented at service layer to enforce the 3-free-transcription limit.
-- **Enterprise Architecture**: Follows industry-standard layered architecture with proper separation of concerns, dependency injection, and comprehensive error handling.
-- **Payment Integration**: Dedicated payment controllers for both Stripe and PayPal with proper service layer integration.
+- **Two-Step Transcription**: URL validation followed by transcription processing.
+- **Authentication**: JWT-based authentication with refresh token support, managed by AWS Amplify on the frontend and synchronized with backend via Cognito user IDs.
+- **Real-Time Updates**: Intelligent polling system for dashboard updates, coupled with bilingual toast notifications.
+- **Multi-language Support**: Comprehensive bilingual support for UI elements and notifications.
+- **Freemium Model Enforcement**: Usage tracking at the service layer enforces the 3-free-transcription limit.
+- **Enterprise Architecture**: Follows layered architecture with separation of concerns, dependency injection, and comprehensive error handling.
 - **Deployment**: Optimized for GitHub Pages with custom domain configuration.
 
 # External Dependencies
@@ -149,11 +56,10 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 ### Database & Infrastructure
 - **AWS RDS PostgreSQL**: For managed PostgreSQL database hosting.
 - **Drizzle ORM**: For type-safe database queries.
+- **AWS Amplify**: For frontend user authentication and authorization.
+- **AWS Cognito**: For user creation and management.
 
 ### External APIs & Queue System
-- **Python Transcription Service**: An external API endpoint responsible for video transcription processing.
-- **AWS SQS**: Utilized for asynchronous message queuing to manage transcription requests.
+- **Python Transcription Service**: An external API endpoint for video transcription processing.
+- **AWS SQS**: For asynchronous message queuing to manage transcription requests.
 - **oEmbed API**: Used for extracting real YouTube video titles.
-
-### Development Tools
-- **Replit Integration**: For development environment detection and runtime error display.

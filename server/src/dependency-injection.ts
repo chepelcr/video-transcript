@@ -8,13 +8,8 @@ import { AuthService } from './services/auth.service';
 import { EmailService } from './services/email.service';
 import { SQSService } from './services/sqs.service';
 import { VideoTitleService } from './services/video-title.service';
-import { TranscriptionController } from './controllers/transcription.controller';
-import { AuthController } from './controllers/auth.controller';
-import { PaymentController } from './controllers/payment.controller';
-import { UserController } from './controllers/user.controller';
-import { HealthController } from './controllers/health.controller';
 import { AuthMiddleware } from './middlewares/auth.middleware';
-// Modern controllers include routing
+// Modern controllers with embedded routing (AWS API Gateway compatible)
 import { TranscriptionController as ModernTranscriptionController } from './controllers/transcription.controller.modern';
 import { AuthController as ModernAuthController } from './controllers/auth.controller.modern';
 import { UserController as ModernUserController } from './controllers/user.controller.modern';
@@ -36,13 +31,6 @@ export const transcriptionService = new TranscriptionService(
   sqsService,
   videoTitleService
 );
-
-// Create controllers (legacy for now)
-export const authController = new AuthController(authService, userRepository);
-export const transcriptionController = new TranscriptionController(transcriptionService);
-export const paymentController = new PaymentController(userRepository);
-export const userController = new UserController(userRepository, transcriptionRepository);
-export const healthController = new HealthController();
 
 // Create middlewares
 export const authMiddleware = new AuthMiddleware(authService);
