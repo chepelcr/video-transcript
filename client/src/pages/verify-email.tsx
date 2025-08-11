@@ -129,8 +129,8 @@ export default function VerifyEmail() {
             {t('auth.verify.description')} {email}
           </CardDescription>
           
-          {/* Progress Steps - positioned below title */}
-          <div className="mt-6 mb-6">
+          {/* Progress Steps - positioned below title with proper spacing */}
+          <div className="mt-8 mb-6">
             <ProgressSteps 
               steps={steps}
               currentStep="verify"
