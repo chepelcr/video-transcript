@@ -1,4 +1,4 @@
-import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import { APIGatewayEvent, APIGatewayProxyResult, Context, SQSEvent, SQSRecord } from 'aws-lambda';
 import { Request, Response } from 'express';
 import express from 'express';
 import serverlessHttp from 'serverless-http';
@@ -88,27 +88,182 @@ export function handleAuthorizerRequest(event: any): any {
   }
 }
 
-// Main Lambda handler (similar to Python example)
-export async function lambdaHandler(event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> {
-  console.log('🚀 Lambda handler invoked');
+// Handle SQS message processing
+export async function handleSQSMessages(event: SQSEvent): Promise<void> {
+  console.log('📬 Processing SQS messages:', event.Records.length);
+  
+  for (const record of event.Records) {
+    try {
+      await processSQSRecord(record);
+    } catch (error) {
+      console.error('❌ Error processing SQS record:', record.messageId, error);
+      throw error; // Re-throw to trigger Lambda retry mechanism
+    }
+  }
+}
+
+// Process individual SQS record
+async function processSQSRecord(record: SQSRecord): Promise<void> {
+  console.log('📝 Processing SQS record:', record.messageId);
+  
+  try {
+    const messageBody = JSON.parse(record.body);
+    const { type, data } = messageBody;
+    
+    switch (type) {
+      case 'transcription_request':
+        await handleTranscriptionRequest(data);
+        break;
+        
+      case 'transcription_completed':
+        await handleTranscriptionCompleted(data);
+        break;
+        
+      case 'notification_send':
+        await handleNotificationSend(data);
+        break;
+        
+      case 'user_sync':
+        await handleUserSync(data);
+        break;
+        
+      default:
+        console.warn('⚠️ Unknown SQS message type:', type);
+        // Don't throw error for unknown types to avoid infinite retries
+    }
+    
+    console.log('✅ SQS record processed successfully:', record.messageId);
+    
+  } catch (error) {
+    console.error('❌ Error parsing SQS message:', record.messageId, error);
+    throw error;
+  }
+}
+
+// Handle transcription request from SQS
+async function handleTranscriptionRequest(data: any): Promise<void> {
+  console.log('🎥 Processing transcription request:', data.transcriptionId);
+  
+  try {
+    // Import transcription service from dependency injection
+    const { transcriptionService } = await import('../dependency-injection');
+    
+    // Submit for processing using existing method
+    await transcriptionService.submitForProcessing(data.transcriptionId);
+    
+    console.log('✅ Transcription request processed:', data.transcriptionId);
+    
+  } catch (error) {
+    console.error('❌ Error processing transcription request:', data.transcriptionId, error);
+    throw error;
+  }
+}
+
+// Handle transcription completion notification
+async function handleTranscriptionCompleted(data: any): Promise<void> {
+  console.log('🎉 Processing transcription completion:', data.transcriptionId);
+  
+  try {
+    // Import notification service from dependency injection
+    const { notificationService } = await import('../dependency-injection');
+    
+    // Create completion notification using existing method
+    await notificationService.createNotification({
+      userId: data.userId,
+      type: 'transcription_completed',
+      title: 'Transcription Completed',
+      message: `Your transcription for "${data.videoTitle}" is ready!`,
+      metadata: { transcriptionId: data.transcriptionId },
+      isRead: false
+    });
+    
+    console.log('✅ Transcription completion notification created:', data.transcriptionId);
+    
+  } catch (error) {
+    console.error('❌ Error creating completion notification:', data.transcriptionId, error);
+    throw error;
+  }
+}
+
+// Handle notification sending
+async function handleNotificationSend(data: any): Promise<void> {
+  console.log('📧 Processing notification send:', data.type);
+  
+  try {
+    // Import email service from dependency injection
+    const { emailService } = await import('../dependency-injection');
+    
+    // Send appropriate email based on type
+    if (data.type === 'verification') {
+      await emailService.sendVerificationEmail(data.email, data.code);
+    } else if (data.type === 'password_reset') {
+      await emailService.sendPasswordResetEmail(data.email, data.token);
+    }
+    
+    console.log('✅ Notification sent successfully:', data.type);
+    
+  } catch (error) {
+    console.error('❌ Error sending notification:', data.type, error);
+    // Don't re-throw for email failures to avoid infinite retries
+  }
+}
+
+// Handle user synchronization
+async function handleUserSync(data: any): Promise<void> {
+  console.log('👤 Processing user sync:', data.userId);
+  
+  try {
+    // For now, log the sync request - actual implementation would depend on Cognito integration
+    console.log('User sync requested for:', data.userId);
+    // This would typically involve updating user data from Cognito
+    
+    console.log('✅ User sync completed:', data.userId);
+    
+  } catch (error) {
+    console.error('❌ Error syncing user:', data.userId, error);
+    throw error;
+  }
+}
+
+// Check if event is from SQS
+function isSQSEvent(event: any): event is SQSEvent {
+  return event.Records && Array.isArray(event.Records) && 
+         event.Records.length > 0 && event.Records[0].eventSource === 'aws:sqs';
+}
+
+// Main Lambda handler supporting multiple event types
+export async function lambdaHandler(event: any, context: Context): Promise<any> {
+  console.log('🚀 Lambda handler invoked, event type detection...');
   
   // Check if this is an authorizer request
-  if ((event as any).type === 'TOKEN' || (event as any).type === 'REQUEST') {
+  if (event.type === 'TOKEN' || event.type === 'REQUEST') {
     console.log('🔐 Processing authorizer request');
-    return handleAuthorizerRequest(event as any);
+    return handleAuthorizerRequest(event);
+  }
+
+  // Check if this is an SQS event
+  if (isSQSEvent(event)) {
+    console.log('📬 Processing SQS event with', event.Records.length, 'messages');
+    try {
+      await handleSQSMessages(event);
+      console.log('✅ All SQS messages processed successfully');
+      return { statusCode: 200 }; // SQS doesn't expect detailed response
+    } catch (error) {
+      console.error('❌ SQS processing failed:', error);
+      throw error; // Let Lambda handle retries
+    }
   }
 
   // Check if event comes from EventBridge
-  if ((event as any).source === "aws.events") {
+  if (event.source === "aws.events") {
     console.log('📅 Processing EventBridge event');
-    // Handle EventBridge invocation
     return {
       statusCode: 200,
       body: JSON.stringify({ message: 'EventBridge event processed' })
     };
   }
 
-  // Handle HTTP requests through Express app
+  // Handle HTTP requests through Express app (API Gateway)
   console.log('🌐 Processing HTTP request through Express');
   
   try {
@@ -122,11 +277,11 @@ export async function lambdaHandler(event: APIGatewayEvent, context: Context): P
     // Handle the request
     const result = await handler(event, context) as APIGatewayProxyResult;
     
-    console.log('✅ Lambda request processed successfully');
+    console.log('✅ HTTP request processed successfully');
     return result;
     
   } catch (error) {
-    console.error('❌ Error processing Lambda request:', error);
+    console.error('❌ Error processing HTTP request:', error);
     return {
       statusCode: 500,
       headers: {

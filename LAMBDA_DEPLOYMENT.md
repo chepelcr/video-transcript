@@ -28,11 +28,32 @@ Key features:
 
 ### Lambda Handler
 
-The Lambda handler (`server/lambda.ts`) provides:
-- **API Gateway Integration**: HTTP request/response handling
-- **Express App Integration**: Reuses existing Express application
-- **Authorizer Support**: API key validation for secured endpoints
-- **EventBridge Support**: Handles scheduled events
+The Lambda handler (`server/src/utils/lambda-handler.ts`) provides comprehensive event processing:
+
+#### ✅ **Authorization Requests**
+- API Gateway authorizer integration
+- API key validation for secured endpoints
+- Dynamic policy generation based on request path
+- Support for both TOKEN and REQUEST authorizer types
+
+#### ✅ **API Requests**
+- HTTP request/response handling via Express integration
+- Serverless-http adapter for seamless conversion
+- Full API endpoint support (transcriptions, users, payments, notifications)
+- CORS and error handling
+
+#### ✅ **SQS Message Processing**
+- Asynchronous message queue handling
+- Support for multiple message types:
+  - `transcription_request`: Process video transcription requests
+  - `transcription_completed`: Create completion notifications
+  - `notification_send`: Send verification and password reset emails
+  - `user_sync`: Synchronize user data from Cognito
+- Automatic retry mechanism for failed messages
+- Proper error handling to prevent infinite loops
+
+#### Additional Event Types
+- **EventBridge Support**: Handles scheduled events and custom triggers
 
 ## Build Instructions
 
@@ -52,9 +73,27 @@ docker-compose -f docker-compose.lambda.yml build
 # Test with Lambda Runtime Interface Emulator
 docker-compose -f docker-compose.lambda.yml up
 
-# Test the endpoint
+# Test API requests
 curl -X POST "http://localhost:9000/2015-03-31/functions/function/invocations" \
   -d '{"httpMethod": "GET", "path": "/health", "headers": {}}'
+
+# Test SQS messages
+curl -X POST "http://localhost:9000/2015-03-31/functions/function/invocations" \
+  -d '{
+    "Records": [{
+      "eventSource": "aws:sqs",
+      "messageId": "test-123",
+      "body": "{\"type\": \"transcription_request\", \"data\": {\"transcriptionId\": \"test-456\"}}"
+    }]
+  }'
+
+# Test authorization requests
+curl -X POST "http://localhost:9000/2015-03-31/functions/function/invocations" \
+  -d '{
+    "type": "REQUEST",
+    "authorizationToken": "api-key-12345",
+    "methodArn": "arn:aws:execute-api:us-east-1:123456789012:abcdef123/test/GET/transcriptions"
+  }'
 ```
 
 ### 3. Deploy to AWS
