@@ -44,21 +44,21 @@ export class NotificationController {
    * /api/users/{userId}/notifications:
    *   get:
    *     summary: Get user notifications
-   *     description: Retrieve the latest 5 notifications for a user
+   *     description: |
+   *       Retrieve the latest 5 notifications for the authenticated user.
+   *       
+   *       **Security**: Protected by AWS API Gateway - users can only access their own notifications.
    *     tags: [Notifications]
+   *     security:
+   *       - ApiGatewayAuth: []
    *     parameters:
    *       - in: path
    *         name: userId
    *         required: true
    *         schema:
    *           type: string
-   *         description: User ID
-   *       - in: header
-   *         name: x-user-id
-   *         required: true
-   *         schema:
-   *           type: string
-   *         description: Authenticated user ID
+   *         description: AWS Cognito User ID (validated by API Gateway)
+   *         example: "54384458-c0d1-705c-3ebb-46cf191cd791"
    *     responses:
    *       200:
    *         description: User notifications retrieved successfully
@@ -103,27 +103,28 @@ export class NotificationController {
    * /api/users/{userId}/notifications/{notificationId}/read:
    *   put:
    *     summary: Mark notification as read
-   *     description: Mark a specific notification as read
+   *     description: |
+   *       Mark a specific notification as read for the authenticated user.
+   *       
+   *       **Security**: Protected by AWS API Gateway - users can only access their own notifications.
    *     tags: [Notifications]
+   *     security:
+   *       - ApiGatewayAuth: []
    *     parameters:
    *       - in: path
    *         name: userId
    *         required: true
    *         schema:
    *           type: string
-   *         description: User ID
+   *         description: AWS Cognito User ID (validated by API Gateway)
+   *         example: "54384458-c0d1-705c-3ebb-46cf191cd791"
    *       - in: path
    *         name: notificationId
    *         required: true
    *         schema:
    *           type: string
    *         description: Notification ID
-   *       - in: header
-   *         name: x-user-id
-   *         required: true
-   *         schema:
-   *           type: string
-   *         description: Authenticated user ID
+   *         example: "af36ad9e-f378-4f81-a850-ab057492793e"
    *     responses:
    *       200:
    *         description: Notification marked as read successfully
@@ -163,21 +164,21 @@ export class NotificationController {
    * /api/users/{userId}/notifications/read-all:
    *   put:
    *     summary: Mark all notifications as read
-   *     description: Mark all notifications for a user as read
+   *     description: |
+   *       Mark all notifications as read for the authenticated user.
+   *       
+   *       **Security**: Protected by AWS API Gateway - users can only access their own notifications.
    *     tags: [Notifications]
+   *     security:
+   *       - ApiGatewayAuth: []
    *     parameters:
    *       - in: path
    *         name: userId
    *         required: true
    *         schema:
    *           type: string
-   *         description: User ID
-   *       - in: header
-   *         name: x-user-id
-   *         required: true
-   *         schema:
-   *           type: string
-   *         description: Authenticated user ID
+   *         description: AWS Cognito User ID (validated by API Gateway)
+   *         example: "54384458-c0d1-705c-3ebb-46cf191cd791"
    *     responses:
    *       200:
    *         description: All notifications marked as read successfully
@@ -256,13 +257,13 @@ export class NotificationController {
   async createTestTranscriptionComplete(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      const { db } = await import('../config/database');
+      const database = await import('../config/database');
       const { transcriptions } = await import('../../../shared/schema');
       
       console.log('🧪 Creating test completed transcription for user:', userId);
 
       // Create completed transcription directly in database
-      const [transcription] = await db
+      const [transcription] = await database.db
         .insert(transcriptions)
         .values({
           userId,

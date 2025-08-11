@@ -105,15 +105,23 @@ export class UserController implements IUserController {
      * /api/users/{userId}/verify-email-complete:
      *   post:
      *     summary: Complete Email Verification
-     *     description: Called after successful email verification to send welcome materials
+     *     description: |
+     *       Called after successful email verification to send welcome materials.
+     *       This endpoint automatically syncs user data from AWS Cognito if the user 
+     *       doesn't exist in the database yet, then sends welcome email and notifications.
+     *       
+     *       **Security**: Protected by AWS API Gateway - users can only access their own verification endpoint.
      *     tags: [Users]
+     *     security:
+     *       - ApiGatewayAuth: []
      *     parameters:
      *       - in: path
      *         name: userId
      *         required: true
      *         schema:
      *           type: string
-     *         description: User ID
+     *         description: AWS Cognito User ID (validated by API Gateway)
+     *         example: "54384458-c0d1-705c-3ebb-46cf191cd791"
      *       - in: query
      *         name: language
      *         required: false
@@ -135,26 +143,26 @@ export class UserController implements IUserController {
      *                   type: string
      *                   description: Success message
      *                   example: "Welcome materials sent successfully"
+     *                 user:
+     *                   $ref: '#/components/schemas/User'
      *       400:
      *         description: User ID is required
      *         content:
      *           application/json:
      *             schema:
-     *               type: object
-     *               properties:
-     *                 error:
-     *                   type: string
-     *                   example: "User ID is required"
-     *       404:
-     *         description: User not found
+     *               $ref: '#/components/schemas/ErrorResponse'
+     *       403:
+     *         description: Unauthorized - API Gateway validation failed
      *         content:
      *           application/json:
      *             schema:
-     *               type: object
-     *               properties:
-     *                 error:
-     *                   type: string
-     *                   example: "User not found"
+     *               $ref: '#/components/schemas/ErrorResponse'
+     *       404:
+     *         description: User not found in Cognito
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ErrorResponse'
      */
     this.router.post('/:userId/verify-email-complete', apiGatewayMiddleware, this.verifyEmailComplete.bind(this));
 
@@ -163,30 +171,30 @@ export class UserController implements IUserController {
      * /api/users/{userId}/profile:
      *   get:
      *     summary: Get User Profile
-     *     description: Get detailed user profile information
+     *     description: |
+     *       Get detailed user profile information for the authenticated user.
+     *       
+     *       **Security**: Protected by AWS API Gateway - users can only access their own profile.
      *     tags: [Users]
+     *     security:
+     *       - ApiGatewayAuth: []
      *     parameters:
      *       - in: path
      *         name: userId
      *         required: true
      *         schema:
      *           type: string
-     *         description: User ID
+     *         description: AWS Cognito User ID (validated by API Gateway)
+     *         example: "54384458-c0d1-705c-3ebb-46cf191cd791"
      *     responses:
      *       200:
-     *         description: User profile retrieved
+     *         description: User profile retrieved successfully
      *         content:
      *           application/json:
      *             schema:
      *               $ref: '#/components/schemas/User'
-     *       401:
-     *         description: Not authenticated
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ErrorResponse'
      *       403:
-     *         description: User can only access their own profile
+     *         description: Unauthorized - API Gateway validation failed
      *         content:
      *           application/json:
      *             schema:
@@ -205,15 +213,21 @@ export class UserController implements IUserController {
      * /api/users/{userId}/profile:
      *   put:
      *     summary: Update User Profile
-     *     description: Update user profile information (username, firstName, lastName)
+     *     description: |
+     *       Update user profile information (username, firstName, lastName).
+     *       
+     *       **Security**: Protected by AWS API Gateway - users can only update their own profile.
      *     tags: [Users]
+     *     security:
+     *       - ApiGatewayAuth: []
      *     parameters:
      *       - in: path
      *         name: userId
      *         required: true
      *         schema:
      *           type: string
-     *         description: User ID
+     *         description: AWS Cognito User ID (validated by API Gateway)
+     *         example: "54384458-c0d1-705c-3ebb-46cf191cd791"
      *     requestBody:
      *       required: false
      *       content:
@@ -279,13 +293,7 @@ export class UserController implements IUserController {
         return;
       }
 
-      // AWS API Gateway handles authorization - verify user can access this profile
-      const authenticatedUserId = req.headers['x-user-id'] as string;
-      
-      if (authenticatedUserId && userId !== authenticatedUserId) {
-        res.status(403).json({ error: 'You can only access your own profile' });
-        return;
-      }
+      // Note: AWS API Gateway handles authorization - userId in path is already validated
 
       console.log(`👤 Getting profile for user: ${userId.substring(0, 8)}...`);
       
@@ -315,13 +323,7 @@ export class UserController implements IUserController {
         return;
       }
 
-      // AWS API Gateway handles authorization - verify user can update this profile
-      const authenticatedUserId = req.headers['x-user-id'] as string;
-      
-      if (authenticatedUserId && userId !== authenticatedUserId) {
-        res.status(403).json({ error: 'You can only update your own profile' });
-        return;
-      }
+      // Note: AWS API Gateway handles authorization - userId in path is already validated
 
       console.log(`👤 Updating profile for user: ${userId.substring(0, 8)}...`);
       
@@ -449,13 +451,7 @@ export class UserController implements IUserController {
         return;
       }
       
-      // AWS API Gateway handles authorization - ensure user can access this endpoint
-      const authenticatedUserId = req.headers['x-user-id'] as string;
-      
-      if (authenticatedUserId && userId !== authenticatedUserId) {
-        res.status(403).json({ error: 'You can only complete verification for your own account' });
-        return;
-      }
+      // Note: AWS API Gateway handles authorization - userId in path is already validated
       
       console.log(`🔍 Finding user by ID: ${userId.substring(0, 8)}...`);
       

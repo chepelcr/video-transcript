@@ -39,6 +39,12 @@ const swaggerOptions = {
           in: 'header',
           name: 'x-api-key',
           description: 'API key for AWS Lambda/API Gateway integration'
+        },
+        ApiGatewayAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'AWS API Gateway authorization with JWT token validation. The userId in the path must match the authenticated user.'
         }
       },
       schemas: {
