@@ -299,8 +299,13 @@ export function useAuth() {
       if (result.isSignUpComplete) {
         try {
           console.log('Calling verification completion endpoint...');
+          
+          // Small delay to ensure AWS Amplify session is fully established
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
           // Get user after successful verification to get user ID
           const amplifyUser = await getCurrentUser();
+          
           // Detect language from current URL or localStorage
           const currentLanguage = window.location.pathname.includes('/es') ? 'es' : 'en';
           

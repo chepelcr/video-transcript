@@ -57,8 +57,10 @@ export class EmailService implements IEmailService {
       console.log(`📧 Sending verification email to: ${to}`);
       
       const transporter = await this.getTransporter();
+      const fromEmail = process.env.FROM_EMAIL || 'noreply@jcampos.dev';
+      
       const mailOptions = {
-        from: process.env.FROM_EMAIL || 'noreply@video-transcript.jcampos.dev',
+        from: fromEmail,
         to,
         subject: 'Verify Your Email - Video Transcript',
         html: `
@@ -100,8 +102,10 @@ export class EmailService implements IEmailService {
       const transporter = await this.getTransporter();
       const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
       
+      const fromEmail = process.env.FROM_EMAIL || 'noreply@jcampos.dev';
+      
       const mailOptions = {
-        from: process.env.FROM_EMAIL || 'noreply@video-transcript.jcampos.dev',
+        from: fromEmail,
         to,
         subject: 'Reset Your Password - Video Transcript',
         html: `
@@ -151,8 +155,11 @@ export class EmailService implements IEmailService {
       const fullName = firstName && lastName ? `${firstName} ${lastName}` : firstName || (language === 'es' ? 'Usuario' : 'User');
       const emailContent = this.getWelcomeEmailContent(fullName, language);
       
+      // Get FROM_EMAIL from environment variable or use verified AWS SES email
+      const fromEmail = process.env.FROM_EMAIL || 'noreply@jcampos.dev';
+      
       const mailOptions = {
-        from: process.env.FROM_EMAIL || 'noreply@video-transcript.jcampos.dev',
+        from: fromEmail,
         to,
         subject: emailContent.subject,
         html: emailContent.html,
