@@ -167,7 +167,7 @@ export class UserRepository implements IUserRepository {
       console.log(`📊 Total users in database: ${userCount[0]?.count || 0}`);
       
       // Debug: Show recent users for comparison
-      if (userCount[0]?.count > 0) {
+      if (Number(userCount[0]?.count) > 0) {
         const recentUsers = await db
           .select({ id: users.id, username: users.username, email: users.email })
           .from(users)
