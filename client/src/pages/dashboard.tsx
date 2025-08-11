@@ -478,7 +478,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 md:grid-rows-1">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Account Overview */}
           <div className="lg:col-span-1">
             <Card className="h-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
@@ -536,7 +536,7 @@ export default function Dashboard() {
           </div>
 
           {/* Transcription History */}
-          <div className="md:col-span-2 lg:col-span-2">
+          <div className="lg:col-span-2">
             <Card className="h-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
