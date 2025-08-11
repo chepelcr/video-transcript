@@ -223,11 +223,36 @@ export class UserController implements IUserController {
 
       console.log(`👤 Getting profile for user: ${userId.substring(0, 8)}...`);
       
-      const user = await this.userRepository.findById(userId);
+      let user = await this.userRepository.findById(userId);
       
       if (!user) {
-        res.status(404).json({ error: 'User not found' });
-        return;
+        // User not found in database - sync from Cognito
+        console.log('User not found in database, syncing from Cognito...');
+        
+        try {
+          const cognitoUserData = await this.cognitoService.getUser(userId);
+          
+          if (!cognitoUserData) {
+            console.log(`❌ User ${userId.substring(0, 8)} not found in Cognito`);
+            res.status(404).json({ error: 'User not found in Cognito. Please verify your email and complete registration.' });
+            return;
+          }
+          
+          // Create user in database
+          user = await this.userRepository.createWithCognitoId({
+            id: userId,
+            email: cognitoUserData.email,
+            username: cognitoUserData.username || cognitoUserData.email.split('@')[0],
+            firstName: cognitoUserData.firstName,
+            lastName: cognitoUserData.lastName
+          });
+          
+          console.log(`✅ User synced from Cognito: ${user.username} (${user.email})`);
+        } catch (error) {
+          console.error('Error syncing user from Cognito:', error);
+          res.status(404).json({ error: 'User not found in Cognito. Please verify your email and complete registration.' });
+          return;
+        }
       }
       
       console.log(`✅ Profile retrieved for user: ${user.username}`);
