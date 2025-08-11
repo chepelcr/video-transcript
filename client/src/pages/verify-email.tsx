@@ -122,21 +122,21 @@ export default function VerifyEmail() {
 
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          {/* Progress Steps */}
-          <div className="mb-6">
-            <ProgressSteps 
-              steps={steps}
-              currentStep="verify"
-              completedSteps={['info', 'password']}
-            />
-          </div>
-          
           <CardTitle className="text-2xl font-bold text-center">
             {t('auth.verify.title')}
           </CardTitle>
           <CardDescription className="text-center">
             {t('auth.verify.description')} {email}
           </CardDescription>
+          
+          {/* Progress Steps - positioned below title */}
+          <div className="mt-6 mb-6">
+            <ProgressSteps 
+              steps={steps}
+              currentStep="verify"
+              completedSteps={['info', 'password']}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <Form {...form}>

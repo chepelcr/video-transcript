@@ -119,6 +119,14 @@ const translations = {
     'auth.register.steps.securityDesc': 'Create password',
     'auth.register.steps.verify': 'Verify',
     'auth.register.steps.verifyDesc': 'Email verification',
+    
+    // Multi-step registration
+    'auth.register.step1.title': 'Personal Info',
+    'auth.register.step1.subtitle': 'Basic information',
+    'auth.register.step2.title': 'Security',
+    'auth.register.step2.subtitle': 'Create password',
+    'auth.register.step3.title': 'Verify',
+    'auth.register.step3.subtitle': 'Email verification',
     'auth.register.continue': 'Continue to Password',
     'auth.register.back': 'Back',
     'auth.register.createAccount': 'Create Account',
@@ -476,6 +484,14 @@ const translations = {
     'auth.register.steps.securityDesc': 'Crear contraseña',
     'auth.register.steps.verify': 'Verificar',
     'auth.register.steps.verifyDesc': 'Verificación de email',
+    
+    // Multi-step registration
+    'auth.register.step1.title': 'Información Personal',
+    'auth.register.step1.subtitle': 'Información básica',
+    'auth.register.step2.title': 'Seguridad',
+    'auth.register.step2.subtitle': 'Crear contraseña',
+    'auth.register.step3.title': 'Verificar',
+    'auth.register.step3.subtitle': 'Verificación de email',
     'auth.register.continue': 'Continuar a Contraseña',
     'auth.register.back': 'Atrás',
     'auth.register.createAccount': 'Crear Cuenta',
