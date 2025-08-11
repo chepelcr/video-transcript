@@ -10,6 +10,14 @@ export function useEmailVerificationGuard() {
   useEffect(() => {
     const checkEmailVerification = async () => {
       try {
+        // Check if user just completed verification successfully
+        const justVerified = sessionStorage.getItem('justVerified');
+        if (justVerified) {
+          console.log('🎉 User just verified, skipping email verification check');
+          sessionStorage.removeItem('justVerified');
+          return;
+        }
+        
         // Get current Amplify user
         const user = await getCurrentUser();
         if (!user) {

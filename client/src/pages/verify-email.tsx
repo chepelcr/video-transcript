@@ -99,6 +99,9 @@ export default function VerifyEmail() {
       password: password,
     }, {
       onSuccess: () => {
+        // Set flag to prevent session cleanup on next page load
+        sessionStorage.setItem('justVerified', 'true');
+        
         // Clear session storage on successful verification
         sessionStorage.removeItem('verificationData');
         
