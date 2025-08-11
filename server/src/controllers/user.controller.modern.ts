@@ -114,23 +114,22 @@ export class UserController implements IUserController {
      *         schema:
      *           type: string
      *         description: User ID
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             required:
-     *               - email
-     *             properties:
-     *               email:
-     *                 type: string
-     *                 format: email
-     *                 description: User's email address
-     *                 example: "john@example.com"
+     *       - in: query
+     *         name: language
+     *         required: false
+     *         schema:
+     *           type: string
+     *           enum: [en, es]
+     *           default: en
+     *         description: Language for welcome email and notifications
+     *         example: "es"
      *     responses:
      *       200:
      *         description: Welcome materials sent successfully
+     *       400:
+     *         description: User ID is required
+     *       404:
+     *         description: User not found
      *         content:
      *           application/json:
      *             schema:
@@ -441,21 +440,21 @@ export class UserController implements IUserController {
     try {
       console.log('📧 Processing email verification completion');
       
-      const { email } = req.body;
-      if (!email) {
-        res.status(400).json({ error: 'Email is required' });
+      const userId = req.params.userId;
+      if (!userId) {
+        res.status(400).json({ error: 'User ID is required' });
         return;
       }
       
-      // Find user by email
-      const user = await this.userRepository.findByEmail(email);
+      // Find user by ID
+      const user = await this.userRepository.findById(userId);
       if (!user) {
         res.status(404).json({ error: 'User not found' });
         return;
       }
       
-      // Detect language from request headers or use default
-      const userLanguage = this.detectUserLanguage(req);
+      // Get language from query parameter or detect from headers
+      const userLanguage = req.query.language as string || this.detectUserLanguage(req);
       
       // Send welcome email and create notification
       try {

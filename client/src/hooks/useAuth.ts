@@ -301,9 +301,9 @@ export function useAuth() {
           console.log('Calling verification completion endpoint...');
           // Get user after successful verification to get user ID
           const amplifyUser = await getCurrentUser();
-          await apiRequest('POST', `/api/users/${amplifyUser.userId}/verify-email-complete`, {
-            email: data.email,
-          });
+          // Detect language from current URL or localStorage
+          const currentLanguage = window.location.pathname.includes('/es') ? 'es' : 'en';
+          await apiRequest('POST', `/api/users/${amplifyUser.userId}/verify-email-complete?language=${currentLanguage}`);
           console.log('Welcome materials triggered successfully');
         } catch (error) {
           console.warn('Failed to trigger welcome materials:', error);
