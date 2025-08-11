@@ -178,17 +178,38 @@ export class NotificationService {
    */
   async createWelcomeNotification(
     userId: string,
-    firstName?: string
+    firstName?: string,
+    language: string = 'en'
   ): Promise<Notification> {
-    const userName = firstName || 'User';
+    const userName = firstName || (language === 'es' ? 'Usuario' : 'User');
+    const content = this.getWelcomeNotificationContent(userName, language);
+    
     const notification: InsertNotification = {
       userId,
       type: 'system',
-      title: '🎉 Welcome to VideoScript!',
-      message: `Welcome ${userName}! Your account is ready. You have 3 free transcriptions to get started. Click here to transcribe your first video.`,
+      title: content.title,
+      message: content.message,
       relatedId: null,
     };
 
     return this.createNotification(notification);
+  }
+
+  /**
+   * Get welcome notification content based on language
+   */
+  private getWelcomeNotificationContent(userName: string, language: string): { title: string; message: string } {
+    if (language === 'es') {
+      return {
+        title: '🎉 ¡Bienvenido a VideoScript!',
+        message: `¡Bienvenido ${userName}! Tu cuenta está lista. Tienes 3 transcripciones gratuitas para comenzar. Haz clic aquí para transcribir tu primer video.`
+      };
+    }
+
+    // Default English content
+    return {
+      title: '🎉 Welcome to VideoScript!',
+      message: `Welcome ${userName}! Your account is ready. You have 3 free transcriptions to get started. Click here to transcribe your first video.`
+    };
   }
 }

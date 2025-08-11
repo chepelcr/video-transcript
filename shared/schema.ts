@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   firstName: text("first_name"),
   lastName: text("last_name"),
   emailVerified: boolean("email_verified").default(false),
+  languagePreference: text("language_preference").default("en"), // en, es
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionTier: text("subscription_tier").default("free"), // free, pro, enterprise

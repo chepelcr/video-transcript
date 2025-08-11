@@ -146,11 +146,15 @@ export class AuthController implements IAuthController {
         try {
           console.log(`🎉 Sending welcome materials for new user: ${dbUser.email}`);
           
+          // Detect language from request headers or use default
+          const userLanguage = this.detectUserLanguage(req);
+          
           // Send welcome email (async, don't block response)
           this.emailService.sendWelcomeEmail(
             dbUser.email, 
             dbUser.firstName, 
-            dbUser.lastName
+            dbUser.lastName,
+            userLanguage
           ).catch(error => {
             console.error('Failed to send welcome email:', error);
           });
@@ -158,10 +162,11 @@ export class AuthController implements IAuthController {
           // Create welcome notification
           await this.notificationService.createWelcomeNotification(
             dbUser.id,
-            dbUser.firstName
+            dbUser.firstName,
+            userLanguage
           );
           
-          console.log(`✅ Welcome materials sent for: ${dbUser.username}`);
+          console.log(`✅ Welcome materials sent for: ${dbUser.username} (${userLanguage})`);
         } catch (error) {
           console.error('Failed to send welcome materials:', error);
           // Don't fail the registration if welcome materials fail
@@ -200,11 +205,15 @@ export class AuthController implements IAuthController {
       try {
         console.log(`🎉 Sending welcome materials for new user: ${dbUser.email}`);
         
+        // Detect language from request headers or use default
+        const userLanguage = this.detectUserLanguage(req);
+        
         // Send welcome email (async, don't block response)
         this.emailService.sendWelcomeEmail(
           dbUser.email, 
           dbUser.firstName, 
-          dbUser.lastName
+          dbUser.lastName,
+          userLanguage
         ).catch(error => {
           console.error('Failed to send welcome email:', error);
         });
@@ -212,10 +221,11 @@ export class AuthController implements IAuthController {
         // Create welcome notification
         await this.notificationService.createWelcomeNotification(
           dbUser.id,
-          dbUser.firstName
+          dbUser.firstName,
+          userLanguage
         );
         
-        console.log(`✅ Welcome materials sent for: ${dbUser.username}`);
+        console.log(`✅ Welcome materials sent for: ${dbUser.username} (${userLanguage})`);
       } catch (error) {
         console.error('Failed to send welcome materials:', error);
         // Don't fail the registration if welcome materials fail
@@ -249,6 +259,35 @@ export class AuthController implements IAuthController {
   // - User profile access: Use /users/{userId}/profile endpoint
 
 
+
+  /**
+   * Detect user language from request headers or URL path
+   */
+  private detectUserLanguage(req: Request): string {
+    try {
+      // Check Accept-Language header
+      const acceptLanguage = req.headers['accept-language'];
+      if (acceptLanguage && acceptLanguage.includes('es')) {
+        return 'es';
+      }
+      
+      // Check for language in request body
+      if (req.body?.language) {
+        return req.body.language === 'es' ? 'es' : 'en';
+      }
+      
+      // Check URL path for language indicator
+      const referer = req.headers.referer || req.headers.referrer;
+      if (referer && referer.includes('/es')) {
+        return 'es';
+      }
+      
+      return 'en'; // Default to English
+    } catch (error) {
+      console.warn('Failed to detect user language:', error);
+      return 'en';
+    }
+  }
 
   public getRouter(): Router {
     return this.router;
