@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 import { IUserRepository } from '../repositories/user.repository';
 import { UpdateUserInput } from '../models/user.model';
 // Removed apiGatewayMiddleware import - authentication now handled by AWS API Gateway
-import { CognitoService, createCognitoService } from '../services/cognito.service';
+// Removed Cognito service - authentication handled client-side only
 import { EmailService } from '../services/email.service';
 import { NotificationService } from '../services/notification.service';
 
@@ -15,7 +15,6 @@ export interface IUserController {
 
 export class UserController implements IUserController {
   private router: Router;
-  private cognitoService: CognitoService;
   private emailService: EmailService;
   private notificationService: NotificationService;
 
@@ -23,7 +22,6 @@ export class UserController implements IUserController {
     private userRepository: IUserRepository
   ) {
     this.router = Router();
-    this.cognitoService = createCognitoService();
     this.emailService = new EmailService();
     this.notificationService = new NotificationService();
     this.setupRoutes();
@@ -39,11 +37,10 @@ export class UserController implements IUserController {
      *     summary: Complete Email Verification
      *     description: |
      *       Called after successful email verification to send welcome materials.
-     *       This endpoint automatically creates user records from JWT token data if the user 
-     *       doesn't exist in the database yet, then sends welcome email and notifications.
+     *       This endpoint creates users in the database if they don't exist, then
+     *       sends welcome email and notifications.
      *       
-     *       **Security**: Authentication handled by AWS API Gateway with Cognito authorizer.
-     *       User data is extracted from decoded JWT claims passed as headers by API Gateway.
+     *       **Note**: Authentication is handled client-side with AWS Cognito/Amplify.
      *     tags: [Users]
      *     parameters:
      *       - in: path
@@ -62,6 +59,30 @@ export class UserController implements IUserController {
      *           default: en
      *         description: Language for welcome email and notifications
      *         example: "es"
+     *     requestBody:
+     *       required: false
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               email:
+     *                 type: string
+     *                 format: email
+     *                 description: User email (required for new users)
+     *                 example: "user@example.com"
+     *               username:
+     *                 type: string
+     *                 description: Username (optional, generated from email if not provided)
+     *                 example: "johndoe"
+     *               firstName:
+     *                 type: string
+     *                 description: User's first name
+     *                 example: "John"
+     *               lastName:
+     *                 type: string
+     *                 description: User's last name
+     *                 example: "Doe"
      *     responses:
      *       200:
      *         description: Welcome materials sent successfully
@@ -89,7 +110,7 @@ export class UserController implements IUserController {
      *             schema:
      *               $ref: '#/components/schemas/ErrorResponse'
      *       404:
-     *         description: User not found in Cognito
+     *         description: User not found in database
      *         content:
      *           application/json:
      *             schema:
@@ -300,38 +321,28 @@ export class UserController implements IUserController {
       let user = await this.userRepository.findById(userId);
       
       if (!user) {
-        console.log('User not found in database, creating from JWT token data...');
+        console.log('User not found in database, creating from request data...');
         
-        // Extract user data from JWT token via API Gateway headers
-        // In production, AWS API Gateway will pass decoded JWT claims as headers
-        const email = req.headers['x-user-email'] as string || 
-                     req.headers['cognito-email'] as string || 
-                     `user-${userId}@example.com`; // Fallback for development
+        // Extract user data from request body for user creation
+        const { username, email, firstName, lastName } = req.body || {};
         
-        const firstName = req.headers['x-user-given-name'] as string || 
-                         req.headers['cognito-given-name'] as string || 
-                         undefined;
+        if (!email) {
+          res.status(400).json({ error: 'Email is required to create user' });
+          return;
+        }
         
-        const lastName = req.headers['x-user-family-name'] as string || 
-                        req.headers['cognito-family-name'] as string || 
-                        undefined;
-        
-        const username = email.split('@')[0]; // Generate username from email
-        
-        console.log(`Creating user from JWT data: ${email} (${username})`);
-        
-        // Create user in our database using JWT token data
+        // Create user in our database
         user = await this.userRepository.createWithCognitoId({
           id: userId,
           email: email,
-          username: username,
+          username: username || email.split('@')[0], // Generate username from email if not provided
           firstName: firstName,
           lastName: lastName
         });
         
-        console.log(`✅ User created from JWT token: ${user.username} (${user.email})`);
+        console.log(`✅ User created: ${user.username} (${user.email})`);
       } else {
-        console.log(`✅ Found user: ${user.username} (${user.email})`);
+        console.log(`✅ Found existing user: ${user.username} (${user.email})`);
       }
       
       // Get language from query parameter or detect from headers
