@@ -172,4 +172,23 @@ export class NotificationService {
 
     return this.createNotification(notification);
   }
+
+  /**
+   * Create a welcome notification for new users
+   */
+  async createWelcomeNotification(
+    userId: string,
+    firstName?: string
+  ): Promise<Notification> {
+    const userName = firstName || 'User';
+    const notification: InsertNotification = {
+      userId,
+      type: 'system',
+      title: '🎉 Welcome to VideoScript!',
+      message: `Welcome ${userName}! Your account is ready. You have 3 free transcriptions to get started. Click here to transcribe your first video.`,
+      relatedId: null,
+    };
+
+    return this.createNotification(notification);
+  }
 }

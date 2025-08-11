@@ -1,15 +1,19 @@
 import nodemailer from 'nodemailer';
 import { APP_CONFIG } from '../config/app';
+import { AWSSecretsService } from './aws-secrets.service';
 
 export interface IEmailService {
   sendVerificationEmail(to: string, verificationCode: string): Promise<boolean>;
   sendPasswordResetEmail(to: string, resetToken: string): Promise<boolean>;
+  sendWelcomeEmail(to: string, firstName?: string, lastName?: string): Promise<boolean>;
 }
 
 export class EmailService implements IEmailService {
   private transporter: nodemailer.Transporter;
+  private awsSecretsService: AWSSecretsService;
 
   constructor() {
+    this.awsSecretsService = new AWSSecretsService();
     this.transporter = nodemailer.createTransport({
       host: 'email-smtp.us-east-1.amazonaws.com',
       port: 587,
@@ -19,6 +23,33 @@ export class EmailService implements IEmailService {
         pass: process.env.AWS_SES_SMTP_PASSWORD,
       },
     });
+  }
+
+  /**
+   * Get transporter with AWS Secrets Manager fallback
+   */
+  private async getTransporter(): Promise<nodemailer.Transporter> {
+    try {
+      // Try to get credentials from AWS Secrets Manager
+      const smtpCredentials = await this.awsSecretsService.getSMTPCredentials();
+      
+      const transporter = nodemailer.createTransporter({
+        host: smtpCredentials.host,
+        port: parseInt(smtpCredentials.port),
+        secure: false,
+        auth: {
+          user: smtpCredentials.user,
+          pass: smtpCredentials.password,
+        },
+      });
+      
+      console.log('📧 Using AWS Secrets Manager for SMTP credentials');
+      return transporter;
+      
+    } catch (error) {
+      console.warn('⚠️ Failed to get SMTP credentials from AWS Secrets Manager, using environment variables');
+      return this.transporter;
+    }
   }
 
   async sendVerificationEmail(to: string, verificationCode: string): Promise<boolean> {
@@ -108,6 +139,106 @@ export class EmailService implements IEmailService {
       
     } catch (error) {
       console.error('Failed to send password reset email:', error);
+      return false;
+    }
+  }
+
+  async sendWelcomeEmail(to: string, firstName?: string, lastName?: string): Promise<boolean> {
+    try {
+      console.log(`🎉 Sending welcome email to: ${to}`);
+      
+      const transporter = await this.getTransporter();
+      const fullName = firstName && lastName ? `${firstName} ${lastName}` : firstName || 'User';
+      
+      const mailOptions = {
+        from: process.env.FROM_EMAIL || 'noreply@video-transcript.jcampos.dev',
+        to,
+        subject: 'Welcome to VideoScript - Your Video Transcription Journey Begins!',
+        html: `
+          <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+            <div style="background-color: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <!-- Header -->
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #2c3e50; font-size: 28px; margin: 0; font-weight: bold;">
+                  Welcome to VideoScript! 🎉
+                </h1>
+                <p style="color: #7f8c8d; font-size: 16px; margin-top: 10px;">
+                  Your intelligent video transcription service
+                </p>
+              </div>
+
+              <!-- Personal Greeting -->
+              <div style="margin-bottom: 30px;">
+                <h2 style="color: #34495e; font-size: 20px; margin-bottom: 15px;">
+                  Hello ${fullName}!
+                </h2>
+                <p style="color: #555; font-size: 16px; line-height: 1.6;">
+                  Thank you for joining VideoScript! We're excited to help you transform your videos into accurate, searchable transcripts with the power of AI.
+                </p>
+              </div>
+
+              <!-- Features Section -->
+              <div style="background-color: #ecf0f1; padding: 25px; border-radius: 8px; margin-bottom: 30px;">
+                <h3 style="color: #2c3e50; font-size: 18px; margin-bottom: 20px; text-align: center;">
+                  🚀 What you can do with VideoScript:
+                </h3>
+                <ul style="color: #555; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                  <li><strong>Fast Transcription:</strong> Convert videos to text in minutes</li>
+                  <li><strong>Multiple Formats:</strong> Support for YouTube, Vimeo, and direct video files</li>
+                  <li><strong>High Accuracy:</strong> AI-powered transcription with 95%+ accuracy</li>
+                  <li><strong>Easy Export:</strong> Download transcripts as text files or copy to clipboard</li>
+                  <li><strong>Real-time Dashboard:</strong> Track all your transcriptions in one place</li>
+                </ul>
+              </div>
+
+              <!-- Free Trial Info -->
+              <div style="background-color: #e8f5e8; border-left: 4px solid #27ae60; padding: 20px; margin-bottom: 30px;">
+                <h3 style="color: #27ae60; font-size: 16px; margin: 0 0 10px 0;">
+                  🎁 Your Free Trial Includes:
+                </h3>
+                <p style="color: #555; font-size: 14px; margin: 0; line-height: 1.5;">
+                  <strong>3 free transcriptions</strong> to get you started! No credit card required. 
+                  Experience the full power of VideoScript before deciding to upgrade.
+                </p>
+              </div>
+
+              <!-- Call to Action -->
+              <div style="text-align: center; margin-bottom: 30px;">
+                <a href="${process.env.FRONTEND_URL || 'https://video-transcript.jcampos.dev'}" 
+                   style="background-color: #3498db; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 16px;">
+                  Start Your First Transcription
+                </a>
+              </div>
+
+              <!-- Support Section -->
+              <div style="border-top: 1px solid #eee; padding-top: 20px; text-align: center;">
+                <p style="color: #7f8c8d; font-size: 14px; margin: 0 0 10px 0;">
+                  Need help getting started? We're here to support you!
+                </p>
+                <p style="color: #555; font-size: 13px; margin: 0;">
+                  Check our documentation or contact our support team if you have any questions.
+                </p>
+              </div>
+
+              <!-- Footer -->
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+              <div style="text-align: center;">
+                <p style="color: #999; font-size: 12px; margin: 0;">
+                  VideoScript - Intelligent Video Transcription Service<br>
+                  Built with ❤️ for content creators and professionals
+                </p>
+              </div>
+            </div>
+          </div>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`✅ Welcome email sent to: ${to}`);
+      return true;
+      
+    } catch (error) {
+      console.error('Failed to send welcome email:', error);
       return false;
     }
   }

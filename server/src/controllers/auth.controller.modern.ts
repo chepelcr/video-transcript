@@ -7,6 +7,8 @@ import {
 } from '../models/user.model';
 import { apiGatewayMiddleware } from '../middlewares/api-gateway.middleware';
 import { CognitoService, createCognitoService } from '../services/cognito.service';
+import { EmailService } from '../services/email.service';
+import { NotificationService } from '../services/notification.service';
 
 export interface IAuthController {
   register(req: Request, res: Response): Promise<void>;
@@ -20,6 +22,8 @@ export interface IAuthController {
 export class AuthController implements IAuthController {
   private router: Router;
   private cognitoService: CognitoService;
+  private emailService: EmailService;
+  private notificationService: NotificationService;
 
   constructor(
     private authService: IAuthService,
@@ -27,6 +31,8 @@ export class AuthController implements IAuthController {
   ) {
     this.router = Router();
     this.cognitoService = createCognitoService();
+    this.emailService = new EmailService();
+    this.notificationService = new NotificationService();
     this.setupRoutes();
   }
 
@@ -136,6 +142,31 @@ export class AuthController implements IAuthController {
           emailVerified: cognitoUserData.emailVerified || false,
         });
         
+        // Send welcome email and create notification for new user
+        try {
+          console.log(`🎉 Sending welcome materials for new user: ${dbUser.email}`);
+          
+          // Send welcome email (async, don't block response)
+          this.emailService.sendWelcomeEmail(
+            dbUser.email, 
+            dbUser.firstName, 
+            dbUser.lastName
+          ).catch(error => {
+            console.error('Failed to send welcome email:', error);
+          });
+          
+          // Create welcome notification
+          await this.notificationService.createWelcomeNotification(
+            dbUser.id,
+            dbUser.firstName
+          );
+          
+          console.log(`✅ Welcome materials sent for: ${dbUser.username}`);
+        } catch (error) {
+          console.error('Failed to send welcome materials:', error);
+          // Don't fail the registration if welcome materials fail
+        }
+        
         console.log(`✅ User auto-synced from Cognito: ${dbUser.username}`);
         res.status(201).json(dbUser);
         return;
@@ -164,6 +195,31 @@ export class AuthController implements IAuthController {
         firstName: validatedInput.firstName,
         lastName: validatedInput.lastName,
       });
+      
+      // Send welcome email and create notification for new user
+      try {
+        console.log(`🎉 Sending welcome materials for new user: ${dbUser.email}`);
+        
+        // Send welcome email (async, don't block response)
+        this.emailService.sendWelcomeEmail(
+          dbUser.email, 
+          dbUser.firstName, 
+          dbUser.lastName
+        ).catch(error => {
+          console.error('Failed to send welcome email:', error);
+        });
+        
+        // Create welcome notification
+        await this.notificationService.createWelcomeNotification(
+          dbUser.id,
+          dbUser.firstName
+        );
+        
+        console.log(`✅ Welcome materials sent for: ${dbUser.username}`);
+      } catch (error) {
+        console.error('Failed to send welcome materials:', error);
+        // Don't fail the registration if welcome materials fail
+      }
       
       console.log(`✅ User synced to database: ${validatedInput.username}`);
       
