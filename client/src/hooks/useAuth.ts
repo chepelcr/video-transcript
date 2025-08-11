@@ -290,10 +290,20 @@ export function useAuth() {
       
       console.log('Amplify verification result:', result);
       
-      // If verification successful, trigger welcome email and notification
+      // If verification successful, auto-login and trigger welcome materials
       if (result.isSignUpComplete) {
         try {
           console.log('Calling verification completion endpoint...');
+          
+          // Auto-login the user after successful verification
+          if (data.password) {
+            console.log('Auto-logging in user after verification...');
+            const signInResult = await signIn({
+              username: data.email,
+              password: data.password
+            });
+            console.log('Auto-login successful:', signInResult);
+          }
           
           // Small delay to ensure AWS Amplify session is fully established
           await new Promise(resolve => setTimeout(resolve, 1000));
@@ -304,16 +314,10 @@ export function useAuth() {
           // Detect language from current URL or localStorage
           const currentLanguage = window.location.pathname.includes('/es') ? 'es' : 'en';
           
-          // Call the verification completion endpoint (public endpoint)
-          const completionResponse = await fetch(
-            `${API_BASE_URL}/api/users/${amplifyUser.userId}/verify-email-complete?language=${currentLanguage}`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Origin': window.location.origin
-              }
-            }
+          // Call the verification completion endpoint with authentication
+          const completionResponse = await authenticatedRequest(
+            'POST',
+            `/api/users/${amplifyUser.userId}/verify-email-complete?language=${currentLanguage}`
           );
           
           if (completionResponse.ok) {
