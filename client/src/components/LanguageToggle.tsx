@@ -16,21 +16,31 @@ export function LanguageToggle() {
   const switchLanguage = (newLang: 'en' | 'es') => {
     setLanguage(newLang);
     
-    // Simple language routing for custom domain deployment
+    // Parse the current URL properly to separate path and search
+    const currentURL = new URL(window.location.href);
+    const currentPathname = currentURL.pathname;
+    const currentSearch = currentURL.search;
+    
     // Remove any existing language prefix from current path
-    const currentPath = location.replace(/^\/(en|es)/, '') || '/';
+    const currentPath = currentPathname.replace(/^\/(en|es)/, '') || '/';
     const newPath = currentPath === '/' ? `/${newLang}` : `/${newLang}${currentPath}`;
     
     console.log('Language switch:', { 
       newLang, 
       originalLocation: location,
+      currentPathname,
       currentPath, 
       newPath,
-      windowPath: window.location.pathname
+      currentSearch,
+      finalURL: newPath + currentSearch
     });
     
+    // Update the browser URL directly to avoid encoding issues
+    const newURL = newPath + currentSearch;
+    window.history.pushState({}, '', newURL);
+    
     // Update router location
-    setLocation(newPath);
+    setLocation(newPath + currentSearch);
   };
 
   return (
