@@ -31,8 +31,7 @@ type VerifyEmailForm = z.infer<typeof verifyEmailSchema>;
 
 export default function VerifyEmail() {
   const [, navigate] = useLocation();
-  const search = useSearch();
-  const { verifyEmail } = useAuth();
+  const { verifyEmail, resendVerificationCode } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const [email, setEmail] = useState('');
@@ -46,19 +45,31 @@ export default function VerifyEmail() {
   });
 
   useEffect(() => {
-    const params = new URLSearchParams(search);
-    const emailParam = params.get('email');
-    const passwordParam = params.get('password');
-    if (emailParam) {
-      setEmail(emailParam);
-      if (passwordParam) {
-        setPassword(passwordParam);
+    // Read verification data from session storage
+    const verificationDataStr = sessionStorage.getItem('verificationData');
+    if (verificationDataStr) {
+      try {
+        const verificationData = JSON.parse(verificationDataStr);
+        const now = Date.now();
+        
+        // Check if data is not older than 30 minutes (for security)
+        if (now - verificationData.timestamp < 30 * 60 * 1000) {
+          setEmail(verificationData.email);
+          setPassword(verificationData.password);
+        } else {
+          // Data expired, redirect to register
+          sessionStorage.removeItem('verificationData');
+          navigate(`/${language}/register`);
+        }
+      } catch (error) {
+        console.error('Error parsing verification data:', error);
+        navigate(`/${language}/register`);
       }
     } else {
-      // Redirect to register if no email
+      // No verification data, redirect to register
       navigate(`/${language}/register`);
     }
-  }, [search, navigate, language]);
+  }, [navigate, language]);
 
   const onSubmit = async (values: VerifyEmailForm) => {
     if (!email) return;
@@ -69,6 +80,9 @@ export default function VerifyEmail() {
       password: password,
     }, {
       onSuccess: () => {
+        // Clear session storage on successful verification
+        sessionStorage.removeItem('verificationData');
+        
         toast({
           title: t('auth.verify.success.title'),
           description: t('auth.verify.success.description'),
@@ -83,6 +97,26 @@ export default function VerifyEmail() {
         toast({
           title: t('common.error'),
           description: error.message || t('auth.verify.error'),
+          variant: 'destructive',
+        });
+      }
+    });
+  };
+
+  const handleResendCode = async () => {
+    if (!email) return;
+
+    resendVerificationCode.mutate({ email }, {
+      onSuccess: () => {
+        toast({
+          title: t('auth.verify.resend.success.title'),
+          description: t('auth.verify.resend.success.description'),
+        });
+      },
+      onError: (error: any) => {
+        toast({
+          title: t('common.error'),
+          description: error.message || t('auth.verify.resend.error'),
           variant: 'destructive',
         });
       }
@@ -176,9 +210,13 @@ export default function VerifyEmail() {
             <Button
               variant="link"
               className="p-0 h-auto font-medium"
-              onClick={() => navigate(`/${language}/register`)}
+              onClick={handleResendCode}
+              disabled={resendVerificationCode.isPending}
             >
-              {t('auth.verify.backToRegister')}
+              {resendVerificationCode.isPending && (
+                <Icons.spinner className="mr-2 h-3 w-3 animate-spin" />
+              )}
+              {t('auth.verify.resendCode')}
             </Button>
           </div>
         </CardContent>

@@ -125,11 +125,19 @@ export default function Register() {
       // Check if verification is needed
       if (result?.needsVerification) {
         setCurrentStep('verify');
+        
+        // Store verification data in session storage instead of URL parameters
+        sessionStorage.setItem('verificationData', JSON.stringify({
+          email: step1Data.email,
+          password: values.password,
+          timestamp: Date.now()
+        }));
+        
         toast({
           title: t('auth.register.success.title'),
           description: t('auth.register.success.description'),
         });
-        navigate(`/${language}/verify-email?email=${encodeURIComponent(step1Data.email)}&password=${encodeURIComponent(values.password)}`);
+        navigate(`/${language}/verify-email`);
       } else {
         // Registration complete, redirect to dashboard
         setCompletedSteps(['info', 'password', 'verify']);

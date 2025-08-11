@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { signUp, signIn, signOut, getCurrentUser, fetchAuthSession, confirmSignUp, resetPassword, confirmResetPassword } from 'aws-amplify/auth';
+import { signUp, signIn, signOut, getCurrentUser, fetchAuthSession, confirmSignUp, resetPassword, confirmResetPassword, resendSignUpCode } from 'aws-amplify/auth';
 import type { 
   AuthResponse, 
   UserResponse, 
@@ -220,6 +220,15 @@ export function useAuth() {
     },
   });
 
+  // Resend verification code mutation
+  const resendVerificationCodeMutation = useMutation({
+    mutationFn: async (data: { email: string }) => {
+      const result = await resendSignUpCode({ username: data.email });
+      console.log('Verification code resent:', result);
+      return result;
+    },
+  });
+
   // Logout function using Amplify Auth
   const logout = async () => {
     console.log('Logging out user via Amplify');
@@ -236,6 +245,7 @@ export function useAuth() {
     register: registerMutation,
     login: loginMutation,
     verifyEmail: verifyEmailMutation,
+    resendVerificationCode: resendVerificationCodeMutation,
     forgotPassword: forgotPasswordMutation,
     resetPassword: resetPasswordMutation,
     logout,
