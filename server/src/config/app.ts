@@ -26,7 +26,8 @@ export const APP_CONFIG = {
   // CORS Configuration
   ALLOWED_ORIGINS: [
     'https://a84950eb-2031-40c4-8a39-1789c99c8ca2-00-2c46rofc44noa.spock.replit.dev',
-    'https://video-transcript.jcampos.dev'
+    'https://video-transcript.jcampos.dev',
+    'video-transcript.jcampos.dev' // Also allow without protocol
   ]
 } as const;
 

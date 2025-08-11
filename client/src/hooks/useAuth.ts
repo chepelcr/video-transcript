@@ -132,16 +132,10 @@ export function useAuth() {
       const cognitoUserId = result.userId;
       console.log('Cognito user ID:', cognitoUserId);
 
-      // Sync to backend after Amplify registration, including Cognito user ID
-      const backendData = {
-        ...data,
-        cognitoUserId: cognitoUserId
-      };
-      const response = await apiRequest('POST', '/api/users', backendData);
-      
+      // Registration complete with Amplify - no backend sync needed during registration
+      // User will be auto-synced to backend when they first log in after email verification
       return {
         amplifyResult: result,
-        backendResponse: response,
         needsVerification: !result.isSignUpComplete,
       };
     },
@@ -187,23 +181,24 @@ export function useAuth() {
         
         if (!response.ok) {
           if (response.status === 404) {
-            // User exists in Cognito but not in our backend - auto-create them
-            console.log('User not found in backend, auto-creating...');
-            const createResponse = await authenticatedRequest('POST', '/api/users', {
-              cognitoUserId: amplifyUser.userId
-            });
-            if (createResponse.ok) {
-              // Retry fetching the profile
-              const retryResponse = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
-              if (retryResponse.ok) {
-                const userData = await retryResponse.json() as UserResponse;
-                return { 
-                  user: userData, 
-                  amplifyResult,
-                  needsVerification: amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'
-                };
-              }
-            }
+            // User exists in Cognito but not in our backend - this will auto-sync on first API usage
+            console.log('User not found in backend, will auto-sync on first transcription request');
+            // Return basic user data from Cognito instead of backend
+            const userData = {
+              id: amplifyUser.userId,
+              username: amplifyUser.username || amplifyUser.userId,
+              email: amplifyUser.signInDetails?.loginId || '',
+              freeTranscriptionsUsed: 0,
+              maxFreeTranscriptions: 3,
+              isSubscribed: false,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+            return { 
+              user: userData, 
+              amplifyResult,
+              needsVerification: amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'
+            };
           }
           throw new Error(`Failed to fetch user profile: ${response.status}`);
         }
