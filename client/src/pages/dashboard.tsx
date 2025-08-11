@@ -555,12 +555,9 @@ export default function Dashboard() {
                     onClick={() => refetchTranscriptions()}
                     disabled={transcriptionsLoading || isFetching}
                   >
-                    <Icons.refresh className="h-4 w-4 mr-1" />
+                    <Icons.refresh className={`h-4 w-4 mr-1 ${(transcriptionsLoading || isFetching) ? 'animate-spin' : ''}`} />
                     {t("common.refresh")}
                   </Button>
-                  {(transcriptionsLoading || isFetching) && (
-                    <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />
-                  )}
                 </div>
               </CardHeader>
               <CardContent>
