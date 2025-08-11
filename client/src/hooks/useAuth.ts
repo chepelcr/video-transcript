@@ -295,14 +295,28 @@ export function useAuth() {
       
       console.log('Amplify verification result:', result);
       
-      // If verification successful and password provided, auto-login
-      if (result.isSignUpComplete && data.password) {
-        console.log('Auto-logging in user after verification...');
-        const loginResult = await signIn({
-          username: data.email,
-          password: data.password,
-        });
-        console.log('Auto-login successful:', loginResult);
+      // If verification successful, trigger welcome email and notification
+      if (result.isSignUpComplete) {
+        try {
+          console.log('Calling verification completion endpoint...');
+          await apiRequest('POST', '/api/auth/verify-email-complete', {
+            email: data.email,
+          });
+          console.log('Welcome materials triggered successfully');
+        } catch (error) {
+          console.warn('Failed to trigger welcome materials:', error);
+          // Don't fail verification if welcome materials fail
+        }
+        
+        // If password provided, auto-login
+        if (data.password) {
+          console.log('Auto-logging in user after verification...');
+          const loginResult = await signIn({
+            username: data.email,
+            password: data.password,
+          });
+          console.log('Auto-login successful:', loginResult);
+        }
       }
       
       return {

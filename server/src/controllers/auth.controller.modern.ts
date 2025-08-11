@@ -12,10 +12,7 @@ import { NotificationService } from '../services/notification.service';
 
 export interface IAuthController {
   register(req: Request, res: Response): Promise<void>;
-  me(req: Request, res: Response): Promise<void>;
-  verifyEmail(req: Request, res: Response): Promise<void>;
-  forgotPassword(req: Request, res: Response): Promise<void>;
-  resetPassword(req: Request, res: Response): Promise<void>;
+  verifyEmailComplete(req: Request, res: Response): Promise<void>;
   getRouter(): Router;
 }
 
@@ -93,8 +90,7 @@ export class AuthController implements IAuthController {
      *               $ref: '#/components/schemas/ErrorResponse'
      */
     this.router.post('/register', apiGatewayMiddleware, this.register.bind(this));
-
-
+    this.router.post('/verify-email-complete', apiGatewayMiddleware, this.verifyEmailComplete.bind(this));
 
     // Note: Authentication is handled entirely by AWS Amplify
     // - Email verification: Handled by Amplify
@@ -139,38 +135,9 @@ export class AuthController implements IAuthController {
           email: cognitoUserData.email,
           firstName: cognitoUserData.firstName,
           lastName: cognitoUserData.lastName,
-          emailVerified: cognitoUserData.emailVerified || false,
         });
         
-        // Send welcome email and create notification for new user
-        try {
-          console.log(`🎉 Sending welcome materials for new user: ${dbUser.email}`);
-          
-          // Detect language from request headers or use default
-          const userLanguage = this.detectUserLanguage(req);
-          
-          // Send welcome email (async, don't block response)
-          this.emailService.sendWelcomeEmail(
-            dbUser.email, 
-            dbUser.firstName, 
-            dbUser.lastName,
-            userLanguage
-          ).catch(error => {
-            console.error('Failed to send welcome email:', error);
-          });
-          
-          // Create welcome notification
-          await this.notificationService.createWelcomeNotification(
-            dbUser.id,
-            dbUser.firstName,
-            userLanguage
-          );
-          
-          console.log(`✅ Welcome materials sent for: ${dbUser.username} (${userLanguage})`);
-        } catch (error) {
-          console.error('Failed to send welcome materials:', error);
-          // Don't fail the registration if welcome materials fail
-        }
+        // Note: Welcome email will be sent after email verification is completed
         
         console.log(`✅ User auto-synced from Cognito: ${dbUser.username}`);
         res.status(201).json(dbUser);
@@ -201,35 +168,7 @@ export class AuthController implements IAuthController {
         lastName: validatedInput.lastName,
       });
       
-      // Send welcome email and create notification for new user
-      try {
-        console.log(`🎉 Sending welcome materials for new user: ${dbUser.email}`);
-        
-        // Detect language from request headers or use default
-        const userLanguage = this.detectUserLanguage(req);
-        
-        // Send welcome email (async, don't block response)
-        this.emailService.sendWelcomeEmail(
-          dbUser.email, 
-          dbUser.firstName, 
-          dbUser.lastName,
-          userLanguage
-        ).catch(error => {
-          console.error('Failed to send welcome email:', error);
-        });
-        
-        // Create welcome notification
-        await this.notificationService.createWelcomeNotification(
-          dbUser.id,
-          dbUser.firstName,
-          userLanguage
-        );
-        
-        console.log(`✅ Welcome materials sent for: ${dbUser.username} (${userLanguage})`);
-      } catch (error) {
-        console.error('Failed to send welcome materials:', error);
-        // Don't fail the registration if welcome materials fail
-      }
+      // Note: Welcome email will be sent after email verification is completed
       
       console.log(`✅ User synced to database: ${validatedInput.username}`);
       
@@ -250,7 +189,67 @@ export class AuthController implements IAuthController {
     }
   }
 
-
+  /**
+   * Called after email verification is completed to send welcome materials
+   */
+  async verifyEmailComplete(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('📧 Processing email verification completion');
+      
+      const { email } = req.body;
+      if (!email) {
+        res.status(400).json({ error: 'Email is required' });
+        return;
+      }
+      
+      // Find user by email
+      const user = await this.userRepository.findByEmail(email);
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+      
+      // Detect language from request headers or use default
+      const userLanguage = this.detectUserLanguage(req);
+      
+      // Send welcome email and create notification
+      try {
+        console.log(`🎉 Sending welcome materials for verified user: ${user.email}`);
+        
+        // Send welcome email (async, don't block response)
+        this.emailService.sendWelcomeEmail(
+          user.email, 
+          user.firstName || '', 
+          user.lastName || '',
+          userLanguage
+        ).catch(error => {
+          console.error('Failed to send welcome email:', error);
+        });
+        
+        // Create welcome notification
+        await this.notificationService.createWelcomeNotification(
+          user.id,
+          user.firstName || '',
+          userLanguage
+        );
+        
+        console.log(`✅ Welcome materials sent for verified user: ${user.username} (${userLanguage})`);
+        
+        res.status(200).json({ 
+          message: 'Welcome materials sent successfully',
+          user: user
+        });
+        
+      } catch (error) {
+        console.error('Failed to send welcome materials:', error);
+        res.status(500).json({ error: 'Failed to send welcome materials' });
+      }
+      
+    } catch (error: any) {
+      console.error('Error processing email verification completion:', error);
+      res.status(500).json({ error: error.message || 'Failed to process verification completion' });
+    }
+  }
 
   // Note: All authentication operations are handled by AWS Amplify:
   // - Email verification: Handled by Amplify Auth
