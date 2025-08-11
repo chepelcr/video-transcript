@@ -152,9 +152,10 @@ export class CognitoService {
       const lastName = getAttribute('family_name');
       const sub = getAttribute('sub') || userId;
       const emailVerified = getAttribute('email_verified') === 'true';
+      const customUsername = getAttribute('custom:username');
 
       const userData = {
-        username: email.split('@')[0], // Generate username from email
+        username: customUsername || email.split('@')[0], // Use custom username or fallback to email prefix
         email,
         firstName,
         lastName,

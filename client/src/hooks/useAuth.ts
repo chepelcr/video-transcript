@@ -122,6 +122,7 @@ export function useAuth() {
             email: data.email,
             given_name: data.firstName || '',
             family_name: data.lastName || '',
+            'custom:username': data.username || '', // Store username as custom attribute
           },
         },
       });
