@@ -30,7 +30,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [, navigate] = useLocation();
-  const { login, logout } = useAuth();
+  const { login } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
 
@@ -159,22 +159,6 @@ export default function Login() {
                 onClick={() => navigate(`/${language}/register`)}
               >
                 {t('auth.login.signUp')}
-              </Button>
-            </div>
-            <div className="mt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={async () => {
-                  await logout();
-                  toast({
-                    title: "Session Cleared",
-                    description: "Any existing session has been cleared. You can now try logging in again.",
-                  });
-                }}
-                className="text-xs"
-              >
-                Clear Session
               </Button>
             </div>
           </div>
