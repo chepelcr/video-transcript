@@ -386,6 +386,18 @@ export function useAuth() {
     queryClient.clear();
   };
 
+  // Force logout function - cleans sessions without user interaction
+  const forceLogout = async () => {
+    console.log('Force logging out user to clean stale session');
+    try {
+      await signOut();
+    } catch (error) {
+      console.log('Force logout - no active session to clear');
+    }
+    queryClient.invalidateQueries({ queryKey: ['/api/users/profile'] });
+    queryClient.clear();
+  };
+
   return {
     user,
     isLoading,
@@ -398,5 +410,6 @@ export function useAuth() {
     forgotPassword: forgotPasswordMutation,
     resetPassword: resetPasswordMutation,
     logout,
+    forceLogout,
   };
 }

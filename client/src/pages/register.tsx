@@ -58,7 +58,7 @@ const registrationSteps = [
 
 export default function Register() {
   const [, navigate] = useLocation();
-  const { register } = useAuth();
+  const { register, forceLogout } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const [currentStep, setCurrentStep] = useState<'info' | 'password' | 'verify'>('info');
@@ -95,6 +95,15 @@ export default function Register() {
   });
 
   const currentPassword = step2Form.watch('password') || '';
+
+  // Force logout when registration page loads to clear any stale sessions
+  useEffect(() => {
+    const cleanSession = async () => {
+      console.log('🔄 Cleaning session on registration page load');
+      await forceLogout();
+    };
+    cleanSession();
+  }, [forceLogout]);
 
   const handleStep1Submit = (values: Step1Form) => {
     setStep1Data(values);

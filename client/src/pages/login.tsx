@@ -30,7 +30,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [, navigate] = useLocation();
-  const { login } = useAuth();
+  const { login, forceLogout } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
 
@@ -41,6 +41,15 @@ export default function Login() {
       password: '',
     },
   });
+
+  // Force logout when login page loads to clear any stale sessions
+  useEffect(() => {
+    const cleanSession = async () => {
+      console.log('🔄 Cleaning session on login page load');
+      await forceLogout();
+    };
+    cleanSession();
+  }, [forceLogout]);
 
   const onSubmit = async (values: LoginForm) => {
     login.mutate(values, {
