@@ -12,6 +12,7 @@ import {
 
 export interface IUserRepository {
   create(input: CreateUserInput): Promise<IUser>;
+  createWithCognitoId(input: CreateUserInput & { id?: string }): Promise<IUser>;
   findById(id: string): Promise<IUser | null>;
   findByEmail(email: string): Promise<IUser | null>;
   findByUsername(username: string): Promise<IUser | null>;
@@ -72,6 +73,57 @@ export class UserRepository implements IUserRepository {
       };
       
       console.log(`🔧 Created demo user: ${demoUser.username} (${demoUser.email})`);
+      return demoUser;
+    }
+  }
+
+  async createWithCognitoId(input: CreateUserInput & { id?: string }): Promise<IUser> {
+    console.log(`🔄 Creating user with Cognito ID: ${input.email}`);
+    
+    try {
+      // Hash password
+      const hashedPassword = await bcrypt.hash(input.password, 12);
+      
+      const userData = {
+        username: input.username,
+        email: input.email,
+        password: hashedPassword,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        subscriptionTier: SubscriptionTier.FREE,
+        transcriptionsUsed: 0,
+        isEmailVerified: false,
+        isActive: true,
+        ...(input.id && { id: input.id }) // Include Cognito user ID if provided
+      };
+      
+      const [user] = await db
+        .insert(users)
+        .values(userData)
+        .returning();
+
+      console.log(`✅ Created user with Cognito ID: ${user.username} (${user.email})`);
+      return this.mapToModel(user);
+    } catch (error) {
+      console.warn('🔧 Database insert failed, creating demo user:', error instanceof Error ? error.message : 'Unknown error');
+      
+      // Create a demo user object for when database is unavailable
+      const demoUser: IUser = {
+        id: input.id || `demo-${Date.now()}`,
+        username: input.username,
+        email: input.email,
+        password: await bcrypt.hash(input.password, 12),
+        firstName: input.firstName,
+        lastName: input.lastName,
+        subscriptionTier: SubscriptionTier.FREE,
+        transcriptionsUsed: 0,
+        isEmailVerified: false,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      console.log(`🔧 Created demo user with Cognito ID: ${demoUser.username} (${demoUser.email})`);
       return demoUser;
     }
   }

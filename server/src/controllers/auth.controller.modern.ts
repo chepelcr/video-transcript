@@ -230,7 +230,7 @@ export class AuthController implements IAuthController {
     try {
       console.log('🔐 User registration sync from Amplify');
       
-      const validatedInput = req.body as RegisterInput;
+      const validatedInput = req.body as RegisterInput & { cognitoUserId?: string };
       
       // Note: With Amplify, user registration happens on the frontend
       // This endpoint just syncs the user data to our database
@@ -247,8 +247,9 @@ export class AuthController implements IAuthController {
         return;
       }
 
-      // Create user in our database for additional data
-      const dbUser = await this.userRepository.create({
+      // Create user in our database for additional data, using Cognito user ID if provided
+      const dbUser = await this.userRepository.createWithCognitoId({
+        id: validatedInput.cognitoUserId, // Use Cognito user ID if provided
         username: validatedInput.username,
         email: validatedInput.email,
         password: validatedInput.password, // Required by CreateUserInput

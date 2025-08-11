@@ -125,8 +125,16 @@ export function useAuth() {
 
       console.log('Amplify signup result:', result);
 
-      // Sync to backend after Amplify registration
-      const response = await apiRequest('POST', '/api/auth/register', data);
+      // Get the Cognito user ID from the Amplify result
+      const cognitoUserId = result.userId;
+      console.log('Cognito user ID:', cognitoUserId);
+
+      // Sync to backend after Amplify registration, including Cognito user ID
+      const backendData = {
+        ...data,
+        cognitoUserId: cognitoUserId
+      };
+      const response = await apiRequest('POST', '/api/auth/register', backendData);
       
       return {
         amplifyResult: result,

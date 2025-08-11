@@ -3,6 +3,13 @@
 This is a video transcription service application built with a full-stack TypeScript architecture. The application allows users to submit video URLs for transcription, operating on a freemium model that offers 3 free transcriptions before requiring a paid subscription. It integrates with both Stripe and PayPal for payment processing and features a modern React frontend. The project's ambition is to provide an efficient and reliable video transcription solution, with a focus on user experience and flexible deployment.
 
 ## Recent Changes (August 2025)
+**Critical Login Authentication Fix (August 2025)** - Resolved ID mismatch between Cognito and database:
+- ✅ **ID Synchronization Fix**: Fixed critical issue where users could register but not login due to Cognito user ID vs database UUID mismatch
+- ✅ **Cognito ID Integration**: Modified registration flow to use Cognito user IDs as database primary keys
+- ✅ **Database Sync Method**: Added createWithCognitoId method to user repository for proper ID synchronization
+- ✅ **Authentication Flow**: Updated frontend to pass Cognito user ID during registration sync with backend
+- ✅ **User Resolution**: Fixed /me endpoint to properly find users by their Cognito IDs in database
+
 **Multi-Step Registration with Password Policies (August 2025)** - Implemented enhanced registration flow with progress indicators:
 - ✅ **Multi-Step UI**: 3-step registration (Personal Info → Password → Verification) with bubble progress indicators
 - ✅ **AWS Cognito Password Policies**: Enforced minimum 8 characters, uppercase, lowercase, number, and special character requirements

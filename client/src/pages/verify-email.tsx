@@ -154,23 +154,23 @@ export default function VerifyEmail() {
         <ThemeToggle />
       </div>
 
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            {t('auth.verify.title')}
-          </CardTitle>
-          <CardDescription className="text-center">
-            {t('auth.verify.description')} {email}
-          </CardDescription>
-          
-          {/* Progress Steps - positioned below title with proper spacing */}
-          <div className="mt-8 mb-6">
-            <ProgressSteps 
-              steps={steps}
-              currentStep="verify"
-              completedSteps={['info', 'password']}
-            />
+      <Card className="w-full max-w-lg">
+        <CardHeader className="space-y-4">
+          <div className="text-center">
+            <CardTitle className="text-2xl font-bold">
+              {t('auth.verify.title')}
+            </CardTitle>
+            <CardDescription>
+              {t('auth.verify.description')} {email}
+            </CardDescription>
           </div>
+          
+          {/* Progress Steps */}
+          <ProgressSteps 
+            steps={steps}
+            currentStep="verify"
+            completedSteps={['info', 'password']}
+          />
         </CardHeader>
         <CardContent>
           <Form {...form}>
