@@ -33,6 +33,7 @@ export default function VerifyEmail() {
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const form = useForm<VerifyEmailForm>({
     resolver: zodResolver(verifyEmailSchema),
@@ -44,8 +45,12 @@ export default function VerifyEmail() {
   useEffect(() => {
     const params = new URLSearchParams(search);
     const emailParam = params.get('email');
+    const passwordParam = params.get('password');
     if (emailParam) {
       setEmail(emailParam);
+      if (passwordParam) {
+        setPassword(passwordParam);
+      }
     } else {
       // Redirect to register if no email
       navigate(`/${language}/register`);
@@ -58,6 +63,7 @@ export default function VerifyEmail() {
     verifyEmail.mutate({
       email,
       code: values.code,
+      password: password,
     }, {
       onSuccess: () => {
         toast({

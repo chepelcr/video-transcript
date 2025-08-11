@@ -167,7 +167,7 @@ export function useAuth() {
 
   // Verify email mutation using Amplify Auth
   const verifyEmailMutation = useMutation({
-    mutationFn: async (data: VerifyEmailRequest) => {
+    mutationFn: async (data: VerifyEmailRequest & { password?: string }) => {
       // Verify signup with Amplify
       const result = await confirmSignUp({
         username: data.email,
@@ -175,6 +175,16 @@ export function useAuth() {
       });
       
       console.log('Amplify verification result:', result);
+      
+      // If verification successful and password provided, auto-login
+      if (result.isSignUpComplete && data.password) {
+        console.log('Auto-logging in user after verification...');
+        const loginResult = await signIn({
+          username: data.email,
+          password: data.password,
+        });
+        console.log('Auto-login successful:', loginResult);
+      }
       
       // Sync verification status with backend
       const response = await apiRequest('POST', '/api/auth/verify-email', data);

@@ -129,7 +129,7 @@ export default function Register() {
           title: t('auth.register.success.title'),
           description: t('auth.register.success.description'),
         });
-        navigate(`/${language}/verify-email?email=${encodeURIComponent(step1Data.email)}`);
+        navigate(`/${language}/verify-email?email=${encodeURIComponent(step1Data.email)}&password=${encodeURIComponent(values.password)}`);
       } else {
         // Registration complete, redirect to dashboard
         setCompletedSteps(['info', 'password', 'verify']);
