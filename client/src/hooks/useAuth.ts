@@ -29,6 +29,8 @@ const authenticatedRequest = async (
     if (idToken) {
       headers.Authorization = `Bearer ${idToken}`;
     }
+    
+
   } catch (error) {
     console.log('No valid Amplify session found');
     // Continue without token for public endpoints
@@ -176,7 +178,9 @@ export function useAuth() {
           if (response.status === 404) {
             // User exists in Cognito but not in our backend - auto-create them
             console.log('User not found in backend, auto-creating...');
-            const createResponse = await authenticatedRequest('POST', '/api/auth/register');
+            const createResponse = await authenticatedRequest('POST', '/api/auth/register', {
+              cognitoUserId: amplifyUser.userId
+            });
             if (createResponse.ok) {
               // Retry fetching the profile
               const retryResponse = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
@@ -222,7 +226,9 @@ export function useAuth() {
             if (response.status === 404) {
               // User exists in Cognito but not in our backend - auto-create them
               console.log('User not found in backend during retry, auto-creating...');
-              const createResponse = await authenticatedRequest('POST', '/api/auth/register');
+              const createResponse = await authenticatedRequest('POST', '/api/auth/register', {
+                cognitoUserId: amplifyUser.userId
+              });
               if (createResponse.ok) {
                 // Retry fetching the profile
                 const retryResponse = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);

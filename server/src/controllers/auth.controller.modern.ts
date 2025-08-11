@@ -103,15 +103,12 @@ export class AuthController implements IAuthController {
     try {
       console.log('🔐 User registration/sync from Amplify');
       
-      // Get user ID from API Gateway middleware (for auto-sync scenarios)
-      const cognitoUserId = req.headers['x-user-id'] as string;
+      // Get user ID from request body (for auto-sync scenarios)
+      const cognitoUserId = req.body?.cognitoUserId;
       
-      // If this is an auto-sync call (no body data), get user from Cognito
-      if (!req.body || Object.keys(req.body).length === 0) {
-        if (!cognitoUserId) {
-          res.status(400).json({ error: 'No authenticated user found' });
-          return;
-        }
+      // If this is an auto-sync call with just cognitoUserId, get user from Cognito
+      if (cognitoUserId && Object.keys(req.body).length === 1 && req.body.cognitoUserId) {
+        console.log('Auto-sync call detected with Cognito user ID:', cognitoUserId);
 
         // Check if user already exists
         const existingUser = await this.userRepository.findById(cognitoUserId);

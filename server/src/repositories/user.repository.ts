@@ -93,9 +93,46 @@ export class UserRepository implements IUserRepository {
       console.log(`✅ Created user with Cognito ID: ${user.username} (${user.email})`);
       return this.mapToModel(user);
     } catch (error) {
-      console.warn('🔧 Database insert failed, creating demo user:', error instanceof Error ? error.message : 'Unknown error');
+      console.warn('🔧 Database insert failed:', error instanceof Error ? error.message : 'Unknown error');
       
-      // Create a demo user object for when database is unavailable
+      // Check if this is a duplicate email error
+      if (error instanceof Error && error.message.includes('duplicate key value violates unique constraint "users_email_key"')) {
+        console.log(`🔄 User with email ${input.email} already exists, fetching existing user...`);
+        
+        try {
+          // Find the existing user and return it with updated Cognito data
+          const [existingUser] = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, input.email));
+          
+          if (existingUser) {
+            // Update the existing user with Cognito data but keep the same database ID
+            const [updatedUser] = await db
+              .update(users)
+              .set({
+                firstName: input.firstName,
+                lastName: input.lastName,
+                username: input.username,
+                updatedAt: new Date()
+              })
+              .where(eq(users.email, input.email))
+              .returning();
+            
+            if (updatedUser) {
+              console.log(`✅ Updated existing user data: ${updatedUser.username} (${updatedUser.email})`);
+              // Return the user with the Cognito ID for API responses
+              const userWithCognitoId = this.mapToModel(updatedUser);
+              userWithCognitoId.id = input.id || userWithCognitoId.id; // Use Cognito ID for API responses
+              return userWithCognitoId;
+            }
+          }
+        } catch (updateError) {
+          console.error('Failed to update existing user:', updateError);
+        }
+      }
+      
+      // Create a demo user object for when database operations fail
       const demoUser: IUser = {
         id: input.id || `demo-${Date.now()}`,
         username: input.username,
