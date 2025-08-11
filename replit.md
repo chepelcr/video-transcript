@@ -7,6 +7,12 @@ This project is a video transcription service application built with a full-stac
 Preferred communication style: Simple, everyday language.
 UI Design: Prefers flag icons over text indicators for language selection in navigation. Prefers compact, well-aligned interface elements with proper spacing. Flags should be aligned to the right side of dropdown menus to match navbar icon alignment.
 
+# Recent Changes
+
+API Endpoint Structure Fix: ✅ COMPLETED - August 11, 2025 - Fixed transcription API endpoint malformation by updating frontend to use existing backend routes instead of creating new endpoints. Updated all frontend API calls from `/api/transcriptions/create` to `/api/users/{userId}/transcriptions` to match existing backend controller structure. Modified dashboard, video transcription form, and sidebar components to use user-specific endpoints. Updated query keys and cache invalidation to use proper user-scoped structure. All transcription endpoints now correctly include `/api/` prefix and follow domain-style URL pattern for complete user isolation.
+
+Swagger Documentation Consistency Fix: ✅ COMPLETED - August 11, 2025 - Updated all Swagger documentation across all controllers to include proper `/api/` prefix for consistent API documentation. Fixed TranscriptionController paths from `/users/{userId}/transcriptions` to `/api/users/{userId}/transcriptions` and HealthController paths from `/health`, `/ping`, `/readiness`, `/liveness` to include `/api/` prefix. All API documentation now accurately reflects the actual mounted endpoints. Swagger UI now displays correct URLs that match the real API structure for seamless frontend-backend integration.
+
 # System Architecture
 
 ## Frontend Architecture

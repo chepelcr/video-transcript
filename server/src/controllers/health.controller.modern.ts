@@ -20,7 +20,7 @@ export class HealthController implements IHealthController {
   private setupRoutes(): void {
     /**
      * @swagger
-     * /health:
+     * /api/health:
      *   get:
      *     summary: Health Check
      *     description: Get overall system health status
@@ -60,7 +60,7 @@ export class HealthController implements IHealthController {
 
     /**
      * @swagger
-     * /ping:
+     * /api/ping:
      *   get:
      *     summary: Simple Ping
      *     description: Simple ping endpoint for basic connectivity test
@@ -84,7 +84,7 @@ export class HealthController implements IHealthController {
 
     /**
      * @swagger
-     * /readiness:
+     * /api/readiness:
      *   get:
      *     summary: Readiness Probe
      *     description: Check if service is ready to handle requests
@@ -110,7 +110,7 @@ export class HealthController implements IHealthController {
 
     /**
      * @swagger
-     * /liveness:
+     * /api/liveness:
      *   get:
      *     summary: Liveness Probe
      *     description: Check if service is alive and running

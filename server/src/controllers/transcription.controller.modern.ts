@@ -29,7 +29,7 @@ export class TranscriptionController implements ITranscriptionController {
   private setupRoutes(): void {
     /**
      * @swagger
-     * /users/{userId}/transcriptions:
+     * /api/users/{userId}/transcriptions:
      *   post:
      *     summary: Create User Transcription
      *     description: Submit video URL for transcription processing for specific user. Authentication handled by AWS API Gateway.
@@ -84,7 +84,7 @@ export class TranscriptionController implements ITranscriptionController {
 
     /**
      * @swagger
-     * /users/{userId}/transcriptions:
+     * /api/users/{userId}/transcriptions:
      *   get:
      *     summary: Get User Transcriptions
      *     description: Get all transcriptions for specific user. Authentication handled by AWS API Gateway.
@@ -143,7 +143,7 @@ export class TranscriptionController implements ITranscriptionController {
 
     /**
      * @swagger
-     * /users/{userId}/transcriptions/{id}:
+     * /api/users/{userId}/transcriptions/{id}:
      *   get:
      *     summary: Get User Transcription By ID
      *     description: Get specific transcription by ID for specific user. Authentication handled by AWS API Gateway.
@@ -184,7 +184,7 @@ export class TranscriptionController implements ITranscriptionController {
 
     /**
      * @swagger
-     * /users/{userId}/transcriptions/{id}:
+     * /api/users/{userId}/transcriptions/{id}:
      *   patch:
      *     summary: Update User Transcription
      *     description: Update specific transcription for specific user. Authentication handled by AWS API Gateway.
@@ -250,7 +250,7 @@ export class TranscriptionController implements ITranscriptionController {
 
     /**
      * @swagger
-     * /transcriptions/{id}/public:
+     * /api/transcriptions/{id}/public:
      *   get:
      *     summary: Get Public Transcription
      *     description: Get transcription for public viewing (no authentication required)
