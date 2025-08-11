@@ -10,16 +10,28 @@ The 404 error shows GitHub Pages isn't configured for this repository yet.
 4. Under **Source**, select **"GitHub Actions"** (not Branch)
 5. Click **Save**
 
-## STEP 2: Repository Visibility
+## STEP 2: Configure Repository Secrets (REQUIRED)
+Before deployment, add these secrets in GitHub repository settings:
+
+1. Go to **Settings** > **Secrets and variables** > **Actions**
+2. Click **New repository secret** for each:
+
+**Required Secrets:**
+- `VITE_API_BASE_URL` - Backend API URL (e.g., `https://api-video-transcript.jcampos.dev`)
+- `VITE_AWS_COGNITO_USER_POOL_ID` - AWS Cognito User Pool ID
+- `VITE_AWS_COGNITO_CLIENT_ID` - AWS Cognito App Client ID
+- `VITE_STRIPE_PUBLIC_KEY` - Stripe publishable key (optional for payments)
+
+## STEP 3: Repository Visibility
 - Repository MUST be **PUBLIC** for free GitHub Pages
 - If private, upgrade to GitHub Pro or make repository public
 
-## STEP 3: Trigger Deployment
+## STEP 4: Trigger Deployment
 After settings are configured:
 1. Push any change to `main` branch, OR
 2. Go to **Actions** tab > **Deploy to GitHub Pages** > **Run workflow**
 
-## STEP 4: Monitor Deployment
+## STEP 5: Monitor Deployment
 1. Check **Actions** tab for workflow progress
 2. Wait for green checkmark on "Deploy to GitHub Pages"
 3. Deployment URL will appear in workflow output
