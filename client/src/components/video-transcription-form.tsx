@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 
 interface VideoTranscriptionFormProps {
   onTranscriptionComplete: (transcription: any) => void;
@@ -28,6 +29,7 @@ export default function VideoTranscriptionForm({
   const [processingStatus, setProcessingStatus] = useState("");
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const validateUrl = (url: string): boolean => {
     try {
@@ -80,7 +82,7 @@ export default function VideoTranscriptionForm({
     
     try {
       // Use new SQS-based endpoint to queue transcription
-      const response = await apiRequest('POST', '/api/transcriptions/create', {
+      const response = await apiRequest('POST', `/api/users/${user?.id}/transcriptions`, {
         videoUrl: videoUrl.trim(),
       });
 

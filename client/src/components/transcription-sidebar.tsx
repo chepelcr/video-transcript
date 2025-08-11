@@ -76,8 +76,8 @@ export default function TranscriptionSidebar({
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ["/api/users/transcriptions"],
-    enabled: isAuthenticated,
+    queryKey: ["/api/users", user?.id, "transcriptions"],
+    enabled: isAuthenticated && !!user?.id,
     retry: false,
     refetchInterval: (data: any) => {
       // Auto-refresh every 5 seconds if there are processing transcriptions
@@ -93,7 +93,7 @@ export default function TranscriptionSidebar({
       }
 
       const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-      const response = await fetch(`${baseUrl}/api/users/transcriptions`, {
+      const response = await fetch(`${baseUrl}/api/users/${user?.id}/transcriptions`, {
         headers: {
           Authorization: `Bearer ${tokens.accessToken}`,
           "Content-Type": "application/json",

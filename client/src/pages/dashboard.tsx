@@ -253,7 +253,7 @@ export default function Dashboard() {
       // Create transcription record and queue for processing
       const createResponse = await apiRequest(
         "POST",
-        "/api/transcriptions/create",
+        `/api/users/${user?.id}/transcriptions`,
         {
           videoUrl: videoUrl.trim(),
         },
@@ -272,7 +272,7 @@ export default function Dashboard() {
       // Clear form and refresh data
       setVideoUrl("");
       queryClient.invalidateQueries({
-        queryKey: ["/api/users/transcriptions"],
+        queryKey: ["/api/users", user?.id, "transcriptions"],
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
     } catch (error: any) {
