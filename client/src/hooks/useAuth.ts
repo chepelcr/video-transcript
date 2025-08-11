@@ -176,7 +176,7 @@ export function useAuth() {
           if (response.status === 404) {
             // User exists in Cognito but not in our backend - auto-create them
             console.log('User not found in backend, auto-creating...');
-            const createResponse = await authenticatedRequest('POST', '/api/auth/sync-user');
+            const createResponse = await authenticatedRequest('POST', '/api/auth/register');
             if (createResponse.ok) {
               // Retry fetching the profile
               const retryResponse = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
@@ -222,7 +222,7 @@ export function useAuth() {
             if (response.status === 404) {
               // User exists in Cognito but not in our backend - auto-create them
               console.log('User not found in backend during retry, auto-creating...');
-              const createResponse = await authenticatedRequest('POST', '/api/auth/sync-user');
+              const createResponse = await authenticatedRequest('POST', '/api/auth/register');
               if (createResponse.ok) {
                 // Retry fetching the profile
                 const retryResponse = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
