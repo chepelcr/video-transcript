@@ -4,7 +4,7 @@ import { APP_CONFIG } from './config/app';
 import { SwaggerAutoConfig } from './config/swagger-auto';
 import { 
   modernTranscriptionController, modernAuthController, modernUserController, 
-  modernPaymentController, modernHealthController 
+  modernPaymentController, modernHealthController, notificationController 
 } from './dependency-injection';
 
 export async function createApp(): Promise<Express> {
@@ -62,6 +62,7 @@ export async function createApp(): Promise<Express> {
   app.use('/api/auth', modernAuthController.getRouter());
   app.use('/api/users', modernUserController.getRouter());
   app.use('/api/payments', modernPaymentController.getRouter());
+  app.use('/api', notificationController.getRouter());
 
   // Remove duplicate health endpoint (handled by healthRoutes)
 

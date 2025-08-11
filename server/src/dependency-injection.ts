@@ -8,6 +8,7 @@ import { AuthService } from './services/auth.service';
 import { EmailService } from './services/email.service';
 import { SQSService } from './services/sqs.service';
 import { VideoTitleService } from './services/video-title.service';
+import { NotificationService } from './services/notification.service';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 // Modern controllers with embedded routing (AWS API Gateway compatible)
 import { TranscriptionController as ModernTranscriptionController } from './controllers/transcription.controller.modern';
@@ -15,6 +16,7 @@ import { AuthController as ModernAuthController } from './controllers/auth.contr
 import { UserController as ModernUserController } from './controllers/user.controller.modern';
 import { PaymentController as ModernPaymentController } from './controllers/payment.controller.modern';
 import { HealthController as ModernHealthController } from './controllers/health.controller.modern';
+import { NotificationController } from './controllers/notification.controller';
 
 // Create repositories
 export const transcriptionRepository = new TranscriptionRepository();
@@ -24,6 +26,7 @@ export const userRepository = new UserRepository();
 export const sqsService = new SQSService();
 export const videoTitleService = new VideoTitleService();
 export const emailService = new EmailService();
+export const notificationService = new NotificationService();
 export const authService = new AuthService(userRepository, emailService);
 export const transcriptionService = new TranscriptionService(
   transcriptionRepository,
@@ -41,5 +44,6 @@ export const modernAuthController = new ModernAuthController(authService, userRe
 export const modernUserController = new ModernUserController(userRepository);
 export const modernPaymentController = new ModernPaymentController(userRepository);
 export const modernHealthController = new ModernHealthController();
+export const notificationController = new NotificationController(notificationService);
 
 // Legacy routes removed - all functionality migrated to modern controllers

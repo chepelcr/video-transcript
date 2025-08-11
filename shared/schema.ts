@@ -33,6 +33,17 @@ export const transcriptions = pgTable("transcriptions", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  type: text("type").notNull(), // transcription_completed, transcription_failed, system, etc.
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  relatedId: varchar("related_id"), // e.g., transcription ID for transcription notifications
+  isRead: boolean("is_read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
@@ -56,8 +67,18 @@ export const insertTranscriptionSchema = createInsertSchema(transcriptions).pick
   status: z.string().optional(),
 });
 
+export const insertNotificationSchema = createInsertSchema(notifications).pick({
+  userId: true,
+  type: true,
+  title: true,
+  message: true,
+  relatedId: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertTranscription = z.infer<typeof insertTranscriptionSchema>;
 export type Transcription = typeof transcriptions.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type Notification = typeof notifications.$inferSelect;

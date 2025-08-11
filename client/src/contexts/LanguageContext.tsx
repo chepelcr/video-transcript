@@ -36,6 +36,20 @@ const translations = {
     'common.success': 'Success',
     'common.refresh': 'Refresh',
     
+    // Notifications
+    'notifications.title': 'Notifications',
+    'notifications.markAllRead': 'Mark all as read',
+    'notifications.empty': 'No notifications',
+    'notifications.emptyDescription': 'You\'re all caught up! New notifications will appear here.',
+    'notifications.transcriptionCompleted': 'Transcription Completed',
+    'notifications.transcriptionFailed': 'Transcription Failed',
+    'notifications.system': 'System Notification',
+    'notifications.timeAgo.justNow': 'Just now',
+    'notifications.timeAgo.minutesAgo': '{minutes} minutes ago',
+    'notifications.timeAgo.hoursAgo': '{hours} hours ago',
+    'notifications.timeAgo.daysAgo': '{days} days ago',
+    'notifications.unreadCount': '{count} unread notifications',
+    
     // Hero Section
     'hero.title': 'Transform Videos to Text',
     'hero.subtitle': 'in Seconds',
@@ -398,6 +412,20 @@ const translations = {
     'common.error': 'Error',
     'common.success': 'Éxito',
     'common.refresh': 'Actualizar',
+    
+    // Notifications Spanish
+    'notifications.title': 'Notificaciones',
+    'notifications.markAllRead': 'Marcar todo como leído',
+    'notifications.empty': 'Sin notificaciones',
+    'notifications.emptyDescription': '¡Estás al día! Las nuevas notificaciones aparecerán aquí.',
+    'notifications.transcriptionCompleted': 'Transcripción Completada',
+    'notifications.transcriptionFailed': 'Transcripción Falló',
+    'notifications.system': 'Notificación del Sistema',
+    'notifications.timeAgo.justNow': 'Justo ahora',
+    'notifications.timeAgo.minutesAgo': 'hace {minutes} minutos',
+    'notifications.timeAgo.hoursAgo': 'hace {hours} horas',
+    'notifications.timeAgo.daysAgo': 'hace {days} días',
+    'notifications.unreadCount': '{count} notificaciones no leídas',
     
     // Hero Section
     'hero.title': 'Convierte Videos a Texto',

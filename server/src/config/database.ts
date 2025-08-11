@@ -70,9 +70,42 @@ export const connectDatabase = async () => {
     // Test connection
     await pool.connect();
     console.log('Database connection configured successfully');
+    
+    // Create notifications table if it doesn't exist
+    await createNotificationsTable();
+    
     return true;
   } catch (error) {
     console.error('Database connection failed:', error);
     throw error;
   }
 };
+
+async function createNotificationsTable(): Promise<void> {
+  try {
+    console.log('📬 Creating notifications table...');
+    
+    const client = await pool.connect();
+    
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+        "userId" VARCHAR NOT NULL,
+        type VARCHAR NOT NULL DEFAULT 'system',
+        title VARCHAR NOT NULL,
+        message TEXT NOT NULL,
+        "isRead" BOOLEAN NOT NULL DEFAULT false,
+        "createdAt" TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await client.query('CREATE INDEX IF NOT EXISTS idx_notifications_userId ON notifications("userId")');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications("createdAt")');
+    
+    client.release();
+    console.log('✅ Notifications table created successfully');
+  } catch (error) {
+    console.error('❌ Error creating notifications table:', error);
+    // Don't throw error - continue without notifications if table creation fails
+  }
+}

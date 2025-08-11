@@ -25,6 +25,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Icons } from "@/components/ui/icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { NotificationDropdown } from "@/components/NotificationDropdown";
 import { SiYoutube, SiVimeo } from "react-icons/si";
 
 interface Transcription {
@@ -354,6 +355,7 @@ export default function Dashboard() {
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-3">
+              <NotificationDropdown />
               <ThemeToggle />
               <LanguageToggle />
               <Button
@@ -377,6 +379,7 @@ export default function Dashboard() {
 
             {/* Mobile/Tablet Navigation */}
             <div className="lg:hidden flex items-center gap-1">
+              <NotificationDropdown />
               <ThemeToggle />
               <LanguageToggle />
               <Button
