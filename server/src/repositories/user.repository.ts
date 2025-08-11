@@ -1,5 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
-import bcrypt from 'bcryptjs';
+
 import { db } from '../config/database';
 import { users } from '@shared/auth-schema';
 import { 
@@ -18,7 +18,7 @@ export interface IUserRepository {
   findByUsername(username: string): Promise<IUser | null>;
   update(id: string, input: UpdateUserInput): Promise<IUser | null>;
   delete(id: string): Promise<boolean>;
-  verifyPassword(user: IUser, password: string): Promise<boolean>;
+
   incrementTranscriptionsUsed(userId: string): Promise<void>;
   updateStripeCustomerId(userId: string, customerId: string): Promise<IUser>;
   updateUserStripeInfo(userId: string, stripeInfo: { 
@@ -33,20 +33,15 @@ export class UserRepository implements IUserRepository {
     console.log(`🔄 Creating user: ${input.email}`);
     
     try {
-      // Hash password
-      const hashedPassword = await bcrypt.hash(input.password, 12);
-      
       const [user] = await db
         .insert(users)
         .values({
           username: input.username,
           email: input.email,
-          password: hashedPassword,
           firstName: input.firstName,
           lastName: input.lastName,
           subscriptionTier: SubscriptionTier.FREE,
           transcriptionsUsed: 0,
-          isEmailVerified: false,
           isActive: true
         })
         .returning();
@@ -61,12 +56,10 @@ export class UserRepository implements IUserRepository {
         id: `demo-${Date.now()}`,
         username: input.username,
         email: input.email,
-        password: await bcrypt.hash(input.password, 12),
         firstName: input.firstName,
         lastName: input.lastName,
         subscriptionTier: SubscriptionTier.FREE,
         transcriptionsUsed: 0,
-        isEmailVerified: false,
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -81,18 +74,13 @@ export class UserRepository implements IUserRepository {
     console.log(`🔄 Creating user with Cognito ID: ${input.email}`);
     
     try {
-      // Hash password
-      const hashedPassword = await bcrypt.hash(input.password, 12);
-      
       const userData = {
         username: input.username,
         email: input.email,
-        password: hashedPassword,
         firstName: input.firstName,
         lastName: input.lastName,
         subscriptionTier: SubscriptionTier.FREE,
         transcriptionsUsed: 0,
-        isEmailVerified: false,
         isActive: true,
         ...(input.id && { id: input.id }) // Include Cognito user ID if provided
       };
@@ -112,12 +100,10 @@ export class UserRepository implements IUserRepository {
         id: input.id || `demo-${Date.now()}`,
         username: input.username,
         email: input.email,
-        password: await bcrypt.hash(input.password, 12),
         firstName: input.firstName,
         lastName: input.lastName,
         subscriptionTier: SubscriptionTier.FREE,
         transcriptionsUsed: 0,
-        isEmailVerified: false,
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -190,17 +176,12 @@ export class UserRepository implements IUserRepository {
   }
 
   async update(id: string, input: UpdateUserInput): Promise<IUser | null> {
-    console.log(`🔄 Updating user ${id.substring(0, 8)}... with:`, {
-      ...input,
-      password: input.password ? '[HIDDEN]' : undefined
-    });
-    
-    const updateData: any = { ...input };
+    console.log(`🔄 Updating user ${id.substring(0, 8)}... with:`, input);
     
     const [updatedUser] = await db
       .update(users)
       .set({
-        ...updateData,
+        ...input,
         updatedAt: new Date()
       })
       .where(eq(users.id, id))
@@ -227,19 +208,7 @@ export class UserRepository implements IUserRepository {
     return success;
   }
 
-  async verifyPassword(user: IUser, password: string): Promise<boolean> {
-    // Get the user with password from database
-    const [dbUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, user.id));
 
-    if (!dbUser || !dbUser.password) {
-      return false;
-    }
-
-    return bcrypt.compare(password, dbUser.password);
-  }
 
   async incrementTranscriptionsUsed(userId: string): Promise<void> {
     console.log(`🔄 Incrementing transcriptions used for user: ${userId.substring(0, 8)}...`);
@@ -310,7 +279,7 @@ export class UserRepository implements IUserRepository {
       transcriptionsUsed: dbRecord.transcriptionsUsed || 0,
       stripeCustomerId: dbRecord.stripeCustomerId,
       stripeSubscriptionId: dbRecord.stripeSubscriptionId,
-      isEmailVerified: dbRecord.isEmailVerified || false,
+
       isActive: dbRecord.isActive !== false,
       createdAt: new Date(dbRecord.createdAt),
       updatedAt: new Date(dbRecord.updatedAt)
@@ -327,7 +296,7 @@ export class UserRepository implements IUserRepository {
       lastName: user.lastName,
       subscriptionTier: user.subscriptionTier,
       transcriptionsUsed: user.transcriptionsUsed,
-      isEmailVerified: user.isEmailVerified,
+
       isActive: user.isActive,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt

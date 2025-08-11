@@ -1,6 +1,6 @@
 # Overview
 
-This project is a video transcription service application built with a full-stack TypeScript architecture. It enables users to submit video URLs for transcription and operates on a freemium model, offering 3 free transcriptions before requiring a paid subscription. The application integrates with Stripe and PayPal for payment processing and features a modern React frontend. The primary goal is to provide an efficient and reliable video transcription solution, prioritizing user experience and flexible deployment.
+This project is a video transcription service application built with a full-stack TypeScript architecture. It enables users to submit video URLs for transcription and operates on a freemium model, offering 3 free transcriptions before requiring a paid subscription. The application integrates with Stripe and PayPal for payment processing and features a modern React frontend. Authentication is fully managed by AWS Cognito, with no local password storage for enhanced security. The primary goal is to provide an efficient and reliable video transcription solution, prioritizing user experience and flexible deployment.
 
 # User Preferences
 
@@ -30,21 +30,24 @@ UI Design: Prefers flag icons over text indicators for language selection in nav
 - **Transcription Logic**: All transcription logic resides in backend services.
 - **Asynchronous Processing**: AWS SQS-based queuing system with secure webhook processing.
 - **Video Title Extraction**: Intelligent title extraction service for YouTube, Vimeo, and generic URLs.
+- **Security Enhancement**: All password management removed from backend - fully delegated to AWS Cognito for enhanced security.
 - **Dockerization**: Comprehensive Docker setup for development and production.
 
 ## Data Layer
 - **Database**: PostgreSQL, utilizing Drizzle ORM for type-safe operations.
-- **Schema Design**: Includes `Users` for subscription tracking and `Transcriptions` for storing processing results (including video title and status).
-- **Storage Interface**: Abstracted storage layer.
+- **Schema Design**: Includes `Users` for subscription tracking (no password storage) and `Transcriptions` for storing processing results (including video title and status).
+- **Storage Interface**: Abstracted storage layer with authentication methods removed.
 - **Database Provider**: AWS RDS PostgreSQL.
+- **Security**: Password and email verification fields removed from database schema - handled entirely by AWS Cognito.
 
 ## System Design Choices
 - **Two-Step Transcription**: URL validation followed by transcription processing.
-- **Authentication**: JWT-based authentication with refresh token support, managed by AWS Amplify on the frontend and synchronized with backend via Cognito user IDs.
+- **Authentication**: JWT-based authentication with refresh token support, managed by AWS Amplify on the frontend and synchronized with backend via Cognito user IDs. Zero local password storage for enhanced security.
 - **Real-Time Updates**: Intelligent polling system for dashboard updates, coupled with bilingual toast notifications.
 - **Multi-language Support**: Comprehensive bilingual support for UI elements and notifications.
 - **Freemium Model Enforcement**: Usage tracking at the service layer enforces the 3-free-transcription limit.
 - **Enterprise Architecture**: Follows layered architecture with separation of concerns, dependency injection, and comprehensive error handling.
+- **Security Architecture**: Complete delegation of authentication to AWS Cognito - no passwords, verification codes, or refresh tokens stored locally.
 - **Deployment**: Optimized for GitHub Pages with custom domain configuration.
 
 # External Dependencies

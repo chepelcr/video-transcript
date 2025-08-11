@@ -12,12 +12,11 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Users table for authentication - matching existing schema
+// Users table - authentication handled by AWS Cognito
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
-  password: text("password").notNull(),
   firstName: text("first_name"),
   lastName: text("last_name"),
   stripeCustomerId: text("stripe_customer_id"),
@@ -26,13 +25,6 @@ export const users = pgTable("users", {
   transcriptionsUsed: integer("transcriptions_used").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   isActive: boolean("is_active").default(true),
-  // Auth specific fields - we'll add these to the existing table
-  isEmailVerified: boolean("is_email_verified").default(false),
-  emailVerificationCode: varchar("email_verification_code", { length: 6 }),
-  emailVerificationExpires: timestamp("email_verification_expires"),
-  // Password reset fields
-  passwordResetToken: varchar("password_reset_token", { length: 64 }),
-  passwordResetExpires: timestamp("password_reset_expires"),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("users_email_idx").on(table.email),
@@ -56,22 +48,11 @@ export const transcriptions = pgTable("transcriptions", {
   index("transcriptions_created_at_idx").on(table.createdAt),
 ]);
 
-// Refresh tokens table
-export const refreshTokens = pgTable("refresh_tokens", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id).notNull(),
-  token: varchar("token", { length: 500 }).notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-}, (table) => [
-  index("refresh_tokens_user_id_idx").on(table.userId),
-  index("refresh_tokens_token_idx").on(table.token),
-]);
 
-// Insert and Select schemas for validation
+
+// Insert and Select schemas for validation (no password - managed by Cognito)
 export const insertUserSchema = createInsertSchema(users, {
   email: z.string().email(),
-  password: z.string().min(8),
   username: z.string().min(1),
 });
 
@@ -80,8 +61,7 @@ export const selectUserSchema = createSelectSchema(users);
 export const insertTranscriptionSchema = createInsertSchema(transcriptions);
 export const selectTranscriptionSchema = createSelectSchema(transcriptions);
 
-export const insertRefreshTokenSchema = createInsertSchema(refreshTokens);
-export const selectRefreshTokenSchema = createSelectSchema(refreshTokens);
+
 
 // API Request/Response types
 export const registerRequestSchema = z.object({
@@ -129,8 +109,7 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Transcription = typeof transcriptions.$inferSelect;
 export type InsertTranscription = typeof transcriptions.$inferInsert;
-export type RefreshToken = typeof refreshTokens.$inferSelect;
-export type InsertRefreshToken = typeof refreshTokens.$inferInsert;
+
 
 export type RegisterRequest = z.infer<typeof registerRequestSchema>;
 export type VerifyEmailRequest = z.infer<typeof verifyEmailRequestSchema>;

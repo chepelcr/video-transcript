@@ -18,17 +18,15 @@ export interface IUser {
   transcriptionsUsed: number;
   stripeCustomerId?: string | null;
   stripeSubscriptionId?: string | null;
-  isEmailVerified: boolean;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Create user input
+// Create user input (password managed by AWS Cognito)
 export interface CreateUserInput {
   username: string;
   email: string;
-  password: string;
   firstName?: string;
   lastName?: string;
 }
@@ -42,7 +40,6 @@ export interface UpdateUserInput {
   transcriptionsUsed?: number;
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
-  isEmailVerified?: boolean;
   isActive?: boolean;
 }
 
@@ -55,13 +52,12 @@ export interface UserResponse {
   lastName?: string | null;
   subscriptionTier: SubscriptionTier;
   transcriptionsUsed: number;
-  isEmailVerified: boolean;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Authentication input
+// Authentication input (passwords managed by AWS Cognito)
 export interface LoginInput {
   email: string;
   password: string;
@@ -75,7 +71,7 @@ export interface RegisterInput {
   lastName?: string;
 }
 
-// Validation schemas
+// Validation schemas (passwords validated by AWS Cognito)
 export const registerSchema = z.object({
   username: z.string().min(3).max(20),
   email: z.string().email(),
@@ -94,6 +90,5 @@ export const updateUserSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   subscriptionTier: z.nativeEnum(SubscriptionTier).optional(),
-  isEmailVerified: z.boolean().optional(),
   isActive: z.boolean().optional()
 });
