@@ -219,6 +219,10 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     await logout();
+    toast({
+      title: t("auth.logout.title"),
+      description: t("auth.logout.description"),
+    });
     navigate(`/${language}/`);
   };
 

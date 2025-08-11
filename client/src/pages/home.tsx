@@ -156,8 +156,8 @@ export default function Home() {
   const handleLogout = async () => {
     await logout();
     toast({
-      title: "Signed Out",
-      description: "You have been successfully signed out.",
+      title: t("auth.logout.title"),
+      description: t("auth.logout.description"),
     });
   };
 
