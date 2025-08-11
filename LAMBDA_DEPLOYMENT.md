@@ -55,6 +55,62 @@ The Lambda handler (`server/src/utils/lambda-handler.ts`) provides comprehensive
 #### Additional Event Types
 - **EventBridge Support**: Handles scheduled events and custom triggers
 
+## AWS Secrets Manager Integration
+
+The application now uses AWS Secrets Manager for secure credential management:
+
+### Required AWS Secrets
+
+#### 1. Database Credentials: `dev/video-transcript/db`
+```json
+{
+  "username": "dbmasteruser",
+  "password": "your_db_password", 
+  "engine": "postgres",
+  "host": "your-rds-endpoint.amazonaws.com",
+  "port": "5432",
+  "dbname": "video-transcript"
+}
+```
+
+#### 2. SMTP Credentials: `dev/FrontEnd/ses`
+```json
+{
+  "host": "email-smtp.us-east-1.amazonaws.com",
+  "port": "587", 
+  "user": "your_smtp_username",
+  "password": "your_smtp_password"
+}
+```
+
+### Environment Variables
+
+With AWS Secrets Manager, you only need these environment variables:
+
+```bash
+# AWS Configuration (Required)
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+
+# SQS Queue
+SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/account/queue
+
+# Payment APIs (Still required)
+STRIPE_SECRET_KEY=sk_test_...
+PAYPAL_CLIENT_ID=...
+PAYPAL_CLIENT_SECRET=...
+
+# Frontend URL for CORS
+FRONTEND_URL=https://yourusername.github.io
+```
+
+**Security Benefits:**
+- Database passwords are never stored in environment variables
+- SMTP credentials are securely managed by AWS
+- Automatic rotation support through Secrets Manager
+- IAM-based access control
+
 ## Build Instructions
 
 ### 1. Build Lambda Container

@@ -77,8 +77,13 @@ Deploy everything on Replit using the "Deploy" button.
 
 #### Replit (Backend)
 ```bash
-# Database (auto-configured)
-DATABASE_URL=postgresql://...
+# AWS Configuration (for Secrets Manager)
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+
+# SQS Queue
+SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/account/queue
 
 # Payment APIs
 STRIPE_SECRET_KEY=sk_test_...
@@ -88,6 +93,10 @@ PAYPAL_CLIENT_SECRET=...
 # CORS
 FRONTEND_URL=https://yourusername.github.io
 ```
+
+**Note**: Database and SMTP credentials are now managed through AWS Secrets Manager:
+- Database: `dev/video-transcript/db` secret
+- SMTP: `dev/FrontEnd/ses` secret
 
 #### GitHub (Frontend Build)
 ```bash
