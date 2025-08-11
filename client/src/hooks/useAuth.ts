@@ -304,10 +304,16 @@ export function useAuth() {
           // Detect language from current URL or localStorage
           const currentLanguage = window.location.pathname.includes('/es') ? 'es' : 'en';
           
-          // Call the verification completion endpoint
-          const completionResponse = await authenticatedRequest(
-            'POST', 
-            `/api/users/${amplifyUser.userId}/verify-email-complete?language=${currentLanguage}`
+          // Call the verification completion endpoint (public endpoint)
+          const completionResponse = await fetch(
+            `${API_BASE_URL}/api/users/${amplifyUser.userId}/verify-email-complete?language=${currentLanguage}`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Origin': window.location.origin
+              }
+            }
           );
           
           if (completionResponse.ok) {
