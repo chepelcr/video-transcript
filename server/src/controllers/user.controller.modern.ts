@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 import { IUserRepository } from '../repositories/user.repository';
 import { UpdateUserInput } from '../models/user.model';
 // Removed apiGatewayMiddleware import - authentication now handled by AWS API Gateway
-// Removed Cognito service - authentication handled client-side only
+import { CognitoService, createCognitoService } from '../services/cognito.service';
 import { EmailService } from '../services/email.service';
 import { NotificationService } from '../services/notification.service';
 
@@ -15,6 +15,7 @@ export interface IUserController {
 
 export class UserController implements IUserController {
   private router: Router;
+  private cognitoService: CognitoService;
   private emailService: EmailService;
   private notificationService: NotificationService;
 
@@ -22,6 +23,7 @@ export class UserController implements IUserController {
     private userRepository: IUserRepository
   ) {
     this.router = Router();
+    this.cognitoService = createCognitoService();
     this.emailService = new EmailService();
     this.notificationService = new NotificationService();
     this.setupRoutes();
@@ -37,8 +39,8 @@ export class UserController implements IUserController {
      *     summary: Complete Email Verification
      *     description: |
      *       Called after successful email verification to send welcome materials.
-     *       This endpoint creates users in the database if they don't exist, then
-     *       sends welcome email and notifications.
+     *       This endpoint automatically syncs user data from AWS Cognito if the user 
+     *       doesn't exist in the database yet, then sends welcome email and notifications.
      *       
      *       **Note**: Authentication is handled client-side with AWS Cognito/Amplify.
      *     tags: [Users]
@@ -59,30 +61,6 @@ export class UserController implements IUserController {
      *           default: en
      *         description: Language for welcome email and notifications
      *         example: "es"
-     *     requestBody:
-     *       required: false
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               email:
-     *                 type: string
-     *                 format: email
-     *                 description: User email (required for new users)
-     *                 example: "user@example.com"
-     *               username:
-     *                 type: string
-     *                 description: Username (optional, generated from email if not provided)
-     *                 example: "johndoe"
-     *               firstName:
-     *                 type: string
-     *                 description: User's first name
-     *                 example: "John"
-     *               lastName:
-     *                 type: string
-     *                 description: User's last name
-     *                 example: "Doe"
      *     responses:
      *       200:
      *         description: Welcome materials sent successfully
@@ -110,7 +88,7 @@ export class UserController implements IUserController {
      *             schema:
      *               $ref: '#/components/schemas/ErrorResponse'
      *       404:
-     *         description: User not found in database
+     *         description: User not found in Cognito
      *         content:
      *           application/json:
      *             schema:
@@ -321,26 +299,26 @@ export class UserController implements IUserController {
       let user = await this.userRepository.findById(userId);
       
       if (!user) {
-        console.log('User not found in database, creating from request data...');
+        console.log('User not found in database, syncing from Cognito...');
         
-        // Extract user data from request body for user creation
-        const { username, email, firstName, lastName } = req.body || {};
+        // Get user data from Cognito using the user ID
+        const cognitoUserData = await this.cognitoService.getUser(userId);
         
-        if (!email) {
-          res.status(400).json({ error: 'Email is required to create user' });
+        if (!cognitoUserData) {
+          res.status(404).json({ error: 'User not found in Cognito' });
           return;
         }
         
-        // Create user in our database
+        // Create user in our database using Cognito data
         user = await this.userRepository.createWithCognitoId({
           id: userId,
-          email: email,
-          username: username || email.split('@')[0], // Generate username from email if not provided
-          firstName: firstName,
-          lastName: lastName
+          email: cognitoUserData.email,
+          username: cognitoUserData.username || cognitoUserData.email.split('@')[0],
+          firstName: cognitoUserData.firstName,
+          lastName: cognitoUserData.lastName
         });
         
-        console.log(`✅ User created: ${user.username} (${user.email})`);
+        console.log(`✅ User synced from Cognito: ${user.username} (${user.email})`);
       } else {
         console.log(`✅ Found existing user: ${user.username} (${user.email})`);
       }
