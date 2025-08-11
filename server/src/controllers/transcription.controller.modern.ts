@@ -32,10 +32,8 @@ export class TranscriptionController implements ITranscriptionController {
      * /users/{userId}/transcriptions:
      *   post:
      *     summary: Create User Transcription
-     *     description: Submit video URL for transcription processing for specific user
+     *     description: Submit video URL for transcription processing for specific user. Authentication handled by AWS API Gateway.
      *     tags: [Transcriptions]
-     *     security:
-     *       - bearerAuth: []
      *     parameters:
      *       - in: path
      *         name: userId
@@ -89,10 +87,8 @@ export class TranscriptionController implements ITranscriptionController {
      * /users/{userId}/transcriptions:
      *   get:
      *     summary: Get User Transcriptions
-     *     description: Get all transcriptions for specific user
+     *     description: Get all transcriptions for specific user. Authentication handled by AWS API Gateway.
      *     tags: [Transcriptions]
-     *     security:
-     *       - bearerAuth: []
      *     parameters:
      *       - in: path
      *         name: userId
@@ -150,10 +146,8 @@ export class TranscriptionController implements ITranscriptionController {
      * /users/{userId}/transcriptions/{id}:
      *   get:
      *     summary: Get User Transcription By ID
-     *     description: Get specific transcription by ID for specific user
+     *     description: Get specific transcription by ID for specific user. Authentication handled by AWS API Gateway.
      *     tags: [Transcriptions]
-     *     security:
-     *       - bearerAuth: []
      *     parameters:
      *       - in: path
      *         name: userId
@@ -193,10 +187,8 @@ export class TranscriptionController implements ITranscriptionController {
      * /users/{userId}/transcriptions/{id}:
      *   patch:
      *     summary: Update User Transcription
-     *     description: Update specific transcription for specific user
+     *     description: Update specific transcription for specific user. Authentication handled by AWS API Gateway.
      *     tags: [Transcriptions]
-     *     security:
-     *       - bearerAuth: []
      *     parameters:
      *       - in: path
      *         name: userId

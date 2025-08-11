@@ -27,26 +27,6 @@ const swaggerOptions = {
       }
     ],
     components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          description: 'JWT Bearer token for authenticated requests'
-        },
-        apiKeyAuth: {
-          type: 'apiKey',
-          in: 'header',
-          name: 'x-api-key',
-          description: 'API key for AWS Lambda/API Gateway integration'
-        },
-        ApiGatewayAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          description: 'AWS API Gateway authorization with Cognito authorizer. Authentication is handled at the gateway level, not by the application server. All endpoints are public from the application perspective.'
-        }
-      },
       schemas: {
         User: {
           type: 'object',

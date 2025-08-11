@@ -110,10 +110,8 @@ export class UserController implements IUserController {
      *       This endpoint automatically syncs user data from AWS Cognito if the user 
      *       doesn't exist in the database yet, then sends welcome email and notifications.
      *       
-     *       **Security**: Protected by AWS API Gateway - users can only access their own verification endpoint.
+     *       **Security**: Authentication handled by AWS API Gateway with Cognito authorizer.
      *     tags: [Users]
-     *     security:
-     *       - ApiGatewayAuth: []
      *     parameters:
      *       - in: path
      *         name: userId
@@ -174,10 +172,8 @@ export class UserController implements IUserController {
      *     description: |
      *       Get detailed user profile information for the authenticated user.
      *       
-     *       **Security**: Protected by AWS API Gateway - users can only access their own profile.
+     *       **Security**: Authentication handled by AWS API Gateway with Cognito authorizer.
      *     tags: [Users]
-     *     security:
-     *       - ApiGatewayAuth: []
      *     parameters:
      *       - in: path
      *         name: userId
@@ -216,10 +212,8 @@ export class UserController implements IUserController {
      *     description: |
      *       Update user profile information (username, firstName, lastName).
      *       
-     *       **Security**: Protected by AWS API Gateway - users can only update their own profile.
+     *       **Security**: Authentication handled by AWS API Gateway with Cognito authorizer.
      *     tags: [Users]
-     *     security:
-     *       - ApiGatewayAuth: []
      *     parameters:
      *       - in: path
      *         name: userId

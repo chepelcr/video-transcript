@@ -47,10 +47,8 @@ export class NotificationController {
    *     description: |
    *       Retrieve the latest 5 notifications for the authenticated user.
    *       
-   *       **Security**: Protected by AWS API Gateway - users can only access their own notifications.
+   *       **Security**: Authentication handled by AWS API Gateway with Cognito authorizer.
    *     tags: [Notifications]
-   *     security:
-   *       - ApiGatewayAuth: []
    *     parameters:
    *       - in: path
    *         name: userId
@@ -106,10 +104,8 @@ export class NotificationController {
    *     description: |
    *       Mark a specific notification as read for the authenticated user.
    *       
-   *       **Security**: Protected by AWS API Gateway - users can only access their own notifications.
+   *       **Security**: Authentication handled by AWS API Gateway with Cognito authorizer.
    *     tags: [Notifications]
-   *     security:
-   *       - ApiGatewayAuth: []
    *     parameters:
    *       - in: path
    *         name: userId
@@ -167,10 +163,8 @@ export class NotificationController {
    *     description: |
    *       Mark all notifications as read for the authenticated user.
    *       
-   *       **Security**: Protected by AWS API Gateway - users can only access their own notifications.
+   *       **Security**: Authentication handled by AWS API Gateway with Cognito authorizer.
    *     tags: [Notifications]
-   *     security:
-   *       - ApiGatewayAuth: []
    *     parameters:
    *       - in: path
    *         name: userId
