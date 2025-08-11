@@ -36,7 +36,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const [, navigate] = useLocation();
-  const { register, registerLoading, registerError } = useAuth();
+  const { register } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const [step, setStep] = useState<'register' | 'verify'>('register');
@@ -56,7 +56,7 @@ export default function Register() {
 
   const onSubmit = async (values: RegisterForm) => {
     try {
-      await register({
+      const result = await register.mutateAsync({
         username: values.username,
         email: values.email,
         password: values.password,
@@ -65,12 +65,24 @@ export default function Register() {
       });
 
       setEmail(values.email);
-      setStep('verify');
-      toast({
-        title: t('auth.register.success.title'),
-        description: t('auth.register.success.description'),
-      });
+      
+      // Check if verification is needed
+      if (result?.needsVerification) {
+        setStep('verify');
+        toast({
+          title: t('auth.register.success.title'),
+          description: t('auth.register.success.description'),
+        });
+      } else {
+        // Registration complete, redirect to dashboard
+        navigate(`/${language}/dashboard`);
+        toast({
+          title: 'Registration Complete',
+          description: 'Welcome! Your account is ready.',
+        });
+      }
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: t('common.error'),
         description: error.message || t('auth.register.error'),
@@ -208,8 +220,8 @@ export default function Register() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={registerLoading}>
-                {registerLoading && (
+              <Button type="submit" className="w-full" disabled={register.isPending}>
+                {register.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
                 {t('auth.register.submit')}

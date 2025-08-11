@@ -228,18 +228,24 @@ export class AuthController implements IAuthController {
 
   async register(req: Request, res: Response): Promise<void> {
     try {
-      console.log('🔐 AWS Cognito user registration request');
+      console.log('🔐 User registration sync from Amplify');
       
       const validatedInput = req.body as RegisterInput;
       
-      // Create user in AWS Cognito with pre-verified email
-      const cognitoUser = await this.cognitoService.createUser(
-        validatedInput.username,
-        validatedInput.email,
-        validatedInput.password,
-        validatedInput.firstName,
-        validatedInput.lastName
-      );
+      // Note: With Amplify, user registration happens on the frontend
+      // This endpoint just syncs the user data to our database
+      
+      // Check if user already exists in our database
+      const existingUser = await this.userRepository.findByEmail(validatedInput.email);
+      if (existingUser) {
+        console.log(`✅ User already exists in database: ${validatedInput.username}`);
+        res.status(200).json({
+          user: existingUser,
+          message: "User already registered",
+          authProvider: "cognito"
+        });
+        return;
+      }
 
       // Create user in our database for additional data
       const dbUser = await this.userRepository.create({
@@ -250,33 +256,22 @@ export class AuthController implements IAuthController {
         lastName: validatedInput.lastName,
       });
       
-      console.log(`✅ AWS Cognito user registered: ${validatedInput.username}`);
+      console.log(`✅ User synced to database: ${validatedInput.username}`);
       
       res.status(201).json({
         user: dbUser,
-        message: "Registration successful. Your account is ready to use.",
+        message: "Registration sync successful",
         authProvider: "cognito"
       });
       
     } catch (error: any) {
-      console.error('Error registering user with Cognito:', error);
+      console.error('Error syncing user registration:', error);
       if (error.name === 'ZodError') {
         res.status(400).json({ error: 'Invalid input data', details: error.errors });
         return;
       }
       
-      // Handle Cognito-specific errors
-      if (error.message.includes('UsernameExistsException')) {
-        res.status(409).json({ error: 'Username already exists' });
-        return;
-      }
-      
-      if (error.message.includes('InvalidParameterException')) {
-        res.status(400).json({ error: 'Invalid registration parameters' });
-        return;
-      }
-      
-      res.status(400).json({ error: error.message || 'Registration failed' });
+      res.status(400).json({ error: error.message || 'Registration sync failed' });
     }
   }
 
@@ -328,12 +323,6 @@ export class AuthController implements IAuthController {
     } catch (error: any) {
       console.error('Error getting current user:', error);
       res.status(401).json({ error: error.message || 'Authentication failed' });
-    }
-      });
-      
-    } catch (error: any) {
-      console.error('Error in Cognito login flow:', error);
-      res.status(401).json({ error: error.message || 'Login failed' });
     }
   }
 
