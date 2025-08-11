@@ -3,6 +3,14 @@
 This is a video transcription service application built with a full-stack TypeScript architecture. The application allows users to submit video URLs for transcription, operating on a freemium model that offers 3 free transcriptions before requiring a paid subscription. It integrates with both Stripe and PayPal for payment processing and features a modern React frontend. The project's ambition is to provide an efficient and reliable video transcription solution, with a focus on user experience and flexible deployment.
 
 ## Recent Changes (August 2025)
+**AWS Amplify Frontend Integration Completed (August 2025)** - Successfully migrated from custom Cognito implementation to AWS Amplify:
+- ✅ **Frontend Authentication**: Complete AWS Amplify Auth integration replacing custom Cognito client
+- ✅ **Simplified Backend**: Removed `/api/auth/login` endpoint - Amplify handles authentication directly with Cognito
+- ✅ **Token Management**: Amplify automatically manages JWT tokens, refresh, and session state
+- ✅ **Authentication Flow**: Registration, login, password reset, and email verification through Amplify
+- ✅ **Backend Sync**: `/api/auth/me` endpoint syncs Cognito user data with application database
+- ✅ **Cognito Integration**: Backend maintains Cognito service for user creation and management
+
 **Complete Controller-Only Architecture Migration (January 2025)** - Final modernization completed:
 - ✅ **Modern Controller Pattern**: All 5 controllers migrated to self-contained architecture with embedded routing
 - ✅ **JWT/API Key Validation Removed**: All internal authentication removed - AWS API Gateway handles authorization

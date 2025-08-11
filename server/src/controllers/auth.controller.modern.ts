@@ -10,11 +10,10 @@ import { CognitoService, createCognitoService } from '../services/cognito.servic
 
 export interface IAuthController {
   register(req: Request, res: Response): Promise<void>;
-  login(req: Request, res: Response): Promise<void>;
+  me(req: Request, res: Response): Promise<void>;
   verifyEmail(req: Request, res: Response): Promise<void>;
   forgotPassword(req: Request, res: Response): Promise<void>;
   resetPassword(req: Request, res: Response): Promise<void>;
-  refreshToken(req: Request, res: Response): Promise<void>;
   getRouter(): Router;
 }
 
@@ -91,52 +90,34 @@ export class AuthController implements IAuthController {
 
     /**
      * @swagger
-     * /api/auth/login:
-     *   post:
-     *     summary: User Login with AWS Cognito
-     *     description: Authenticate user with AWS Cognito and return tokens for API Gateway authorization
+     * /api/auth/me:
+     *   get:
+     *     summary: Get Current User
+     *     description: Get current authenticated user information from Cognito JWT token
      *     tags: [Authentication]
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             required:
-     *               - email
-     *               - password
-     *             properties:
-     *               email:
-     *                 type: string
-     *                 format: email
-     *                 description: User email address
-     *                 example: "john@example.com"
-     *               password:
-     *                 type: string
-     *                 description: User password
-     *                 example: "SecurePass123!"
+     *     security:
+     *       - bearerAuth: []
      *     responses:
      *       200:
-     *         description: Login successful
+     *         description: User information retrieved successfully
      *         content:
      *           application/json:
      *             schema:
-     *               type: object
-     *               properties:
-     *                 user:
-     *                   $ref: '#/components/schemas/User'
-     *                 accessToken:
-     *                   type: string
-     *                 refreshToken:
-     *                   type: string
+     *               $ref: '#/components/schemas/User'
      *       401:
-     *         description: Invalid credentials
+     *         description: Invalid or missing authentication token
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ErrorResponse'
+     *       404:
+     *         description: User not found in database
      *         content:
      *           application/json:
      *             schema:
      *               $ref: '#/components/schemas/ErrorResponse'
      */
-    this.router.post('/login', apiGatewayMiddleware, this.login.bind(this));
+    this.router.get('/me', apiGatewayMiddleware, this.me.bind(this));
 
     /**
      * @swagger
@@ -239,44 +220,8 @@ export class AuthController implements IAuthController {
      */
     this.router.post('/reset-password', apiGatewayMiddleware, this.resetPassword.bind(this));
 
-    /**
-     * @swagger
-     * /api/auth/refresh-token:
-     *   post:
-     *     summary: Refresh Access Token
-     *     description: Get new access token using refresh token
-     *     tags: [Authentication]
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             required:
-     *               - refreshToken
-     *             properties:
-     *               refreshToken:
-     *                 type: string
-     *                 description: Valid refresh token
-     *     responses:
-     *       200:
-     *         description: New access token generated
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 accessToken:
-     *                   type: string
-     *                   description: New JWT access token
-     *       401:
-     *         description: Invalid refresh token
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ErrorResponse'
-     */
-    this.router.post('/refresh-token', apiGatewayMiddleware, this.refreshToken.bind(this));
+    // Note: Token refresh is handled automatically by AWS Amplify
+    // No backend refresh endpoint needed
 
 
   }
@@ -335,44 +280,55 @@ export class AuthController implements IAuthController {
     }
   }
 
-  async login(req: Request, res: Response): Promise<void> {
+  // Note: Login is handled entirely by AWS Amplify frontend
+  // No backend login endpoint needed
+
+  async me(req: Request, res: Response): Promise<void> {
     try {
-      console.log('🔐 AWS Cognito user login attempt');
+      console.log('🔐 Getting current user from Cognito token');
       
-      const validatedInput = req.body as LoginInput;
-      
-      // Note: Login is handled entirely by the frontend with Cognito
-      // This endpoint primarily serves to sync user data and validate tokens
-      
-      // Extract user info from Cognito tokens (if provided)
+      // Extract user info from Cognito ID token
       const authHeader = req.headers.authorization;
       const idToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
       
-      if (idToken) {
-        // Validate and extract user from Cognito ID token
-        const tokenUser = this.cognitoService.extractUserFromToken(idToken);
-        
-        if (tokenUser) {
-          // Fetch user from database
-          const dbUser = await this.userRepository.findById(tokenUser.sub);
-          
-          if (dbUser) {
-            console.log(`✅ AWS Cognito user authenticated: ${dbUser.username}`);
-            
-            res.json({
-              user: dbUser,
-              message: "Login successful",
-              authProvider: "cognito"
-            });
-            return;
-          }
-        }
+      if (!idToken) {
+        res.status(401).json({ error: "No authorization token provided" });
+        return;
       }
       
-      // For backward compatibility or direct login validation
-      res.status(400).json({ 
-        error: "Please use Cognito client-side authentication",
-        authProvider: "cognito"
+      // Validate and extract user from Cognito ID token
+      const tokenUser = this.cognitoService.extractUserFromToken(idToken);
+      
+      if (!tokenUser) {
+        res.status(401).json({ error: "Invalid authorization token" });
+        return;
+      }
+      
+      // Fetch user from database
+      const dbUser = await this.userRepository.findById(tokenUser.sub);
+      
+      if (!dbUser) {
+        res.status(404).json({ error: "User not found in database" });
+        return;
+      }
+      
+      console.log(`✅ Current user retrieved: ${dbUser.username}`);
+      
+      res.json({
+        username: dbUser.username,
+        email: dbUser.email,
+        firstName: dbUser.firstName,
+        lastName: dbUser.lastName,
+        id: dbUser.id,
+        createdAt: dbUser.createdAt,
+        transcriptionsUsed: dbUser.transcriptionsUsed || 0,
+        hasPaidPlan: dbUser.hasPaidPlan || false
+      });
+      
+    } catch (error: any) {
+      console.error('Error getting current user:', error);
+      res.status(401).json({ error: error.message || 'Authentication failed' });
+    }
       });
       
     } catch (error: any) {
