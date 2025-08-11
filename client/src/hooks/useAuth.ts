@@ -335,16 +335,7 @@ export function useAuth() {
         } catch (error) {
           console.warn('Failed to trigger welcome materials:', error);
         }
-        
-        // If password provided, auto-login
-        if (data.password) {
-          console.log('Auto-logging in user after verification...');
-          const loginResult = await signIn({
-            username: data.email,
-            password: data.password,
-          });
-          console.log('Auto-login successful:', loginResult);
-        }
+
       }
       
       return {
