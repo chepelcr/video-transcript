@@ -74,7 +74,13 @@ export class TranscriptionService implements ITranscriptionService {
     transcriptions: ITranscription[];
     total: number;
   }> {
-    return this.transcriptionRepository.findByUserId(userId, limit, offset);
+    const transcriptions = await this.transcriptionRepository.findByUserId(userId, limit, offset);
+    const total = await this.transcriptionRepository.countByUserId(userId);
+    
+    return {
+      transcriptions,
+      total
+    };
   }
 
   async updateTranscription(id: string, input: UpdateTranscriptionInput): Promise<ITranscription | null> {

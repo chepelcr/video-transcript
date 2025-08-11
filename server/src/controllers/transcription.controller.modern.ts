@@ -474,6 +474,17 @@ export class TranscriptionController implements ITranscriptionController {
 
       const result = await this.transcriptionService.getUserTranscriptions(userId!, Math.min(limit, 100), Math.max(offset, 0));
       
+      console.log(`✅ Retrieved transcription result:`, result);
+      
+      if (!result || !result.transcriptions) {
+        console.log(`❌ Invalid result structure from service`);
+        res.json({
+          transcriptions: [],
+          total: 0
+        });
+        return;
+      }
+      
       console.log(`✅ Retrieved ${result.transcriptions.length} transcriptions for user: ${userId?.substring(0, 8)}...`);
       
       res.json({

@@ -119,8 +119,8 @@ export default function Dashboard() {
     isFetching,
     refetch: refetchTranscriptions,
   } = useQuery<TranscriptionHistoryResponse>({
-    queryKey: ["/api/users/transcriptions"], // Use normal queryKey structure
-    enabled: isAuthenticated && !authLoading,
+    queryKey: ["/api/users", user?.id, "transcriptions"],
+    enabled: isAuthenticated && !authLoading && !!user?.id,
     retry: (failureCount, error) => {
       // Don't retry on authentication errors
       if (error && error.message && error.message.includes("401")) {
