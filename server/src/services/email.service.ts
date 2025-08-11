@@ -193,7 +193,7 @@ export class EmailService implements IEmailService {
                 <h2 style="color: #34495e; font-size: 20px; margin-bottom: 15px;">
                   ¡Hola ${fullName}!
                 </h2>
-                <p style="color: #555; font-size: 16px; line-height: 1.6;">
+                <p style="color: #555; font-size: 16px; line-height: 1.6; text-align: justify;">
                   ¡Gracias por unirte a VideoScript! Estamos emocionados de ayudarte a transformar tus videos en transcripciones precisas y buscables con el poder de la IA.
                 </p>
               </div>
@@ -217,8 +217,8 @@ export class EmailService implements IEmailService {
                 <h3 style="color: #27ae60; font-size: 16px; margin: 0 0 10px 0;">
                   🎁 Tu Prueba Gratuita Incluye:
                 </h3>
-                <p style="color: #555; font-size: 14px; margin: 0; line-height: 1.5;">
-                  <strong>3 transcripciones gratuitas</strong> para comenzar! No se requiere tarjeta de crédito. 
+                <p style="color: #555; font-size: 14px; margin: 0; line-height: 1.5; text-align: justify;">
+                  <strong>3 transcripciones gratuitas por día</strong> para comenzar! No se requiere tarjeta de crédito. 
                   Experimenta todo el poder de VideoScript antes de decidir actualizar.
                 </p>
               </div>
@@ -276,7 +276,7 @@ export class EmailService implements IEmailService {
               <h2 style="color: #34495e; font-size: 20px; margin-bottom: 15px;">
                 Hello ${fullName}!
               </h2>
-              <p style="color: #555; font-size: 16px; line-height: 1.6;">
+              <p style="color: #555; font-size: 16px; line-height: 1.6; text-align: justify;">
                 Thank you for joining VideoScript! We're excited to help you transform your videos into accurate, searchable transcripts with the power of AI.
               </p>
             </div>
@@ -300,8 +300,8 @@ export class EmailService implements IEmailService {
               <h3 style="color: #27ae60; font-size: 16px; margin: 0 0 10px 0;">
                 🎁 Your Free Trial Includes:
               </h3>
-              <p style="color: #555; font-size: 14px; margin: 0; line-height: 1.5;">
-                <strong>3 free transcriptions</strong> to get you started! No credit card required. 
+              <p style="color: #555; font-size: 14px; margin: 0; line-height: 1.5; text-align: justify;">
+                <strong>3 free transcriptions per day</strong> to get you started! No credit card required. 
                 Experience the full power of VideoScript before deciding to upgrade.
               </p>
             </div>

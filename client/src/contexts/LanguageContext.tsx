@@ -57,7 +57,7 @@ const translations = {
     'hero.placeholder': 'Paste your video URL here (YouTube, Vimeo, etc.)',
     'hero.transcribe': 'Transcribe',
     'hero.processing': 'Processing...',
-    'hero.remaining': 'free transcriptions remaining',
+    'hero.remaining': 'transcriptions per day (free tier)',
     
     // Features
     'features.title': 'Why Choose VideoScript?',
@@ -436,7 +436,7 @@ const translations = {
     'hero.placeholder': 'Pega la URL de tu video aquí (YouTube, Vimeo, etc.)',
     'hero.transcribe': 'Transcribir',
     'hero.processing': 'Procesando...',
-    'hero.remaining': 'transcripciones gratuitas restantes',
+    'hero.remaining': 'transcripciones por día (nivel gratuito)',
     
     // Features
     'features.title': '¿Por qué elegir VideoScript?',
