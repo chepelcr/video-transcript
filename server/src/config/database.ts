@@ -87,20 +87,24 @@ async function createNotificationsTable(): Promise<void> {
     
     const client = await pool.connect();
     
+    // Drop existing table and recreate with correct structure
+    await client.query('DROP TABLE IF EXISTS notifications');
+    
     await client.query(`
-      CREATE TABLE IF NOT EXISTS notifications (
+      CREATE TABLE notifications (
         id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-        "userId" VARCHAR NOT NULL,
-        type VARCHAR NOT NULL DEFAULT 'system',
-        title VARCHAR NOT NULL,
+        user_id VARCHAR NOT NULL,
+        type TEXT NOT NULL DEFAULT 'system',
+        title TEXT NOT NULL,
         message TEXT NOT NULL,
-        "isRead" BOOLEAN NOT NULL DEFAULT false,
-        "createdAt" TIMESTAMP DEFAULT NOW()
+        related_id VARCHAR,
+        is_read BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT NOW()
       )
     `);
     
-    await client.query('CREATE INDEX IF NOT EXISTS idx_notifications_userId ON notifications("userId")');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications("createdAt")');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at)');
     
     client.release();
     console.log('✅ Notifications table created successfully');

@@ -180,15 +180,19 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-primary">VideoScript</h1>
             </div>
             <div className="hidden lg:flex items-center space-x-4">
-              <button onClick={() => scrollToSection('features')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
-                {t('nav.features')}
-              </button>
-              <button onClick={() => scrollToSection('pricing')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
-                {t('nav.pricing')}
-              </button>
-              <button onClick={() => scrollToSection('contact')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
-                {t('nav.contact')}
-              </button>
+              {!isAuthenticated && (
+                <>
+                  <button onClick={() => scrollToSection('features')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
+                    {t('nav.features')}
+                  </button>
+                  <button onClick={() => scrollToSection('pricing')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
+                    {t('nav.pricing')}
+                  </button>
+                  <button onClick={() => scrollToSection('contact')} className="text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium">
+                    {t('nav.contact')}
+                  </button>
+                </>
+              )}
               {isAuthenticated && (
                 <Button
                   variant="outline"
@@ -263,33 +267,37 @@ export default function Home() {
         {isMobileMenuOpen && (
           <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 shadow-lg z-50">
             <div className="px-4 py-2 space-y-2">
-              <button 
-                onClick={() => {
-                  scrollToSection('features');
-                  setIsMobileMenuOpen(false);
-                }} 
-                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
-              >
-                {t('nav.features')}
-              </button>
-              <button 
-                onClick={() => {
-                  scrollToSection('pricing');
-                  setIsMobileMenuOpen(false);
-                }} 
-                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
-              >
-                {t('nav.pricing')}
-              </button>
-              <button 
-                onClick={() => {
-                  scrollToSection('contact');
-                  setIsMobileMenuOpen(false);
-                }} 
-                className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
-              >
-                {t('nav.contact')}
-              </button>
+              {!isAuthenticated && (
+                <>
+                  <button 
+                    onClick={() => {
+                      scrollToSection('features');
+                      setIsMobileMenuOpen(false);
+                    }} 
+                    className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
+                  >
+                    {t('nav.features')}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      scrollToSection('pricing');
+                      setIsMobileMenuOpen(false);
+                    }} 
+                    className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
+                  >
+                    {t('nav.pricing')}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      scrollToSection('contact');
+                      setIsMobileMenuOpen(false);
+                    }} 
+                    className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
+                  >
+                    {t('nav.contact')}
+                  </button>
+                </>
+              )}
               {isAuthenticated ? (
                 <>
                   <button 
