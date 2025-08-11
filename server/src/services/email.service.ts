@@ -232,7 +232,7 @@ export class EmailService implements IEmailService {
 
               <!-- Call to Action -->
               <div style="text-align: center; margin-bottom: 30px;">
-                <a href="${process.env.FRONTEND_URL || 'https://video-transcript.jcampos.dev'}" 
+                <a href="${process.env.FRONTEND_URL || 'https://video-transcript.jcampos.dev'}/es" 
                    style="background-color: #3498db; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 16px;">
                   Comienza tu Primera Transcripción
                 </a>
@@ -315,7 +315,7 @@ export class EmailService implements IEmailService {
 
             <!-- Call to Action -->
             <div style="text-align: center; margin-bottom: 30px;">
-              <a href="${process.env.FRONTEND_URL || 'https://video-transcript.jcampos.dev'}" 
+              <a href="${process.env.FRONTEND_URL || 'https://video-transcript.jcampos.dev'}/en" 
                  style="background-color: #3498db; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 16px;">
                 Start Your First Transcription
               </a>
