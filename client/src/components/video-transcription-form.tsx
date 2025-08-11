@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Play, Gift, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -87,6 +87,11 @@ export default function VideoTranscriptionForm({
       });
 
       const createResponse = await response.json();
+
+      // Invalidate transcriptions cache to refresh sidebar/modal
+      await queryClient.invalidateQueries({ 
+        queryKey: ["/api/users", user?.id, "transcriptions"] 
+      });
 
       toast({
         title: t('transcription.queued.title'),
