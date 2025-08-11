@@ -44,9 +44,9 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
                 </div>
                 
                 {/* Step Label */}
-                <div className="mt-3 text-center px-2">
+                <div className="mt-3 text-center w-full">
                   <p className={cn(
-                    "text-sm font-medium transition-colors leading-tight",
+                    "text-sm font-medium transition-colors leading-tight text-center",
                     isCompleted && "text-primary",
                     isCurrent && "text-primary",
                     isUpcoming && "text-muted-foreground"
@@ -54,7 +54,7 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
                     {step.title}
                   </p>
                   {step.description && (
-                    <p className="text-xs text-muted-foreground mt-1 leading-tight">
+                    <p className="text-xs text-muted-foreground mt-1 leading-tight text-center">
                       {step.description}
                     </p>
                   )}
