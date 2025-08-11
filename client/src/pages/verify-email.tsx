@@ -46,8 +46,17 @@ export default function VerifyEmail() {
   });
 
   // Force logout when verification page loads to clear any stale sessions
+  // Only do this if user isn't coming from a successful verification
   useEffect(() => {
     const cleanSession = async () => {
+      // Check if user just completed verification successfully
+      const justVerified = sessionStorage.getItem('justVerified');
+      if (justVerified) {
+        console.log('🎉 User just verified, skipping session cleanup');
+        sessionStorage.removeItem('justVerified');
+        return;
+      }
+      
       console.log('🔄 Cleaning session on verification page load');
       await forceLogout();
     };

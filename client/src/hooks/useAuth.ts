@@ -331,6 +331,8 @@ export function useAuth() {
           
           if (completionResponse.ok) {
             console.log('✅ Welcome materials triggered successfully');
+            // Set flag to skip force logout on verification page
+            sessionStorage.setItem('justVerified', 'true');
           } else {
             console.warn('⚠️ Failed to trigger welcome materials:', completionResponse.status);
           }
