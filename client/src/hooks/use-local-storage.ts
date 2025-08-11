@@ -9,9 +9,22 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T)
 
     try {
       const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      if (!item) {
+        return initialValue;
+      }
+      
+      // Try to parse the JSON
+      const parsed = JSON.parse(item);
+      return parsed;
     } catch (error) {
       console.error(`Error reading localStorage key "${key}":`, error);
+      // Clear the corrupted value from localStorage
+      try {
+        window.localStorage.removeItem(key);
+        console.log(`Cleared corrupted localStorage key "${key}"`);
+      } catch (clearError) {
+        console.error(`Error clearing corrupted localStorage key "${key}":`, clearError);
+      }
       return initialValue;
     }
   });

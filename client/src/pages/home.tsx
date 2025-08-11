@@ -46,13 +46,15 @@ export default function Home() {
   // Check email verification if authenticated
   useEmailVerificationGuard();
 
-  // Debug authentication state
+  // Debug authentication state (only in development)
   useEffect(() => {
-    console.log('Home page auth state:', { 
-      isAuthenticated, 
-      isLoading, 
-      user: user ? { username: user.username, id: user.id } : null 
-    });
+    if (import.meta.env.DEV) {
+      console.log('Home page auth state:', { 
+        isAuthenticated, 
+        isLoading, 
+        user: user ? { username: user.username, id: user.id } : null 
+      });
+    }
   }, [isAuthenticated, isLoading, user]);
 
   // Use server data if authenticated, otherwise fallback to localStorage
@@ -63,18 +65,20 @@ export default function Home() {
   // Auto-transcribe pending video URL after login
   useEffect(() => {
     if (isAuthenticated && pendingVideoUrl && pendingVideoUrl.trim() && remainingTranscriptions > 0) {
-      console.log('Auto-transcribing pending URL:', pendingVideoUrl);
+      if (import.meta.env.DEV) {
+        console.log('Auto-transcribing pending URL:', pendingVideoUrl);
+      }
       
       // Auto-submit the pending URL for transcription via new SQS system
       const autoTranscribe = async () => {
         try {
           const createResponse = await apiRequest('POST', '/api/transcriptions/create', {
             videoUrl: pendingVideoUrl.trim(),
-          });
+          }) as { videoTitle?: string };
 
           toast({
             title: t('transcription.queued.title'),
-            description: t('transcription.queued.description').replace('{{title}}', createResponse.videoTitle),
+            description: t('transcription.queued.description').replace('{{title}}', createResponse.videoTitle || 'Video'),
           });
 
           setPendingVideoUrl(""); // Clear pending URL
@@ -140,7 +144,7 @@ export default function Home() {
       }
     } else {
       // Only update localStorage if not authenticated
-      setTranscriptionsUsed((prev: number) => prev + 1);
+      setTranscriptionsUsed(transcriptionsUsed + 1);
     }
     
     // Scroll to results
