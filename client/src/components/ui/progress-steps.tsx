@@ -20,7 +20,7 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
   
   return (
     <div className={cn("w-full", className)}>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-start justify-between mb-8">
         {steps.map((step, index) => {
           const isCompleted = completedSteps.includes(step.id);
           const isCurrent = step.id === currentStep;
@@ -28,10 +28,10 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
           
           return (
             <React.Fragment key={step.id}>
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center flex-1">
                 {/* Step Circle */}
                 <div className={cn(
-                  "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300",
+                  "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 relative z-10",
                   isCompleted && "bg-primary border-primary text-primary-foreground",
                   isCurrent && "border-primary text-primary bg-primary/10",
                   isUpcoming && "border-muted-foreground/30 text-muted-foreground"
@@ -44,9 +44,9 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
                 </div>
                 
                 {/* Step Label */}
-                <div className="mt-2 text-center max-w-24">
+                <div className="mt-3 text-center px-2">
                   <p className={cn(
-                    "text-sm font-medium transition-colors",
+                    "text-sm font-medium transition-colors leading-tight",
                     isCompleted && "text-primary",
                     isCurrent && "text-primary",
                     isUpcoming && "text-muted-foreground"
@@ -54,7 +54,7 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
                     {step.title}
                   </p>
                   {step.description && (
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1 leading-tight">
                       {step.description}
                     </p>
                   )}
@@ -64,7 +64,7 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
               {/* Connector Line */}
               {index < steps.length - 1 && (
                 <div className={cn(
-                  "flex-1 h-0.5 mx-4 transition-colors duration-300",
+                  "h-0.5 flex-1 mt-5 transition-colors duration-300",
                   index < currentIndex ? "bg-primary" : "bg-muted-foreground/30"
                 )} />
               )}
