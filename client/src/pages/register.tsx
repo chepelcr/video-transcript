@@ -67,9 +67,9 @@ export default function Register() {
 
   // Create localized steps
   const localizedSteps = [
-    { id: 'info', title: t('auth.register.steps.personalInfo'), description: 'Basic information' },
-    { id: 'password', title: t('auth.register.steps.security'), description: 'Create password' },
-    { id: 'verify', title: t('auth.register.steps.verify'), description: 'Email verification' }
+    { id: 'info', title: t('auth.register.steps.personalInfo'), description: t('auth.register.steps.personalInfoDesc') },
+    { id: 'password', title: t('auth.register.steps.security'), description: t('auth.register.steps.securityDesc') },
+    { id: 'verify', title: t('auth.register.steps.verify'), description: t('auth.register.steps.verifyDesc') }
   ];
 
   // Step 1 form (Personal Info)
