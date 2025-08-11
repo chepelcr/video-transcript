@@ -281,6 +281,47 @@ export class TranscriptionController implements ITranscriptionController {
       '/transcriptions/:id/public',
       this.getPublicTranscription.bind(this)
     );
+
+    /**
+     * @swagger
+     * /transcriptions/create:
+     *   post:
+     *     summary: Create Transcription (Generic)
+     *     description: Submit video URL for transcription processing. User ID extracted from AWS API Gateway context.
+     *     tags: [Transcriptions]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - videoUrl
+     *             properties:
+     *               videoUrl:
+     *                 type: string
+     *                 format: url
+     *                 description: Video URL (YouTube, Vimeo, or direct link)
+     *                 example: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+     *               videoTitle:
+     *                 type: string
+     *                 description: Optional video title override
+     *     responses:
+     *       201:
+     *         description: Transcription request created
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Transcription'
+     *       400:
+     *         description: Invalid video URL or daily limit exceeded
+     *       401:
+     *         description: Not authenticated
+     */
+    this.router.post(
+      '/transcriptions/create',
+      this.createTranscriptionGeneric.bind(this)
+    );
   }
 
   async createTranscription(req: Request, res: Response): Promise<void> {
