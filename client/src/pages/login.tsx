@@ -30,7 +30,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [, navigate] = useLocation();
-  const { login, loginLoading, loginError } = useAuth();
+  const { login } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
 
@@ -43,23 +43,24 @@ export default function Login() {
   });
 
   const onSubmit = async (values: LoginForm) => {
-    try {
-      await login(values);
+    login.mutate(values, {
+      onSuccess: (data) => {
+        toast({
+          title: t('auth.login.success.title'),
+          description: t('auth.login.success.description'),
+        });
 
-      toast({
-        title: t('auth.login.success.title'),
-        description: t('auth.login.success.description'),
-      });
-
-      // Redirect to home after successful login
-      navigate(`/${language}/`);
-    } catch (error: any) {
-      toast({
-        title: t('common.error'),
-        description: error.message || t('auth.login.error'),
-        variant: 'destructive',
-      });
-    }
+        // Redirect to home after successful login
+        navigate(`/${language}/`);
+      },
+      onError: (error: any) => {
+        toast({
+          title: t('common.error'),
+          description: error.message || t('auth.login.error'),
+          variant: 'destructive',
+        });
+      }
+    });
   };
 
   return (
@@ -129,8 +130,8 @@ export default function Login() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={loginLoading}>
-                {loginLoading && (
+              <Button type="submit" className="w-full" disabled={login.isPending}>
+                {login.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
                 {t('auth.login.submit')}
