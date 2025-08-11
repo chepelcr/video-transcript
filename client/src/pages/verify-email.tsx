@@ -22,6 +22,7 @@ import { Icons } from '@/components/ui/icons';
 import { ProgressSteps } from '@/components/ui/progress-steps';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LogOut } from 'lucide-react';
 
 const verifyEmailSchema = z.object({
   code: z.string().length(6, 'Verification code must be 6 digits'),
@@ -31,7 +32,7 @@ type VerifyEmailForm = z.infer<typeof verifyEmailSchema>;
 
 export default function VerifyEmail() {
   const [, navigate] = useLocation();
-  const { verifyEmail, resendVerificationCode } = useAuth();
+  const { verifyEmail, resendVerificationCode, logout } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const [email, setEmail] = useState('');
@@ -146,8 +147,29 @@ export default function VerifyEmail() {
     },
   ];
 
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      sessionStorage.removeItem('verificationData');
+      navigate(`/${language}/`);
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      {/* Sign Out Button */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="absolute top-4 left-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
+        onClick={handleSignOut}
+      >
+        <LogOut className="w-4 h-4 mr-2" />
+        {t('common.logout')}
+      </Button>
+
       {/* Language and Theme Toggles */}
       <div className="absolute top-4 right-4 flex items-center gap-2">
         <LanguageToggle />
