@@ -3,7 +3,7 @@ import { connectDatabase } from './config/database';
 import { APP_CONFIG } from './config/app';
 import { SwaggerAutoConfig } from './config/swagger-auto';
 import { 
-  modernTranscriptionController, modernAuthController, modernUserController, 
+  modernTranscriptionController, modernUserController, 
   modernPaymentController, modernHealthController, notificationController 
 } from './dependency-injection';
 
@@ -59,7 +59,6 @@ export async function createApp(): Promise<Express> {
   // Modern controller-based architecture (AWS API Gateway compatible, no JWT validation)
   app.use('/', modernHealthController.getRouter());
   app.use('/api', modernTranscriptionController.getRouter());
-  app.use('/api/auth', modernAuthController.getRouter());
   app.use('/api/users', modernUserController.getRouter());
   app.use('/api/payments', modernPaymentController.getRouter());
   app.use('/api', notificationController.getRouter());

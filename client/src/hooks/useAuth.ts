@@ -137,7 +137,7 @@ export function useAuth() {
         ...data,
         cognitoUserId: cognitoUserId
       };
-      const response = await apiRequest('POST', '/api/auth/register', backendData);
+      const response = await apiRequest('POST', '/api/users', backendData);
       
       return {
         amplifyResult: result,
@@ -189,7 +189,7 @@ export function useAuth() {
           if (response.status === 404) {
             // User exists in Cognito but not in our backend - auto-create them
             console.log('User not found in backend, auto-creating...');
-            const createResponse = await authenticatedRequest('POST', '/api/auth/register', {
+            const createResponse = await authenticatedRequest('POST', '/api/users', {
               cognitoUserId: amplifyUser.userId
             });
             if (createResponse.ok) {
@@ -248,7 +248,7 @@ export function useAuth() {
             if (response.status === 404) {
               // User exists in Cognito but not in our backend - auto-create them
               console.log('User not found in backend during retry, auto-creating...');
-              const createResponse = await authenticatedRequest('POST', '/api/auth/register', {
+              const createResponse = await authenticatedRequest('POST', '/api/users', {
                 cognitoUserId: amplifyUser.userId
               });
               if (createResponse.ok) {
@@ -299,7 +299,9 @@ export function useAuth() {
       if (result.isSignUpComplete) {
         try {
           console.log('Calling verification completion endpoint...');
-          await apiRequest('POST', '/api/auth/verify-email-complete', {
+          // Get user after successful verification to get user ID
+          const amplifyUser = await getCurrentUser();
+          await apiRequest('POST', `/api/users/${amplifyUser.userId}/verify-email-complete`, {
             email: data.email,
           });
           console.log('Welcome materials triggered successfully');
