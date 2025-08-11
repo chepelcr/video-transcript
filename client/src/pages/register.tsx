@@ -18,63 +18,112 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home, Loader2 } from 'lucide-react';
+import { ProgressSteps } from '@/components/ui/progress-steps';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
+import { Home, Loader2, Eye, EyeOff, ArrowLeft, ArrowRight } from 'lucide-react';
 
-const registerSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters').max(20, 'Username must be less than 20 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string(),
+// AWS Cognito password policy: min 8 chars, uppercase, lowercase, number, special char
+const passwordSchema = z.string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number')
+  .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character');
+
+const step1Schema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Please enter a valid email address'),
+  username: z.string().min(3, 'Username must be at least 3 characters').max(20, 'Username must be less than 20 characters'),
+});
+
+const step2Schema = z.object({
+  password: passwordSchema,
+  confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
-type RegisterForm = z.infer<typeof registerSchema>;
+type Step1Form = z.infer<typeof step1Schema>;
+type Step2Form = z.infer<typeof step2Schema>;
+
+const registrationSteps = [
+  { id: 'info', title: 'Personal Info', description: 'Basic information' },
+  { id: 'password', title: 'Security', description: 'Create password' },
+  { id: 'verify', title: 'Verify', description: 'Email verification' }
+];
 
 export default function Register() {
   const [, navigate] = useLocation();
   const { register } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
-  const [step, setStep] = useState<'register' | 'verify'>('register');
-  const [email, setEmail] = useState('');
+  const [currentStep, setCurrentStep] = useState<'info' | 'password' | 'verify'>('info');
+  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [step1Data, setStep1Data] = useState<Step1Form | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const form = useForm<RegisterForm>({
-    resolver: zodResolver(registerSchema),
+  // Step 1 form (Personal Info)
+  const step1Form = useForm<Step1Form>({
+    resolver: zodResolver(step1Schema),
     defaultValues: {
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
       firstName: '',
       lastName: '',
+      email: '',
+      username: '',
     },
   });
 
-  const onSubmit = async (values: RegisterForm) => {
-    try {
-      const result = await register.mutateAsync({
-        username: values.username,
-        email: values.email,
-        password: values.password,
-        firstName: values.firstName,
-        lastName: values.lastName,
-      });
+  // Step 2 form (Password)
+  const step2Form = useForm<Step2Form>({
+    resolver: zodResolver(step2Schema),
+    defaultValues: {
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-      setEmail(values.email);
+  const currentPassword = step2Form.watch('password') || '';
+
+  const handleStep1Submit = (values: Step1Form) => {
+    setStep1Data(values);
+    setCompletedSteps(['info']);
+    setCurrentStep('password');
+  };
+
+  const handleStep2Submit = async (values: Step2Form) => {
+    if (!step1Data) {
+      toast({
+        title: 'Error',
+        description: 'Please complete step 1 first',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const fullRegistrationData = {
+        ...step1Data,
+        ...values,
+      };
+
+      const result = await register.mutateAsync(fullRegistrationData);
+      
+      setCompletedSteps(['info', 'password']);
       
       // Check if verification is needed
       if (result?.needsVerification) {
-        setStep('verify');
+        setCurrentStep('verify');
         toast({
           title: t('auth.register.success.title'),
           description: t('auth.register.success.description'),
         });
+        navigate(`/${language}/verify-email?email=${encodeURIComponent(step1Data.email)}`);
       } else {
         // Registration complete, redirect to dashboard
+        setCompletedSteps(['info', 'password', 'verify']);
         navigate(`/${language}/dashboard`);
         toast({
           title: 'Registration Complete',
@@ -91,12 +140,17 @@ export default function Register() {
     }
   };
 
-  // Handle navigation with useEffect to avoid state update during render
+  const goBackToStep1 = () => {
+    setCurrentStep('info');
+    setCompletedSteps([]);
+  };
+
+  // Pre-populate step1 form if we have data and user goes back
   useEffect(() => {
-    if (step === 'verify') {
-      navigate(`/${language}/verify-email?email=${encodeURIComponent(email)}`);
+    if (step1Data && currentStep === 'info') {
+      step1Form.reset(step1Data);
     }
-  }, [step, language, email, navigate]);
+  }, [step1Data, currentStep, step1Form]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
@@ -111,124 +165,200 @@ export default function Register() {
         Back to Home
       </Button>
       
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            {t('auth.register.title')}
-          </CardTitle>
-          <CardDescription className="text-center">
-            {t('auth.register.description')}
-          </CardDescription>
+      <Card className="w-full max-w-lg">
+        <CardHeader className="space-y-4">
+          <div className="text-center">
+            <CardTitle className="text-2xl font-bold">
+              {t('auth.register.title')}
+            </CardTitle>
+            <CardDescription>
+              {t('auth.register.description')}
+            </CardDescription>
+          </div>
+          
+          {/* Progress Steps */}
+          <ProgressSteps
+            steps={registrationSteps}
+            currentStep={currentStep}
+            completedSteps={completedSteps}
+          />
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('auth.register.username')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('auth.register.usernamePlaceholder')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          {/* Step 1: Personal Information */}
+          {currentStep === 'info' && (
+            <Form {...step1Form}>
+              <form onSubmit={step1Form.handleSubmit(handleStep1Submit)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={step1Form.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={step1Form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
-                  name="firstName"
+                  control={step1Form.control}
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('auth.register.firstName')}</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder={t('auth.register.firstNamePlaceholder')} {...field} />
+                        <Input
+                          type="email"
+                          placeholder="john@example.com"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <FormField
-                  control={form.control}
-                  name="lastName"
+                  control={step1Form.control}
+                  name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('auth.register.lastName')}</FormLabel>
+                      <FormLabel>Username</FormLabel>
                       <FormControl>
-                        <Input placeholder={t('auth.register.lastNamePlaceholder')} {...field} />
+                        <Input placeholder="johndoe" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-              
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('auth.register.email')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder={t('auth.register.emailPlaceholder')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('auth.register.password')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder={t('auth.register.passwordPlaceholder')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('auth.register.confirmPassword')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder={t('auth.register.confirmPasswordPlaceholder')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              <Button type="submit" className="w-full" disabled={register.isPending}>
-                {register.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {t('auth.register.submit')}
-              </Button>
-            </form>
-          </Form>
+                <Button type="submit" className="w-full">
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  Continue to Password
+                </Button>
+              </form>
+            </Form>
+          )}
 
+          {/* Step 2: Password Setup */}
+          {currentStep === 'password' && (
+            <Form {...step2Form}>
+              <form onSubmit={step2Form.handleSubmit(handleStep2Submit)} className="space-y-4">
+                <FormField
+                  control={step2Form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Create a strong password"
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Password Strength Indicator */}
+                {currentPassword && (
+                  <PasswordStrengthIndicator password={currentPassword} className="mt-4" />
+                )}
+                
+                <FormField
+                  control={step2Form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="Confirm your password"
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex gap-3">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={goBackToStep1}
+                    className="flex-1"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    className="flex-1" 
+                    disabled={register.isPending}
+                  >
+                    {register.isPending && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Create Account
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
+
+          {/* Sign In Link */}
           <div className="mt-4 text-center text-sm">
             <span className="text-muted-foreground">
               {t('auth.register.hasAccount')}{' '}
