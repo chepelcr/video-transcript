@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import {
   X,
   FileText,
@@ -86,26 +87,6 @@ export default function TranscriptionSidebar({
       );
       return hasProcessing ? 5000 : false;
     },
-    queryFn: async () => {
-      const tokens = JSON.parse(localStorage.getItem("auth_tokens") || "{}");
-      if (!tokens.accessToken) {
-        throw new Error("No access token available");
-      }
-
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-      const response = await fetch(`${baseUrl}/api/users/${user?.id}/transcriptions`, {
-        headers: {
-          Authorization: `Bearer ${tokens.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch transcriptions: ${response.status}`);
-      }
-
-      return response.json();
-    },
   });
 
   // Refresh transcriptions when sidebar opens
@@ -118,6 +99,10 @@ export default function TranscriptionSidebar({
   const transcriptions = transcriptionData?.transcriptions || [];
 
   const handleRefresh = async () => {
+    // Invalidate cache and force refetch
+    await queryClient.invalidateQueries({ 
+      queryKey: ["/api/users", user?.id, "transcriptions"] 
+    });
     await refetch();
     toast({
       title: t("transcriptions.refreshed"),
