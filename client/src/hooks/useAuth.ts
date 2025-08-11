@@ -303,11 +303,20 @@ export function useAuth() {
           const amplifyUser = await getCurrentUser();
           // Detect language from current URL or localStorage
           const currentLanguage = window.location.pathname.includes('/es') ? 'es' : 'en';
-          await apiRequest('POST', `/api/users/${amplifyUser.userId}/verify-email-complete?language=${currentLanguage}`);
-          console.log('Welcome materials triggered successfully');
+          
+          // Call the verification completion endpoint
+          const completionResponse = await authenticatedRequest(
+            'POST', 
+            `/api/users/${amplifyUser.userId}/verify-email-complete?language=${currentLanguage}`
+          );
+          
+          if (completionResponse.ok) {
+            console.log('✅ Welcome materials triggered successfully');
+          } else {
+            console.warn('⚠️ Failed to trigger welcome materials:', completionResponse.status);
+          }
         } catch (error) {
           console.warn('Failed to trigger welcome materials:', error);
-          // Don't fail verification if welcome materials fail
         }
         
         // If password provided, auto-login
