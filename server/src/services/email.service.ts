@@ -25,6 +25,7 @@ export class EmailService implements IEmailService {
     try {
       console.log(`📧 Sending verification email to: ${to}`);
       
+      const transporter = await this.getTransporter();
       const mailOptions = {
         from: process.env.FROM_EMAIL || 'noreply@video-transcript.jcampos.dev',
         to,
@@ -51,7 +52,7 @@ export class EmailService implements IEmailService {
         `,
       };
 
-      await this.transporter.sendMail(mailOptions);
+      await transporter.sendMail(mailOptions);
       console.log(`✅ Verification email sent to: ${to}`);
       return true;
       
@@ -65,7 +66,8 @@ export class EmailService implements IEmailService {
     try {
       console.log(`🔑 Sending password reset email to: ${to}`);
       
-      const resetUrl = `${APP_CONFIG.FRONTEND_URL}/reset-password?token=${resetToken}`;
+      const transporter = await this.getTransporter();
+      const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
       
       const mailOptions = {
         from: process.env.FROM_EMAIL || 'noreply@video-transcript.jcampos.dev',
@@ -100,7 +102,7 @@ export class EmailService implements IEmailService {
         `,
       };
 
-      await this.transporter.sendMail(mailOptions);
+      await transporter.sendMail(mailOptions);
       console.log(`✅ Password reset email sent to: ${to}`);
       return true;
       

@@ -1,6 +1,6 @@
 import { eq, sql } from 'drizzle-orm';
 
-import { db } from '../config/database';
+import { getDb } from '../config/database';
 import { users } from '@shared/auth-schema';
 import { 
   IUser, 
@@ -33,6 +33,7 @@ export class UserRepository implements IUserRepository {
     console.log(`🔄 Creating user: ${input.email}`);
     
     try {
+      const db = await getDb();
       const [user] = await db
         .insert(users)
         .values({
@@ -85,6 +86,7 @@ export class UserRepository implements IUserRepository {
         ...(input.id && { id: input.id }) // Include Cognito user ID if provided
       };
       
+      const db = await getDb();
       const [user] = await db
         .insert(users)
         .values(userData)
@@ -101,6 +103,7 @@ export class UserRepository implements IUserRepository {
         
         try {
           // Find the existing user and return it with updated Cognito data
+          const db = await getDb();
           const [existingUser] = await db
             .select()
             .from(users)
@@ -155,6 +158,8 @@ export class UserRepository implements IUserRepository {
     console.log(`🔍 Finding user by ID: ${id.substring(0, 8)}...`);
     
     try {
+      const db = await getDb();
+      
       // Debug: Check if any users exist in the database
       const userCount = await db
         .select({ count: sql`count(*)` })
@@ -193,6 +198,7 @@ export class UserRepository implements IUserRepository {
     console.log(`🔍 Finding user by email: ${email}`);
     
     try {
+      const db = await getDb();
       const [user] = await db
         .select()
         .from(users)
@@ -215,6 +221,7 @@ export class UserRepository implements IUserRepository {
     console.log(`🔍 Finding user by username: ${username}`);
     
     try {
+      const db = await getDb();
       const [user] = await db
         .select()
         .from(users)
@@ -236,6 +243,7 @@ export class UserRepository implements IUserRepository {
   async update(id: string, input: UpdateUserInput): Promise<IUser | null> {
     console.log(`🔄 Updating user ${id.substring(0, 8)}... with:`, input);
     
+    const db = await getDb();
     const [updatedUser] = await db
       .update(users)
       .set({
@@ -257,6 +265,7 @@ export class UserRepository implements IUserRepository {
   async delete(id: string): Promise<boolean> {
     console.log(`🗑️ Deleting user: ${id.substring(0, 8)}...`);
     
+    const db = await getDb();
     const result = await db
       .delete(users)
       .where(eq(users.id, id));
@@ -271,6 +280,7 @@ export class UserRepository implements IUserRepository {
   async incrementTranscriptionsUsed(userId: string): Promise<void> {
     console.log(`🔄 Incrementing transcriptions used for user: ${userId.substring(0, 8)}...`);
     
+    const db = await getDb();
     await db
       .update(users)
       .set({
@@ -284,6 +294,7 @@ export class UserRepository implements IUserRepository {
   async updateStripeCustomerId(userId: string, customerId: string): Promise<IUser> {
     console.log(`💳 Updating Stripe customer ID for user: ${userId.substring(0, 8)}...`);
     
+    const db = await getDb();
     const [updatedUser] = await db
       .update(users)
       .set({
@@ -307,6 +318,7 @@ export class UserRepository implements IUserRepository {
   }): Promise<IUser> {
     console.log(`💳 Updating Stripe info for user: ${userId.substring(0, 8)}...`);
     
+    const db = await getDb();
     const [updatedUser] = await db
       .update(users)
       .set({

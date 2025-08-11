@@ -1,5 +1,5 @@
 import { desc, eq, and } from 'drizzle-orm';
-import { db } from '../config/database';
+import { getDb } from '../config/database';
 import { notifications, type InsertNotification, type Notification } from '@shared/schema';
 
 export class NotificationService {
@@ -10,6 +10,7 @@ export class NotificationService {
     try {
       console.log('📬 Creating notification:', notification);
       
+      const db = await getDb();
       const [newNotification] = await db
         .insert(notifications)
         .values(notification)
@@ -32,6 +33,8 @@ export class NotificationService {
   }> {
     try {
       console.log('📬 Fetching notifications for user:', userId);
+      
+      const db = await getDb();
       
       // Get latest 5 notifications
       const userNotifications = await db
@@ -70,6 +73,7 @@ export class NotificationService {
     try {
       console.log('📬 Marking notification as read:', notificationId);
       
+      const db = await getDb();
       const result = await db
         .update(notifications)
         .set({ isRead: true })
@@ -95,6 +99,7 @@ export class NotificationService {
     try {
       console.log('📬 Marking all notifications as read for user:', userId);
       
+      const db = await getDb();
       await db
         .update(notifications)
         .set({ isRead: true })

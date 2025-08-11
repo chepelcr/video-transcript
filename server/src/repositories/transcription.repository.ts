@@ -1,5 +1,5 @@
 import { eq, desc, and, sql } from 'drizzle-orm';
-import { db } from '../config/database';
+import { getDb } from '../config/database';
 import { transcriptions } from '@shared/auth-schema';
 import { 
   ITranscription, 
@@ -23,6 +23,7 @@ export class TranscriptionRepository implements ITranscriptionRepository {
   async create(input: CreateTranscriptionInput): Promise<ITranscription> {
     console.log(`🔄 Creating transcription:`, input);
     
+    const db = await getDb();
     const [transcription] = await db
       .insert(transcriptions)
       .values({
@@ -40,6 +41,7 @@ export class TranscriptionRepository implements ITranscriptionRepository {
   async findById(id: string): Promise<ITranscription | null> {
     console.log(`🔍 Finding transcription by ID: ${id.substring(0, 8)}...`);
     
+    const db = await getDb();
     const [transcription] = await db
       .select()
       .from(transcriptions)
@@ -57,6 +59,7 @@ export class TranscriptionRepository implements ITranscriptionRepository {
   async findByUserId(userId: string, limit?: number, offset?: number): Promise<ITranscription[]> {
     console.log(`🔍 Finding transcriptions for user: ${userId.substring(0, 8)}... (limit: ${limit || 'all'}, offset: ${offset || 0})`);
     
+    const db = await getDb();
     let query = db
       .select()
       .from(transcriptions)
@@ -81,6 +84,7 @@ export class TranscriptionRepository implements ITranscriptionRepository {
   async countByUserId(userId: string): Promise<number> {
     console.log(`🔢 Counting transcriptions for user: ${userId.substring(0, 8)}...`);
     
+    const db = await getDb();
     const totalResult = await db
       .select({ count: sql`count(*)` })
       .from(transcriptions)
@@ -96,6 +100,7 @@ export class TranscriptionRepository implements ITranscriptionRepository {
   async update(id: string, input: UpdateTranscriptionInput): Promise<ITranscription | null> {
     console.log(`🔄 Updating transcription ${id.substring(0, 8)}... with:`, input);
     
+    const db = await getDb();
     const [updatedTranscription] = await db
       .update(transcriptions)
       .set({
@@ -121,6 +126,7 @@ export class TranscriptionRepository implements ITranscriptionRepository {
   async delete(id: string): Promise<boolean> {
     console.log(`🗑️ Deleting transcription: ${id.substring(0, 8)}...`);
     
+    const db = await getDb();
     const result = await db
       .delete(transcriptions)
       .where(eq(transcriptions.id, id));
@@ -133,6 +139,7 @@ export class TranscriptionRepository implements ITranscriptionRepository {
   async findByStatus(status: TranscriptionStatus): Promise<ITranscription[]> {
     console.log(`🔍 Finding transcriptions with status: ${status}`);
     
+    const db = await getDb();
     const results = await db
       .select()
       .from(transcriptions)
