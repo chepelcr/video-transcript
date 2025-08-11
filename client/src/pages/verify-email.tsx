@@ -49,11 +49,11 @@ export default function VerifyEmail() {
   // Only do this if user isn't coming from a successful verification
   useEffect(() => {
     const cleanSession = async () => {
-      // Check if user just completed verification successfully
+      // Check if user just completed verification successfully  
       const justVerified = sessionStorage.getItem('justVerified');
       if (justVerified) {
         console.log('🎉 User just verified, skipping session cleanup');
-        sessionStorage.removeItem('justVerified');
+        // Don't remove the flag yet - wait until after auto-login completes
         return;
       }
       
@@ -99,7 +99,7 @@ export default function VerifyEmail() {
       password: password,
     }, {
       onSuccess: () => {
-        // Set flag to prevent session cleanup on next page load
+        // Set flag to prevent session cleanup during auto-login
         sessionStorage.setItem('justVerified', 'true');
         
         // Clear session storage on successful verification

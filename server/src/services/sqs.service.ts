@@ -41,6 +41,8 @@ export class SQSService implements ISQSService {
     const params: AWS.SQS.SendMessageRequest = {
       QueueUrl: APP_CONFIG.SQS_QUEUE_URL,
       MessageBody: JSON.stringify(message),
+      MessageGroupId: 'transcription-requests', // Required for FIFO queues
+      MessageDeduplicationId: request.transcriptionId, // Use transcription ID for deduplication
       MessageAttributes: {
         TranscriptionId: {
           DataType: 'String',
@@ -56,7 +58,7 @@ export class SQSService implements ISQSService {
     try {
       const result = await this.sqs.sendMessage(params).promise();
       console.log(`✅ SQS message sent successfully: ${result.MessageId}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`❌ Failed to send SQS message:`, error);
       throw new Error(`Failed to send transcription request to queue: ${error.message}`);
     }

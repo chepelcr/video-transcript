@@ -283,6 +283,9 @@ export function useAuth() {
   // Verify email mutation using Amplify Auth
   const verifyEmailMutation = useMutation({
     mutationFn: async (data: VerifyEmailRequest & { password?: string }) => {
+      // Set flag early to prevent session cleanup during auto-login process
+      sessionStorage.setItem('justVerified', 'true');
+      
       // Verify signup with Amplify
       const result = await confirmSignUp({
         username: data.email,
@@ -332,8 +335,7 @@ export function useAuth() {
           
           if (completionResponse.ok) {
             console.log('✅ Welcome materials triggered successfully');
-            // Set flag to skip force logout on verification page
-            sessionStorage.setItem('justVerified', 'true');
+            // Flag was already set at start of verification process
           } else {
             console.warn('⚠️ Failed to trigger welcome materials:', completionResponse.status);
           }
