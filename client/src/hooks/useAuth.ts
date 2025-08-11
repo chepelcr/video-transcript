@@ -295,21 +295,23 @@ export function useAuth() {
         try {
           console.log('Calling verification completion endpoint...');
           
-          // Auto-login the user after successful verification (if not already logged in)
+          // Auto-login the user after successful verification
           if (data.password) {
+            // Force logout first to ensure clean state
+            console.log('🔄 Forcing logout before auto-login to ensure clean session...');
             try {
-              // Check if user is already authenticated
-              await getCurrentUser();
-              console.log('User already authenticated, skipping auto-login');
-            } catch {
-              // User not authenticated, proceed with auto-login
-              console.log('Auto-logging in user after verification...');
-              const signInResult = await signIn({
-                username: data.email,
-                password: data.password
-              });
-              console.log('Auto-login successful:', signInResult);
+              await signOut();
+            } catch (error) {
+              console.log('No active session to clear during verification');
             }
+            
+            // Proceed with auto-login
+            console.log('Auto-logging in user after verification...');
+            const signInResult = await signIn({
+              username: data.email,
+              password: data.password
+            });
+            console.log('Auto-login successful:', signInResult);
           }
           
           // Small delay to ensure AWS Amplify session is fully established

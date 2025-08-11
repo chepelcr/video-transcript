@@ -32,7 +32,7 @@ type VerifyEmailForm = z.infer<typeof verifyEmailSchema>;
 
 export default function VerifyEmail() {
   const [, navigate] = useLocation();
-  const { verifyEmail, resendVerificationCode, logout } = useAuth();
+  const { verifyEmail, resendVerificationCode, logout, forceLogout } = useAuth();
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const [email, setEmail] = useState('');
@@ -44,6 +44,15 @@ export default function VerifyEmail() {
       code: '',
     },
   });
+
+  // Force logout when verification page loads to clear any stale sessions
+  useEffect(() => {
+    const cleanSession = async () => {
+      console.log('🔄 Cleaning session on verification page load');
+      await forceLogout();
+    };
+    cleanSession();
+  }, [forceLogout]);
 
   useEffect(() => {
     // Read verification data from session storage
