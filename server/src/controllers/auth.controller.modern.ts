@@ -10,6 +10,7 @@ import { CognitoService, createCognitoService } from '../services/cognito.servic
 
 export interface IAuthController {
   register(req: Request, res: Response): Promise<void>;
+  syncUser(req: Request, res: Response): Promise<void>;
   me(req: Request, res: Response): Promise<void>;
   verifyEmail(req: Request, res: Response): Promise<void>;
   forgotPassword(req: Request, res: Response): Promise<void>;
@@ -88,7 +89,28 @@ export class AuthController implements IAuthController {
      */
     this.router.post('/register', apiGatewayMiddleware, this.register.bind(this));
 
-
+    /**
+     * @swagger
+     * /api/auth/sync-user:
+     *   post:
+     *     summary: Sync User from Cognito
+     *     description: Auto-create user in backend database from Cognito data when they don't exist
+     *     tags: [Authentication]
+     *     responses:
+     *       201:
+     *         description: User synced successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/User'
+     *       400:
+     *         description: Invalid Cognito token or missing data
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ErrorResponse'
+     */
+    this.router.post('/sync-user', apiGatewayMiddleware, this.syncUser.bind(this));
 
     // Note: Authentication is handled entirely by AWS Amplify
     // - Email verification: Handled by Amplify
@@ -146,6 +168,54 @@ export class AuthController implements IAuthController {
       }
       
       res.status(400).json({ error: error.message || 'Registration sync failed' });
+    }
+  }
+
+  async syncUser(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('🔄 Auto-syncing Cognito user to backend database');
+      
+      // Get user ID from API Gateway middleware 
+      const cognitoUserId = req.headers['x-user-id'] as string;
+      
+      if (!cognitoUserId) {
+        res.status(400).json({ error: 'No authenticated user found' });
+        return;
+      }
+
+      // Check if user already exists
+      const existingUser = await this.userRepository.findById(cognitoUserId);
+      if (existingUser) {
+        console.log(`✅ User already exists: ${existingUser.username}`);
+        res.status(200).json(existingUser);
+        return;
+      }
+
+      // Get user data from Cognito using the service
+      const cognitoUserData = await this.cognitoService.getUser(cognitoUserId);
+      
+      if (!cognitoUserData) {
+        res.status(400).json({ error: 'Failed to get user data from Cognito' });
+        return;
+      }
+
+      // Create user with Cognito data
+      const dbUser = await this.userRepository.createWithCognitoId({
+        id: cognitoUserId,
+        username: cognitoUserData.email.split('@')[0], // Generate username from email
+        email: cognitoUserData.email,
+        password: 'cognito-managed', // Placeholder since Cognito manages passwords
+        firstName: cognitoUserData.firstName,
+        lastName: cognitoUserData.lastName,
+      });
+      
+      console.log(`✅ User auto-synced from Cognito: ${dbUser.username}`);
+      
+      res.status(201).json(dbUser);
+      
+    } catch (error: any) {
+      console.error('Error auto-syncing user from Cognito:', error);
+      res.status(500).json({ error: error.message || 'Failed to sync user' });
     }
   }
 

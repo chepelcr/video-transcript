@@ -74,7 +74,7 @@ export function useAuth() {
 
   // Get current user using Amplify Auth and user profile endpoint
   const { data: user, isLoading, error } = useQuery({
-    queryKey: ['/users/profile'],
+    queryKey: ['/api/users/profile'],
     queryFn: async () => {
       try {
         // Check if user is authenticated with Amplify
@@ -87,7 +87,7 @@ export function useAuth() {
         console.log('Amplify user found, fetching user profile...');
         
         // Use the user profile endpoint with Cognito user ID
-        const response = await authenticatedRequest('GET', `/users/${amplifyUser.userId}/profile`);
+        const response = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
         if (!response.ok) {
           console.log('Profile request failed with status:', response.status);
           if (response.status === 401 || response.status === 403) {
@@ -144,7 +144,7 @@ export function useAuth() {
       };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/users/profile'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users/profile'] });
     },
   });
 
@@ -170,7 +170,29 @@ export function useAuth() {
 
         // Get current user to use their ID for profile endpoint
         const amplifyUser = await getCurrentUser();
-        const response = await authenticatedRequest('GET', `/users/${amplifyUser.userId}/profile`);
+        const response = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            // User exists in Cognito but not in our backend - auto-create them
+            console.log('User not found in backend, auto-creating...');
+            const createResponse = await authenticatedRequest('POST', '/api/auth/sync-user');
+            if (createResponse.ok) {
+              // Retry fetching the profile
+              const retryResponse = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
+              if (retryResponse.ok) {
+                const userData = await retryResponse.json() as UserResponse;
+                return { 
+                  user: userData, 
+                  amplifyResult,
+                  needsVerification: amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'
+                };
+              }
+            }
+          }
+          throw new Error(`Failed to fetch user profile: ${response.status}`);
+        }
+        
         const userData = await response.json() as UserResponse;
         
         return { 
@@ -194,7 +216,29 @@ export function useAuth() {
           });
           
           const amplifyUser = await getCurrentUser();
-          const response = await authenticatedRequest('GET', `/users/${amplifyUser.userId}/profile`);
+          const response = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
+          
+          if (!response.ok) {
+            if (response.status === 404) {
+              // User exists in Cognito but not in our backend - auto-create them
+              console.log('User not found in backend during retry, auto-creating...');
+              const createResponse = await authenticatedRequest('POST', '/api/auth/sync-user');
+              if (createResponse.ok) {
+                // Retry fetching the profile
+                const retryResponse = await authenticatedRequest('GET', `/api/users/${amplifyUser.userId}/profile`);
+                if (retryResponse.ok) {
+                  const userData = await retryResponse.json() as UserResponse;
+                  return { 
+                    user: userData, 
+                    amplifyResult,
+                    needsVerification: amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'
+                  };
+                }
+              }
+            }
+            throw new Error(`Failed to fetch user profile during retry: ${response.status}`);
+          }
+          
           const userData = await response.json() as UserResponse;
           
           return { 
@@ -208,7 +252,7 @@ export function useAuth() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/users/profile'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users/profile'] });
     },
   });
 
@@ -238,7 +282,7 @@ export function useAuth() {
       };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/users/profile'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users/profile'] });
     },
   });
 
@@ -277,7 +321,7 @@ export function useAuth() {
   const logout = async () => {
     console.log('Logging out user via Amplify');
     await signOut();
-    queryClient.invalidateQueries({ queryKey: ['/users/profile'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/users/profile'] });
     queryClient.clear();
   };
 
