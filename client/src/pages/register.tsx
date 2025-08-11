@@ -105,8 +105,8 @@ export default function Register() {
   const handleStep2Submit = async (values: Step2Form) => {
     if (!step1Data) {
       toast({
-        title: 'Error',
-        description: 'Please complete step 1 first',
+        title: t('common.error'),
+        description: t('auth.register.completeStep1'),
         variant: 'destructive',
       });
       return;
@@ -143,8 +143,8 @@ export default function Register() {
         setCompletedSteps(['info', 'password', 'verify']);
         navigate(`/${language}/dashboard`);
         toast({
-          title: 'Registration Complete',
-          description: 'Welcome! Your account is ready.',
+          title: t('auth.register.complete.title'),
+          description: t('auth.register.complete.description'),
         });
       }
     } catch (error: any) {
@@ -179,7 +179,7 @@ export default function Register() {
         onClick={() => navigate(`/${language}/`)}
       >
         <Home className="w-4 h-4 mr-2" />
-        Back to Home
+        {t('navigation.backToHome')}
       </Button>
 
       {/* Language and Theme Toggles */}

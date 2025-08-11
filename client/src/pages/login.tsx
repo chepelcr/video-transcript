@@ -91,7 +91,7 @@ export default function Login() {
         onClick={() => navigate(`/${language}/`)}
       >
         <Home className="w-4 h-4 mr-2" />
-        Back to Home
+        {t('navigation.backToHome')}
       </Button>
 
       {/* Language and Theme Toggles */}

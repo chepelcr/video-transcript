@@ -19,6 +19,7 @@ const translations = {
     'nav.history': 'History',
     'nav.profile': 'Profile',
     'nav.back': 'Back to Home',
+    'navigation.backToHome': 'Back to Home',
     
     // Common
     'common.back': 'Back',
@@ -144,6 +145,9 @@ const translations = {
     'auth.register.continue': 'Continue to Password',
     'auth.register.back': 'Back',
     'auth.register.createAccount': 'Create Account',
+    'auth.register.completeStep1': 'Please complete step 1 first',
+    'auth.register.complete.title': 'Registration Complete',
+    'auth.register.complete.description': 'Welcome! Your account is ready.',
 
     'auth.verify.title': 'Verify Email',
     'auth.verify.description': 'We sent a verification code to',
@@ -398,6 +402,7 @@ const translations = {
     'nav.history': 'Historial',
     'nav.profile': 'Perfil',
     'nav.back': 'Volver al Inicio',
+    'navigation.backToHome': 'Volver al Inicio',
     
     // Common
     'common.back': 'Atrás',
@@ -529,6 +534,9 @@ const translations = {
     'auth.register.continue': 'Continuar a Contraseña',
     'auth.register.back': 'Atrás',
     'auth.register.createAccount': 'Crear Cuenta',
+    'auth.register.completeStep1': 'Por favor completa el paso 1 primero',
+    'auth.register.complete.title': 'Registro Completo',
+    'auth.register.complete.description': '¡Bienvenido! Tu cuenta está lista.',
 
     'auth.verify.title': 'Verificar Email',
     'auth.verify.description': 'Enviamos un código de verificación a',
