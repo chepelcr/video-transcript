@@ -39,10 +39,11 @@ export class UserController implements IUserController {
      *     summary: Complete Email Verification
      *     description: |
      *       Called after successful email verification to send welcome materials.
-     *       This endpoint automatically syncs user data from AWS Cognito if the user 
+     *       This endpoint automatically creates user records from JWT token data if the user 
      *       doesn't exist in the database yet, then sends welcome email and notifications.
      *       
      *       **Security**: Authentication handled by AWS API Gateway with Cognito authorizer.
+     *       User data is extracted from decoded JWT claims passed as headers by API Gateway.
      *     tags: [Users]
      *     parameters:
      *       - in: path
@@ -299,26 +300,36 @@ export class UserController implements IUserController {
       let user = await this.userRepository.findById(userId);
       
       if (!user) {
-        console.log('User not found in database, syncing from Cognito...');
+        console.log('User not found in database, creating from JWT token data...');
         
-        // Get user data from Cognito and create in database
-        const cognitoUserData = await this.cognitoService.getUser(userId);
+        // Extract user data from JWT token via API Gateway headers
+        // In production, AWS API Gateway will pass decoded JWT claims as headers
+        const email = req.headers['x-user-email'] as string || 
+                     req.headers['cognito-email'] as string || 
+                     `user-${userId}@example.com`; // Fallback for development
         
-        if (!cognitoUserData) {
-          res.status(404).json({ error: 'User not found in Cognito' });
-          return;
-        }
+        const firstName = req.headers['x-user-given-name'] as string || 
+                         req.headers['cognito-given-name'] as string || 
+                         undefined;
         
-        // Create user in our database using Cognito data
+        const lastName = req.headers['x-user-family-name'] as string || 
+                        req.headers['cognito-family-name'] as string || 
+                        undefined;
+        
+        const username = email.split('@')[0]; // Generate username from email
+        
+        console.log(`Creating user from JWT data: ${email} (${username})`);
+        
+        // Create user in our database using JWT token data
         user = await this.userRepository.createWithCognitoId({
           id: userId,
-          email: cognitoUserData.email,
-          username: cognitoUserData.username,
-          firstName: cognitoUserData.firstName || undefined,
-          lastName: cognitoUserData.lastName || undefined
+          email: email,
+          username: username,
+          firstName: firstName,
+          lastName: lastName
         });
         
-        console.log(`✅ User created from Cognito: ${user.username} (${user.email})`);
+        console.log(`✅ User created from JWT token: ${user.username} (${user.email})`);
       } else {
         console.log(`✅ Found user: ${user.username} (${user.email})`);
       }
