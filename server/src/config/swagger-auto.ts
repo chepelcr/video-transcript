@@ -84,10 +84,7 @@ const swaggerOptions = {
       }
     },
     tags: [
-      {
-        name: 'Authentication',
-        description: 'User authentication and authorization endpoints'
-      },
+
       {
         name: 'Users',
         description: 'User profile and account management'

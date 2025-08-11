@@ -126,10 +126,6 @@ export class UserController implements IUserController {
      *     responses:
      *       200:
      *         description: Welcome materials sent successfully
-     *       400:
-     *         description: User ID is required
-     *       404:
-     *         description: User not found
      *         content:
      *           application/json:
      *             schema:
@@ -138,20 +134,27 @@ export class UserController implements IUserController {
      *                 message:
      *                   type: string
      *                   description: Success message
-     *                 user:
-     *                   $ref: '#/components/schemas/User'
+     *                   example: "Welcome materials sent successfully"
      *       400:
-     *         description: Invalid request
+     *         description: User ID is required
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/ErrorResponse'
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     *                   example: "User ID is required"
      *       404:
      *         description: User not found
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/ErrorResponse'
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     *                   example: "User not found"
      */
     this.router.post('/:userId/verify-email-complete', apiGatewayMiddleware, this.verifyEmailComplete.bind(this));
 
