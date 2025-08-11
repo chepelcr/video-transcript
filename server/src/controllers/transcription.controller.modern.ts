@@ -13,7 +13,6 @@ export interface ITranscriptionController {
   getUserTranscriptions(req: Request, res: Response): Promise<void>;
   updateTranscription(req: Request, res: Response): Promise<void>;
   getPublicTranscription(req: Request, res: Response): Promise<void>;
-  handleWebhook(req: Request, res: Response): Promise<void>;
   getRouter(): Router;
 }
 
@@ -295,91 +294,6 @@ export class TranscriptionController implements ITranscriptionController {
       apiGatewayMiddleware,
       this.getPublicTranscription.bind(this)
     );
-
-    /**
-     * @swagger
-     * /transcriptions/webhook/{id}:
-     *   post:
-     *     summary: Transcription Webhook
-     *     description: Webhook endpoint for transcription processing updates
-     *     tags: [Transcriptions]
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         required: true
-     *         description: Transcription UUID
-     *         schema:
-     *           type: string
-     *           format: uuid
-     *       - in: header
-     *         name: X-Webhook-Signature
-     *         required: false
-     *         description: Webhook signature for verification
-     *         schema:
-     *           type: string
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             required:
-     *               - status
-     *             properties:
-     *               status:
-     *                 type: string
-     *                 enum: [pending, processing, completed, failed]
-     *                 description: Updated transcription status
-     *               transcript:
-     *                 type: string
-     *                 description: Transcription text (if completed)
-     *               duration:
-     *                 type: number
-     *                 description: Video duration in seconds
-     *               wordCount:
-     *                 type: number
-     *                 description: Number of words in transcript
-     *               accuracy:
-     *                 type: number
-     *                 minimum: 0
-     *                 maximum: 100
-     *                 description: Transcription accuracy percentage
-     *               processingTime:
-     *                 type: number
-     *                 description: Processing time in seconds
-     *               error:
-     *                 type: string
-     *                 description: Error message (if status is failed)
-     *     responses:
-     *       200:
-     *         description: Webhook processed successfully
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 success:
-     *                   type: boolean
-     *                 message:
-     *                   type: string
-     *       400:
-     *         description: Invalid webhook payload
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ErrorResponse'
-     *       404:
-     *         description: Transcription not found
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ErrorResponse'
-     */
-    this.router.post(
-      '/transcriptions/webhook/:id',
-      apiGatewayMiddleware,
-      this.handleWebhook.bind(this)
-    );
   }
 
   async createTranscription(req: Request, res: Response): Promise<void> {
@@ -559,39 +473,6 @@ export class TranscriptionController implements ITranscriptionController {
     } catch (error: any) {
       console.error('Error getting public transcription:', error);
       res.status(500).json({ error: error.message || 'Failed to get transcription' });
-    }
-  }
-
-  async handleWebhook(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-
-      console.log(`📬 Processing webhook for transcription: ${id?.substring(0, 8)}...`);
-      
-      // Validate input
-      const validatedInput = updateTranscriptionSchema.parse(req.body);
-
-      const result = await this.transcriptionService.processWebhookResult(id!, validatedInput);
-      
-      if (!result) {
-        res.status(404).json({ error: 'Transcription not found' });
-        return;
-      }
-
-      console.log(`✅ Webhook processed for transcription: ${id?.substring(0, 8)}...`);
-      
-      res.json({
-        success: true,
-        message: 'Webhook processed successfully'
-      });
-      
-    } catch (error: any) {
-      console.error('Error processing webhook:', error);
-      if (error.name === 'ZodError') {
-        res.status(400).json({ error: 'Invalid webhook payload', details: error.errors });
-        return;
-      }
-      res.status(500).json({ error: error.message || 'Failed to process webhook' });
     }
   }
 

@@ -18,7 +18,7 @@ export interface ITranscriptionService {
   }>;
   updateTranscription(id: string, input: UpdateTranscriptionInput): Promise<ITranscription | null>;
   submitForProcessing(transcriptionId: string): Promise<void>;
-  processWebhookResult(transcriptionId: string, result: any): Promise<ITranscription | null>;
+  processSQSResult(transcriptionId: string, result: any): Promise<ITranscription | null>;
   canUserCreateTranscription(userId: string): Promise<boolean>;
 }
 
@@ -116,7 +116,7 @@ export class TranscriptionService implements ITranscriptionService {
       await this.sqsService.sendTranscriptionRequest({
         transcriptionId: transcription.id,
         videoUrl: transcription.videoUrl,
-        webhookUrl: `${process.env.API_BASE_URL}/api/transcriptions/webhook/${transcription.id}`
+        // Removed webhook URL - processing results will come via SQS messages
       });
       
       console.log(`✅ Transcription submitted to SQS: ${transcriptionId.substring(0, 8)}...`);
@@ -132,12 +132,12 @@ export class TranscriptionService implements ITranscriptionService {
     }
   }
 
-  async processWebhookResult(transcriptionId: string, result: any): Promise<ITranscription | null> {
-    console.log(`📞 Processing webhook result for: ${transcriptionId.substring(0, 8)}...`);
+  async processSQSResult(transcriptionId: string, result: any): Promise<ITranscription | null> {
+    console.log(`📬 Processing SQS result for: ${transcriptionId.substring(0, 8)}...`);
     
     const transcription = await this.transcriptionRepository.findById(transcriptionId);
     if (!transcription) {
-      console.log(`❌ Transcription not found for webhook: ${transcriptionId}`);
+      console.log(`❌ Transcription not found for SQS result: ${transcriptionId}`);
       return null;
     }
 
@@ -152,7 +152,7 @@ export class TranscriptionService implements ITranscriptionService {
         status: TranscriptionStatus.COMPLETED
       });
       
-      console.log(`✅ Transcription completed successfully: ${transcriptionId.substring(0, 8)}...`);
+      console.log(`✅ Transcription completed successfully via SQS: ${transcriptionId.substring(0, 8)}...`);
       return updated;
     } else {
       // Update as failed
@@ -160,7 +160,7 @@ export class TranscriptionService implements ITranscriptionService {
         status: TranscriptionStatus.FAILED
       });
       
-      console.log(`❌ Transcription failed: ${transcriptionId.substring(0, 8)}... - ${result.error}`);
+      console.log(`❌ Transcription failed via SQS: ${transcriptionId.substring(0, 8)}... - ${result.error}`);
       return updated;
     }
   }

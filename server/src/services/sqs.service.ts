@@ -4,7 +4,7 @@ import { APP_CONFIG } from '../config/app';
 export interface TranscriptionRequest {
   transcriptionId: string;
   videoUrl: string;
-  webhookUrl: string;
+  // Removed webhookUrl - processing results will come via SQS messages
 }
 
 export interface ISQSService {
@@ -35,7 +35,6 @@ export class SQSService implements ISQSService {
     const message = {
       transcriptionId: request.transcriptionId,
       videoUrl: request.videoUrl,
-      webhookUrl: request.webhookUrl,
       timestamp: new Date().toISOString()
     };
 

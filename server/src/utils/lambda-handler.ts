@@ -119,6 +119,10 @@ async function processSQSRecord(record: SQSRecord): Promise<void> {
         await handleTranscriptionCompleted(data);
         break;
         
+      case 'transcription_result':
+        await handleTranscriptionResult(data);
+        break;
+        
       case 'notification_send':
         await handleNotificationSend(data);
         break;
@@ -205,6 +209,25 @@ async function handleNotificationSend(data: any): Promise<void> {
   } catch (error) {
     console.error('❌ Error sending notification:', data.type, error);
     // Don't re-throw for email failures to avoid infinite retries
+  }
+}
+
+// Handle transcription processing results
+async function handleTranscriptionResult(data: any): Promise<void> {
+  console.log('🎬 Processing transcription result:', data.transcriptionId);
+  
+  try {
+    // Import transcription service from dependency injection
+    const { transcriptionService } = await import('../dependency-injection');
+    
+    // Process the SQS result using the new method
+    await transcriptionService.processSQSResult(data.transcriptionId, data.result);
+    
+    console.log('✅ Transcription result processed:', data.transcriptionId);
+    
+  } catch (error) {
+    console.error('❌ Error processing transcription result:', data.transcriptionId, error);
+    throw error;
   }
 }
 

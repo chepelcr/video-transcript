@@ -32,7 +32,7 @@ Lambda Deployment: ✅ ENHANCED - August 11, 2025 - Completed comprehensive AWS 
 - **Payment Processing**: Integration with dedicated PaymentController for Stripe subscriptions and PayPal one-time payments.
 - **Session Management**: Express sessions with PostgreSQL session store.
 - **Transcription Logic**: All transcription logic resides in backend services.
-- **Asynchronous Processing**: AWS SQS-based queuing system with secure webhook processing.
+- **Asynchronous Processing**: AWS SQS-based queuing system with complete SQS message processing (no webhooks).
 - **Video Title Extraction**: Intelligent title extraction service for YouTube, Vimeo, and generic URLs.
 - **Security Enhancement**: All password management removed from backend - fully delegated to AWS Cognito for enhanced security.
 - **Dockerization**: Multi-stage Docker setup supporting development, production, and AWS Lambda deployments with optimized container configurations.
