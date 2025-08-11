@@ -9,7 +9,7 @@ import { EmailService } from './services/email.service';
 import { SQSService } from './services/sqs.service';
 import { VideoTitleService } from './services/video-title.service';
 import { NotificationService } from './services/notification.service';
-import { AuthMiddleware } from './middlewares/auth.middleware';
+// Removed AuthMiddleware import - authentication now handled by AWS API Gateway
 // Modern controllers with embedded routing (AWS API Gateway compatible)
 import { TranscriptionController as ModernTranscriptionController } from './controllers/transcription.controller.modern';
 
@@ -35,8 +35,7 @@ export const transcriptionService = new TranscriptionService(
   videoTitleService
 );
 
-// Create middlewares
-export const authMiddleware = new AuthMiddleware(authService);
+// Middlewares removed - authentication now handled by AWS API Gateway
 
 // Modern controllers with embedded routes (AWS API Gateway compatible)
 export const modernTranscriptionController = new ModernTranscriptionController(transcriptionService);
