@@ -151,24 +151,61 @@ export function useAuth() {
   // Login mutation using Amplify Auth
   const loginMutation = useMutation({
     mutationFn: async (data: LoginRequest) => {
-      // Login with Amplify Auth
-      const amplifyResult = await signIn({
-        username: data.email,
-        password: data.password,
-      });
-      
-      console.log('Amplify login successful:', amplifyResult);
+      try {
+        // First, ensure any existing session is cleared
+        try {
+          await signOut();
+          console.log('Cleared existing session before login');
+        } catch (signOutError) {
+          console.log('No existing session to clear');
+        }
 
-      // Get current user to use their ID for profile endpoint
-      const amplifyUser = await getCurrentUser();
-      const response = await authenticatedRequest('GET', `/users/${amplifyUser.userId}/profile`);
-      const userData = await response.json() as UserResponse;
-      
-      return { 
-        user: userData, 
-        amplifyResult,
-        needsVerification: amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'
-      };
+        // Login with Amplify Auth
+        const amplifyResult = await signIn({
+          username: data.email,
+          password: data.password,
+        });
+        
+        console.log('Amplify login successful:', amplifyResult);
+
+        // Get current user to use their ID for profile endpoint
+        const amplifyUser = await getCurrentUser();
+        const response = await authenticatedRequest('GET', `/users/${amplifyUser.userId}/profile`);
+        const userData = await response.json() as UserResponse;
+        
+        return { 
+          user: userData, 
+          amplifyResult,
+          needsVerification: amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'
+        };
+      } catch (error: any) {
+        console.error('Login error:', error);
+        
+        // Handle specific Cognito errors
+        if (error.name === 'UserAlreadyAuthenticatedException' || 
+            error.message?.includes('already a signed in user')) {
+          // Force sign out and retry
+          await signOut();
+          console.log('Cleared conflicting session, retrying login...');
+          
+          const amplifyResult = await signIn({
+            username: data.email,
+            password: data.password,
+          });
+          
+          const amplifyUser = await getCurrentUser();
+          const response = await authenticatedRequest('GET', `/users/${amplifyUser.userId}/profile`);
+          const userData = await response.json() as UserResponse;
+          
+          return { 
+            user: userData, 
+            amplifyResult,
+            needsVerification: amplifyResult.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'
+          };
+        }
+        
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/users/profile'] });
