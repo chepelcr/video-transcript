@@ -14,6 +14,7 @@ export interface CognitoUser {
   firstName?: string;
   lastName?: string;
   sub: string;
+  emailVerified?: boolean;
 }
 
 export class CognitoService {
@@ -150,6 +151,7 @@ export class CognitoService {
       const firstName = getAttribute('given_name');
       const lastName = getAttribute('family_name');
       const sub = getAttribute('sub') || userId;
+      const emailVerified = getAttribute('email_verified') === 'true';
 
       const userData = {
         username: email.split('@')[0], // Generate username from email
@@ -157,6 +159,7 @@ export class CognitoService {
         firstName,
         lastName,
         sub,
+        emailVerified,
       };
 
       console.log(`✅ Retrieved Cognito user: ${userData.username} (${email})`);
