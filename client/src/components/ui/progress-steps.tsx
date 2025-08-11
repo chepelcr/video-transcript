@@ -20,7 +20,7 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
   
   return (
     <div className={cn("w-full", className)}>
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between mb-8 px-4">
         {steps.map((step, index) => {
           const isCompleted = completedSteps.includes(step.id);
           const isCurrent = step.id === currentStep;
@@ -28,7 +28,7 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
           
           return (
             <React.Fragment key={step.id}>
-              <div className="flex flex-col items-center flex-1">
+              <div className="flex flex-col items-center flex-1 min-w-0 px-2">
                 {/* Step Circle */}
                 <div className={cn(
                   "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 relative z-10",
@@ -44,25 +44,29 @@ export function ProgressSteps({ steps, currentStep, completedSteps, className }:
                 </div>
                 
                 {/* Step Label */}
-                <div className="mt-3 text-center w-full min-h-[3rem] flex flex-col justify-start">
-                  <p className={cn(
-                    "text-sm font-medium transition-colors leading-tight text-center",
-                    isCompleted && "text-primary",
-                    isCurrent && "text-primary",
-                    isUpcoming && "text-muted-foreground"
-                  )}>
-                    {step.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1 leading-tight text-center h-4 flex items-center justify-center">
-                    {step.description || ''}
-                  </p>
+                <div className="mt-4 text-center w-full">
+                  <div className="h-10 flex flex-col justify-center">
+                    <p className={cn(
+                      "text-sm font-medium transition-colors leading-tight text-center mb-1",
+                      isCompleted && "text-primary",
+                      isCurrent && "text-primary",
+                      isUpcoming && "text-muted-foreground"
+                    )}>
+                      {step.title}
+                    </p>
+                  </div>
+                  <div className="h-8 flex items-center justify-center">
+                    <p className="text-xs text-muted-foreground leading-tight text-center">
+                      {step.description || ''}
+                    </p>
+                  </div>
                 </div>
               </div>
               
               {/* Connector Line */}
               {index < steps.length - 1 && (
                 <div className={cn(
-                  "h-0.5 flex-1 mt-5 transition-colors duration-300",
+                  "h-0.5 flex-1 mt-5 mx-1 transition-colors duration-300",
                   index < currentIndex ? "bg-primary" : "bg-muted-foreground/30"
                 )} />
               )}
