@@ -44,7 +44,7 @@ const swaggerOptions = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'AWS API Gateway authorization with JWT token validation. The userId in the path must match the authenticated user.'
+          description: 'AWS API Gateway authorization with Cognito authorizer. Authentication is handled at the gateway level, not by the application server. All endpoints are public from the application perspective.'
         }
       },
       schemas: {

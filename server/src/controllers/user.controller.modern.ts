@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { IUserRepository } from '../repositories/user.repository';
 import { UpdateUserInput, RegisterInput } from '../models/user.model';
-import { apiGatewayMiddleware } from '../middlewares/api-gateway.middleware';
+// Removed apiGatewayMiddleware import - authentication now handled by AWS API Gateway
 import { CognitoService, createCognitoService } from '../services/cognito.service';
 import { EmailService } from '../services/email.service';
 import { NotificationService } from '../services/notification.service';
@@ -98,7 +98,7 @@ export class UserController implements IUserController {
      *             schema:
      *               $ref: '#/components/schemas/ErrorResponse'
      */
-    this.router.post('/', apiGatewayMiddleware, this.register.bind(this));
+    this.router.post('/', this.register.bind(this));
 
     /**
      * @swagger
@@ -164,7 +164,7 @@ export class UserController implements IUserController {
      *             schema:
      *               $ref: '#/components/schemas/ErrorResponse'
      */
-    this.router.post('/:userId/verify-email-complete', apiGatewayMiddleware, this.verifyEmailComplete.bind(this));
+    this.router.post('/:userId/verify-email-complete', this.verifyEmailComplete.bind(this));
 
     /**
      * @swagger
@@ -206,7 +206,7 @@ export class UserController implements IUserController {
      *             schema:
      *               $ref: '#/components/schemas/ErrorResponse'
      */
-    this.router.get('/:userId/profile', apiGatewayMiddleware, this.getProfile.bind(this));
+    this.router.get('/:userId/profile', this.getProfile.bind(this));
 
     /**
      * @swagger
@@ -279,7 +279,7 @@ export class UserController implements IUserController {
      *             schema:
      *               $ref: '#/components/schemas/ErrorResponse'
      */
-    this.router.put('/:userId/profile', apiGatewayMiddleware, this.updateProfile.bind(this));
+    this.router.put('/:userId/profile', this.updateProfile.bind(this));
 
 
   }

@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express';
-import { apiGatewayMiddleware } from '../middlewares/api-gateway.middleware';
+// Removed apiGatewayMiddleware import - authentication now handled by AWS API Gateway
 
 export interface IHealthController {
   health(req: Request, res: Response): Promise<void>;

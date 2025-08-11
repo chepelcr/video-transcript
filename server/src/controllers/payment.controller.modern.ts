@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { IUserRepository } from '../repositories/user.repository';
 import Stripe from 'stripe';
-import { apiGatewayMiddleware } from '../middlewares/api-gateway.middleware';
+// Removed apiGatewayMiddleware import - authentication now handled by AWS API Gateway
 
 // PayPal imports
 import {
@@ -95,7 +95,7 @@ export class PaymentController implements IPaymentController {
      *                   type: string
      *                   description: Stripe client secret for payment completion
      */
-    this.router.post('/create-payment-intent', apiGatewayMiddleware, this.createPaymentIntent.bind(this));
+    this.router.post('/create-payment-intent', this.createPaymentIntent.bind(this));
 
     /**
      * @swagger
@@ -117,7 +117,7 @@ export class PaymentController implements IPaymentController {
      *                 clientSecret:
      *                   type: string
      */
-    this.router.post('/get-or-create-subscription', apiGatewayMiddleware, this.getOrCreateSubscription.bind(this));
+    this.router.post('/get-or-create-subscription', this.getOrCreateSubscription.bind(this));
 
     /**
      * @swagger
@@ -137,7 +137,7 @@ export class PaymentController implements IPaymentController {
      *                 clientToken:
      *                   type: string
      */
-    this.router.get('/paypal/setup', apiGatewayMiddleware, this.setupPaypal.bind(this));
+    this.router.get('/paypal/setup', this.setupPaypal.bind(this));
 
     /**
      * @swagger
@@ -170,7 +170,7 @@ export class PaymentController implements IPaymentController {
      *       200:
      *         description: PayPal order created
      */
-    this.router.post('/paypal/order', apiGatewayMiddleware, this.createPaypalOrder.bind(this));
+    this.router.post('/paypal/order', this.createPaypalOrder.bind(this));
 
     /**
      * @swagger
@@ -189,7 +189,7 @@ export class PaymentController implements IPaymentController {
      *       200:
      *         description: PayPal order captured
      */
-    this.router.post('/paypal/order/:orderID/capture', apiGatewayMiddleware, this.capturePaypalOrder.bind(this));
+    this.router.post('/paypal/order/:orderID/capture', this.capturePaypalOrder.bind(this));
   }
 
   async createPaymentIntent(req: Request, res: Response): Promise<void> {

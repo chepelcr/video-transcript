@@ -5,7 +5,7 @@ import {
   updateTranscriptionSchema,
   TranscriptionStatus 
 } from '../models/transcription.model';
-import { apiGatewayMiddleware } from '../middlewares/api-gateway.middleware';
+// Removed apiGatewayMiddleware import - authentication now handled by AWS API Gateway
 
 export interface ITranscriptionController {
   createTranscription(req: Request, res: Response): Promise<void>;
@@ -81,7 +81,6 @@ export class TranscriptionController implements ITranscriptionController {
      */
     this.router.post(
       '/users/:userId/transcriptions',
-      apiGatewayMiddleware,
       this.createTranscription.bind(this)
     );
 
@@ -143,7 +142,6 @@ export class TranscriptionController implements ITranscriptionController {
      */
     this.router.get(
       '/users/:userId/transcriptions',
-      apiGatewayMiddleware,
       this.getUserTranscriptions.bind(this)
     );
 
@@ -187,7 +185,6 @@ export class TranscriptionController implements ITranscriptionController {
      */
     this.router.get(
       '/users/:userId/transcriptions/:id',
-      apiGatewayMiddleware,
       this.getTranscriptionById.bind(this)
     );
 
@@ -256,7 +253,6 @@ export class TranscriptionController implements ITranscriptionController {
      */
     this.router.patch(
       '/users/:userId/transcriptions/:id',
-      apiGatewayMiddleware,
       this.updateTranscription.bind(this)
     );
 
@@ -291,7 +287,6 @@ export class TranscriptionController implements ITranscriptionController {
      */
     this.router.get(
       '/transcriptions/:id/public',
-      apiGatewayMiddleware,
       this.getPublicTranscription.bind(this)
     );
   }
